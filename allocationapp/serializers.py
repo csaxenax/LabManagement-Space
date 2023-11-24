@@ -72,3 +72,24 @@ class BoardAllocationDataModelSerializer(serializers.ModelSerializer):
             "id","Program","Sku","Team","Vendor","TotalBoard","createdBy","createdDate","modifiedBy","modifiedDate","deletedBy","deletedDate",
             "isdeleted","January","February","March","April","May","June","July","August","September","October","November","December",
             ]
+class BoardAllocationDataModelSerializers(serializers.ModelSerializer):
+    # Use the custom serializer for the fields that store JSON data
+    January = CustomJSONField()
+    February = CustomJSONField()
+    March = CustomJSONField()
+    April = CustomJSONField()
+    May = CustomJSONField()
+    June = CustomJSONField()
+    July = CustomJSONField()
+    August = CustomJSONField()
+    September = CustomJSONField()
+    October = CustomJSONField()
+    November = CustomJSONField()
+    December = CustomJSONField()
+    # Add the rest of your fields here
+
+    class Meta:
+        model = BoardAllocationDataModel
+        fields = [
+            "January","February","March","April","May","June","July","August","September","October","November","December",
+            ]

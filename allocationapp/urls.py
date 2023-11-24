@@ -51,5 +51,9 @@ urlpatterns = [
     path('EditApprovalRequests/',views.EditAPIView.as_view(),name='editapprovalrequests'),
     path('board-api/', views.BoardAPI.as_view(), name='board-api'),
     path('board-api/<int:id>/',views.BoardAPI.as_view(),name='board-api-id'),
-    path('workWeek/', views.WorkWeekWiseData.as_view(),name='created')
+    path('workWeek/', views.WorkWeekWiseData.as_view(),name='created'),
+    path('allocated/', views.ForecastSummary.as_view(),name='created'),
+    path('forecastRvp/', views.ForecastSummaryRVP.as_view(),name='created'),
+    path('forecastTableSummary/', views.ForecastSummaryTable.as_view(),name='created'),
+    path('quaterlyData/', views.ForecastQuaterWiseSummary.as_view(),name='created'),
 ]
