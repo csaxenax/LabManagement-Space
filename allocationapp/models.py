@@ -229,6 +229,7 @@ class BoardAllocationDataModel(models.Model):
     deletedBy = models.CharField(max_length=255,blank=True)
     deletedDate = models.DateTimeField(auto_now_add=True,null=True)
     isdeleted = models.BooleanField(default=False)
+    year = models.PositiveIntegerField()
     January = models.JSONField()
     February = models.JSONField()
     March = models.JSONField()

@@ -56,4 +56,8 @@ urlpatterns = [
     path('forecastRvp/', views.ForecastSummaryRVP.as_view(),name='created'),
     path('forecastTableSummary/', views.ForecastSummaryTable.as_view(),name='created'),
     path('quaterlyData/', views.ForecastQuaterWiseSummary.as_view(),name='created'),
+    path('year-list/', views.YearListAPI.as_view(), name='year-list-api'),
+    path('yearWiseData/', views.YearWiseData.as_view(), name='year-list-api'),
+    path('excelUpload/', views.excelUpload.as_view(), name='excel'),
+    path('freeBenchReport/',views.FreeBenchReport.as_view(),name='free-bench'),
 ]

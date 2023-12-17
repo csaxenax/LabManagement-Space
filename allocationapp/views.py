@@ -1,17 +1,19 @@
 
 from django.shortcuts import render
 from django.http import JsonResponse
-from rest_framework.generics import ListAPIView, RetrieveAPIView
 from .models import BoardAllocationDataModel
+from rest_framework.parsers import FileUploadParser
 from .serializers import BoardAllocationDataModelSerializer
 from rest_framework.views  import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.db.models import Q,Count
+from django.db.models import Q,F
 from django.utils import timezone
 import traceback
-from datetime import datetime
-import json
+from itertools import chain
+from datetime import datetime,timedelta,date
+from dateutil.relativedelta import relativedelta
+import json,pdb,calendar
 import traceback
 import os
 import urllib3 
@@ -22,10 +24,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.decorators import parser_classes
 from rest_framework.parsers import JSONParser
 from django.core.exceptions import FieldError
-# from allocationapp.functions import calculate_workweek
 from django.db.models import Max
 import sys,ast
-
+# from allocationapp.functions import calculate_workweek
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logger = logging.getLogger(__name__)
 logger= logging.getLogger('django')
@@ -472,13 +473,11 @@ class BookBenchView(APIView):
                 logger_error.error(str(e))
                 return Response(e,status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             try:
-                allocation_query = AllocationDetailsModel.objects.get(Program=data['Program'],Sku=data['Sku'],Vendor=data['Vendor'],\
-                    AllocatedTo=data['AllocatedTo'],NotifyTo=data['NotifyTo'],FromWW=data['FromWW'],ToWW=data['ToWW'],NumberOfbenches=data['NumberOfBenches'],\
-                    Team=data['Team'],Remarks=data['Remarks'],Location=lab_data,\
-                    BenchData=data['BenchData'],\
-                    Duration=data['Duration'],status='requested')
-                if allocation_query:
-                    return Response("Allocation Exists",status=status.HTTP_200_OK)
+                allocation_query = AllocationDetailsModel.objects.get(Program=data['Program'], Sku=data['Sku'], Vendor=data['Vendor'], \
+                    AllocatedTo=data['AllocatedTo'], NotifyTo=data['NotifyTo'], FromWW=data['FromWW'], ToWW=data['ToWW'], \
+                    NumberOfbenches=data['NumberOfBenches'], Team=data['Team'], Remarks=data['Remarks'], Location=lab_data, \
+                    BenchData=data['BenchData'], Duration=data['Duration'], status='requested')
+                return Response("Allocation Exists", status=status.HTTP_200_OK)
             except AllocationDetailsModel.DoesNotExist:
                 allocation_detail = AllocationDetailsModel(id=id,Program=data['Program'],Sku=data['Sku'],Vendor=data['Vendor'],\
                     AllocatedTo=data['AllocatedTo'],NotifyTo=data['NotifyTo'],FromWW=data['FromWW'],ToWW=data['ToWW'],NumberOfbenches=data['NumberOfBenches'],
@@ -2409,67 +2408,54 @@ class BoardAPI(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
         except BoardAllocationDataModel.DoesNotExist:
             return Response('Record not found', status=status.HTTP_404_NOT_FOUND)
+        
+class excelUpload(APIView):
+    def post(self, request):
+        """API to add new board allocation data from Excel"""
+        try:
+            excel_data_array = request.data  # Assuming the Excel data is sent as an array of dictionaries
 
-class WorkWeekWiseData(APIView):
-    def get(self, request):
-        allocation_data = AllocationDetailsModel.objects.order_by('-created').prefetch_related('Location').values(
-            'id', 'Program', 'Sku', 'Vendor', 'FromWW', 'ToWW', 'Duration', 'AllocatedTo', 'NumberOfbenches', 'Remarks',
-            'Team', 'Location__Name', 'BenchData', 'approvedBy'
-        )
-        formatted_data = defaultdict(list)
-        id_count_per_week = defaultdict(int)
-        for entry in allocation_data:
-            week_key = f"WW{entry['FromWW']}"
-            allocated_to_data = entry.pop('AllocatedTo')
-            entry['AllocatedTo'] = allocated_to_data
-            formatted_data[week_key].append(entry)
-            # Reset the count to zero when NumberOfbenches is zero
-            if entry['NumberOfbenches'] > 0:
-                id_count_per_week[week_key] += 1
-            else:
-                id_count_per_week[week_key] = 0
-        current_year = datetime.now().year  # Change this to the desired year
-        all_work_weeks = [f"WW{str(i + 1).zfill(2)}{current_year}" for i in range(52)]
-
-        for week in all_work_weeks:
-            if week not in formatted_data:
-                formatted_data[week] = []
-        sorted_keys = sorted(formatted_data.keys())
-        sorted_formatted_data = {key: formatted_data[key] for key in sorted_keys}
-        # Include the count of ids for each week in percentage_data with explicit zeros
-        percentage_data = {}
-        accumulated_count = 0  # Initialize accumulated count
-        for week in all_work_weeks:
-            # Add the accumulated count from the previous week to the current count
-            accumulated_count += id_count_per_week[week]
-            # Display the current count
-            percentage_data[week] = f"{accumulated_count} occurrences" if accumulated_count > 0 else "0 occurrences"
-        # Calculate percentages based on specific categories
-        category_values = {'All': 981, 'Allocated': 560, 'non-siv': 421}
-        category_percentages = {}
-        for category, value in category_values.items():
-            # Filter out non-numeric occurrences before performing the calculation
-            numeric_occurrences = [float(occurrence.split()[0]) if 'occurrences' in occurrence and '0 occurrences' not in occurrence else 0 for occurrence in percentage_data.values()]
-            # Calculate percentages and display 0% for 0 values and where the value is the same as the previous week
-            category_percentages[category] = {}
-            for i, week in enumerate(all_work_weeks):
-                occurrence = numeric_occurrences[i]
-                # Display 0% for weeks where there is no non-zero value or the value is the same as the previous week
-                if (occurrence == numeric_occurrences[i - 1] and i > 0) or occurrence == 0:
-                    category_percentages[category][week] = "0%"
+            # Serialize and save each item in the array
+            response_data = []
+            for item_data in excel_data_array:
+                serializer = BoardAllocationDataModelSerializer(data=item_data)
+                if serializer.is_valid():
+                    serializer.save()
+                    response_data.append(serializer.data)
                 else:
-                    category_percentages[category][week] = f"{(occurrence / value) * 100:.2f}%"
-        # Format the response as specified
-        response_data = {}
-        for week in all_work_weeks:
-            response_data[week] = {
-                'total': category_percentages['All'][week],
-                'wse': category_percentages['Allocated'][week],
-                'non_wse': category_percentages['non-siv'][week]
-            }
-        # Create the response array with two objects
-        response_array = [sorted_formatted_data, response_data]
-        return Response(response_array, status=status.HTTP_200_OK)
+                    # If any item is not valid, return the errors
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            # Additional message when 201 is created
+            success_message = "Records created successfully"
+
+            return Response({'message': success_message, 'data': response_data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+        
+class YearListAPI(APIView):
+    def get(self, request):
+        # Get a list of unique years from the database
+        years = sorted(BoardAllocationDataModel.objects.values_list('year', flat=True).distinct())
+        # Create a dictionary to store data for each year
+        year_data = {}
+        # Iterate through each unique year and retrieve data
+        for year in years:
+            data = BoardAllocationDataModel.objects.filter(year=year)
+            serializer = BoardAllocationDataModelSerializer(data, many=True)
+            year_data[str(year)] = serializer.data
+        return Response(year_data, status=status.HTTP_200_OK)
+    
+class YearWiseData(APIView):  
+    def post(self, request):
+        # Get the year from the request data
+        year = request.data.get('year')
+        if not year:
+            return Response("Year not provided in the request data", status=status.HTTP_400_BAD_REQUEST)
+        # Retrieve data for the specified year
+        data = BoardAllocationDataModel.objects.filter(year=year)
+        serializer = BoardAllocationDataModelSerializer(data, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 class ForecastSummary(APIView):
     parser_classes = [JSONParser]
@@ -2485,15 +2471,20 @@ class ForecastSummary(APIView):
                             if each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['IsAllocated'] and \
                                     each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['team'] == "SIV":
                                 allocated_count += 1
+                            elif not each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['IsAllocated'] and \
+                                    each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['team'] == "SIV":
+                                # Include free seats in the count
+                                allocated_count += 1
         return allocated_count
 
     def process_record(self, records, allocated_count, year):
+        current_year = datetime.now().year
         monthly_data = [
             {
                 "category": month,
-                "intel": sum(int(record[month]['boardsIntelBench']) + int(record[month]['boardIntelRack']) for record in records),
-                "ODC": sum(int(record[month]['boardsODCBench']) + int(record[month]['boardsODCRack']) for record in records),
-                "WSE_BENCH_Allocation": allocated_count,
+                "intel": sum(int(record[month]['boardsIntelBench'] or 0) + int(record[month]['boardIntelRack'] or 0) for record in records),
+                "ODC": sum(int(record[month]['boardsODCBench'] or 0) + int(record[month]['boardsODCRack'] or 0) for record in records),
+                "WSE_BENCH_Allocation": allocated_count if int(year) == current_year else 0,
             }
             for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
         ]
@@ -2519,19 +2510,20 @@ class ForecastSummary(APIView):
 
             if id is not None:
                 try:
-                    board = BoardAllocationDataModel.objects.get(pk=id)
+                    board = BoardAllocationDataModel.objects.get(pk=id, year=year)
                     serializer = BoardAllocationDataModelSerializer(board)
                     response_data = serializer.data
                     return Response(self.process_record([response_data], allocated_count, year), status=status.HTTP_200_OK)
                 except BoardAllocationDataModel.DoesNotExist:
-                    return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
+                    return Response("Record not found for the specified year", status=status.HTTP_404_NOT_FOUND)
             else:
-                data = BoardAllocationDataModel.objects.all()
+                data = BoardAllocationDataModel.objects.filter(year=year)
                 serializer = BoardAllocationDataModelSerializer(data, many=True)
-
+                # Check if there is any data for the specified year
+                if not data.exists():
+                    return Response({year: []}, status=status.HTTP_200_OK)
                 # Combine records into a single dictionary
                 combined_record = self.process_record(serializer.data, allocated_count, year)
-
                 return Response(combined_record, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2543,10 +2535,12 @@ class ForecastSummaryRVP(APIView):
         monthly_totals = {month: {'Total': 0} for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]}
         for record in records:
             for month in monthly_totals:
-                monthly_totals[month]['Total'] += sum(int(record[month][key]) for key in ['boardsIntelBench', 'boardIntelRack', 'boardsODCBench', 'boardsODCRack'])
+                monthly_totals[month]['Total'] += sum(int(record[month][key] or 0) for key in ['boardsIntelBench', 'boardIntelRack', 'boardsODCBench', 'boardsODCRack'])
         for month, total_data in monthly_totals.items():
             result.append({
                 "category": month,
+                "intel": sum(int(record[month]['boardsIntelBench'] or 0) + int(record[month]['boardIntelRack'] or 0) for record in records),
+                "ODC": sum(int(record[month]['boardsODCBench'] or 0) + int(record[month]['boardsODCRack'] or 0) for record in records),
                 "Total": total_data['Total'],
             })
         return result
@@ -2557,20 +2551,24 @@ class ForecastSummaryRVP(APIView):
             year = data.get('year', '2023')
             board_id = data.get('id')
             if board_id is not None:
-                board = BoardAllocationDataModel.objects.get(pk=board_id)
-                serializer = BoardAllocationDataModelSerializer(board)
-                response_data = [serializer.data]
+                try:
+                    board = BoardAllocationDataModel.objects.get(pk=board_id)
+                    serializer = BoardAllocationDataModelSerializer(board)
+                    response_data = [serializer.data]
+                except BoardAllocationDataModel.DoesNotExist:
+                    return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
             else:
-                data = BoardAllocationDataModel.objects.all()
+                data = BoardAllocationDataModel.objects.filter(year=year)
+                # Check if there is any data for the specified year
+                if not data.exists():
+                    return Response({year: []}, status=status.HTTP_200_OK)
                 serializer = BoardAllocationDataModelSerializer(data, many=True)
                 response_data = serializer.data
             output_data = {year: self.process_record(response_data)}
             return Response(output_data, status=status.HTTP_201_CREATED)
-        except ObjectDoesNotExist:
-            return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            
+        
 class ForecastSummaryTable(APIView):
     parser_classes = [JSONParser]
     def process_record(self, records):
@@ -2578,21 +2576,22 @@ class ForecastSummaryTable(APIView):
         monthly_totals = {month: {'Bench_Demand_Intel': 0, 'Rack_Demand_Intel': 0, 'Bench_Demand_ODC': 0, 'Rack_Demand_ODC': 0, 'Total': 0} for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]}
         for record in records:
             for month in monthly_totals:
-                monthly_totals[month]['Bench_Demand_Intel'] += int(record[month]['boardsIntelBench'])
-                monthly_totals[month]['Rack_Demand_Intel'] += int(record[month]['boardIntelRack'])
-                monthly_totals[month]['Bench_Demand_ODC'] += int(record[month]['boardsODCBench'])
-                monthly_totals[month]['Rack_Demand_ODC'] += int(record[month]['boardsODCRack'])
-                monthly_totals[month]['Total'] += sum(int(record[month][key]) for key in ['boardsIntelBench', 'boardIntelRack', 'boardsODCBench', 'boardsODCRack'])
+                monthly_totals[month]['Bench_Demand_Intel'] += int(record[month]['boardsIntelBench'] or 0)
+                monthly_totals[month]['Rack_Demand_Intel'] += int(record[month]['boardIntelRack'] or 0)
+                monthly_totals[month]['Bench_Demand_ODC'] += int(record[month]['boardsODCBench'] or 0)
+                monthly_totals[month]['Rack_Demand_ODC'] += int(record[month]['boardsODCRack'] or 0)
+                monthly_totals[month]['Total'] += sum(int(record[month][key] or 0) for key in ['boardsIntelBench', 'boardIntelRack', 'boardsODCBench', 'boardsODCRack'])
         for month, total_data in monthly_totals.items():
+            total = total_data['Total']
             result.append({
                 "category": month,
                 "Bench_Demand_Intel": total_data['Bench_Demand_Intel'],
                 "Rack_Demand_Intel": total_data['Rack_Demand_Intel'],
                 "Bench_Demand_ODC": total_data['Bench_Demand_ODC'],
                 "Rack_Demand_ODC": total_data['Rack_Demand_ODC'],
-                "Total": total_data['Total'],
-                "Intel_percentage": f"{round((total_data['Bench_Demand_Intel'] + total_data['Rack_Demand_Intel']) / total_data['Total'] * 100)}%" if total_data['Total'] != 0 else "0%",
-                "ODC_percentage": f"{round((total_data['Bench_Demand_ODC'] + total_data['Rack_Demand_ODC']) / total_data['Total'] * 100)}%" if total_data['Total'] != 0 else "0%",
+                "Total": total,
+                "Intel_percentage": f"{round((total_data['Bench_Demand_Intel'] + total_data['Rack_Demand_Intel']) / total * 100, 2)}%" if total != 0 else "0%",
+                "ODC_percentage": f"{round((total_data['Bench_Demand_ODC'] + total_data['Rack_Demand_ODC']) / total * 100, 2)}%" if total != 0 else "0%",
             })
         return result
 
@@ -2601,16 +2600,20 @@ class ForecastSummaryTable(APIView):
             data = request.data
             year = data.get('year', '2023')
             board_id = data.get('id')
-
             if board_id is not None:
-                board = BoardAllocationDataModel.objects.get(pk=board_id)
-                serializer = BoardAllocationDataModelSerializer(board)
-                response_data = [serializer.data]
+                try:
+                    board = BoardAllocationDataModel.objects.get(pk=board_id)
+                    serializer = BoardAllocationDataModelSerializer(board)
+                    response_data = [serializer.data]
+                except BoardAllocationDataModel.DoesNotExist:
+                    return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
             else:
-                data = BoardAllocationDataModel.objects.all()
+                data = BoardAllocationDataModel.objects.filter(year=year)
+                # Check if there is any data for the specified year
+                if not data.exists():
+                    return Response({year: []}, status=status.HTTP_200_OK)
                 serializer = BoardAllocationDataModelSerializer(data, many=True)
                 response_data = serializer.data
-
             output_data = {year: self.process_record(response_data)}
             return Response(output_data, status=status.HTTP_201_CREATED)
         except ObjectDoesNotExist:
@@ -2628,69 +2631,221 @@ class ForecastQuaterWiseSummary(APIView):
             "Q4": {"intel": 0, "ODC": 0},
         }
         for record in records:
-            for month in ["January", "February", "March"]:
-                quarterly_data["Q1"]["intel"] += int(record[month]['boardsIntelBench']) + int(record[month]['boardIntelRack'])
-                quarterly_data["Q1"]["ODC"] += int(record[month]['boardsODCBench']) + int(record[month]['boardsODCRack'])
-
-            for month in ["April", "May", "June"]:
-                quarterly_data["Q2"]["intel"] += int(record[month]['boardsIntelBench']) + int(record[month]['boardIntelRack'])
-                quarterly_data["Q2"]["ODC"] += int(record[month]['boardsODCBench']) + int(record[month]['boardsODCRack'])
-
-            for month in ["July", "August", "September"]:
-                quarterly_data["Q3"]["intel"] += int(record[month]['boardsIntelBench']) + int(record[month]['boardIntelRack'])
-                quarterly_data["Q3"]["ODC"] += int(record[month]['boardsODCBench']) + int(record[month]['boardsODCRack'])
-
-            for month in ["October", "November", "December"]:
-                quarterly_data["Q4"]["intel"] += int(record[month]['boardsIntelBench']) + int(record[month]['boardIntelRack'])
-                quarterly_data["Q4"]["ODC"] += int(record[month]['boardsODCBench']) + int(record[month]['boardsODCRack'])
-
+            if record["year"] == year:
+                for quarter, months in [("Q1", ["January", "February", "March"]),
+                                        ("Q2", ["April", "May", "June"]),
+                                        ("Q3", ["July", "August", "September"]),
+                                        ("Q4", ["October", "November", "December"])]:
+                    for month in months:
+                        # Handle potential empty strings during conversion to integers
+                        quarterly_data[quarter]["intel"] += int(record[month]['boardsIntelBench'] or 0) + int(record[month]['boardIntelRack'] or 0)
+                        quarterly_data[quarter]["ODC"] += int(record[month]['boardsODCBench'] or 0) + int(record[month]['boardsODCRack'] or 0)
         result = {
             year: [
                 {
-                    "category": "Q1",
-                    "intel": quarterly_data["Q1"]["intel"],
-                    "ODC": quarterly_data["Q1"]["ODC"],
-                },
-                {
-                    "category": "Q2",
-                    "intel": quarterly_data["Q2"]["intel"],
-                    "ODC": quarterly_data["Q2"]["ODC"],
-                },
-                {
-                    "category": "Q3",
-                    "intel": quarterly_data["Q3"]["intel"],
-                    "ODC": quarterly_data["Q3"]["ODC"],
-                },
-                {
-                    "category": "Q4",
-                    "intel": quarterly_data["Q4"]["intel"],
-                    "ODC": quarterly_data["Q4"]["ODC"],
-                },
+                    "category": quarter,
+                    "intel": quarterly_data[quarter]["intel"],
+                    "ODC": quarterly_data[quarter]["ODC"],
+                    "intel_percentage": round((quarterly_data[quarter]["intel"] / (quarterly_data[quarter]["intel"] + quarterly_data[quarter]["ODC"])) * 100, 2),
+                    "ODC_percentage": round((quarterly_data[quarter]["ODC"] / (quarterly_data[quarter]["intel"] + quarterly_data[quarter]["ODC"])) * 100, 2),
+                }
+                for quarter in ["Q1", "Q2", "Q3", "Q4"]
             ]
         }
-        return result
 
+        if not result[year]:
+            return {}
+        return result
+    
     def post(self, request, *args, **kwargs):
         try:
             data = request.data
             year = data.get('year', '2023')
-            id = data.get('id')
+            board_id = data.get('id')
 
-            if id is not None:
+            if board_id is not None:
                 try:
-                    board = BoardAllocationDataModel.objects.get(pk=id)
+                    board = BoardAllocationDataModel.objects.get(pk=board_id)
                     serializer = BoardAllocationDataModelSerializer(board)
                     response_data = serializer.data
                     return Response(self.process_record([response_data], year), status=status.HTTP_200_OK)
                 except BoardAllocationDataModel.DoesNotExist:
                     return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
             else:
-                data = BoardAllocationDataModel.objects.all()
+                # Filter data based on the specified year
+                data = BoardAllocationDataModel.objects.filter(year=year)
+
+                # Check if there is any data for the specified year
+                if not data.exists():
+                    return Response({year: []}, status=status.HTTP_200_OK)
+
                 serializer = BoardAllocationDataModelSerializer(data, many=True)
 
                 # Combine records into a single dictionary
                 combined_record = self.process_record(serializer.data, year)
 
                 return Response(combined_record, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class WorkWeekWiseData(APIView):
+    def calculate_siv_non_siv_counts(self, lab_names_list):
+        siv_count = 0
+        non_siv_count = 0
+        all_count = 0
+        for each_location in lab_names_list:
+            lab_data = LabModel.objects.filter(Name__icontains=each_location)
+            for each_lab in lab_data:
+                if (each_lab.BenchDetails is not None) and ("TOE" not in each_lab.Name):
+                    for each_row_no in range(len(each_lab.BenchDetails)):
+                        for each_bench_no in range(len(each_lab.BenchDetails[each_row_no]['seats'])):
+                            if each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['team'] == "Non-SIV":
+                                non_siv_count += 1
+                                all_count += 1
+                            elif each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['IsAllocated'] and \
+                                    each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['team'] == "SIV":
+                                siv_count += 1
+                                all_count += 1
+                            elif not each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['IsAllocated'] and \
+                                    each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['team'] == "SIV":
+                                siv_count += 1  # Count free seats as well
+                                all_count += 1
+        return siv_count, non_siv_count, all_count
+    
+    def calculate_percentages(self, count_per_week_data, siv_count, non_siv_count, all_count):
+        percentage_data = {}
+        for entry in count_per_week_data:
+            week_key = entry['week']
+            count = entry['count']
+            siv_percentage = (count / siv_count) * 100 if siv_count > 0 else 0
+            non_siv_percentage = (count / non_siv_count) * 100 if non_siv_count > 0 else 0
+            all_percentage = (count / all_count) * 100 if all_count > 0 else 0
+            percentage_data[week_key] = {
+                'siv': f"{siv_percentage:.2f}%",
+                'non_siv': f"{non_siv_percentage:.2f}%",
+                'all': f"{all_percentage:.2f}%",
+            }
+        return percentage_data
+    
+    def post(self, request):
+        year = request.data.get('Year')
+        if year is None:
+            return Response({'error': 'Year is required in the payload.'}, status=status.HTTP_400_BAD_REQUEST)
+        lab_filter_query_list = [lab['Name'] for lab in LabModel.objects.filter().values('Name') if "TOE" not in lab['Name']]
+        lab_names_list = sorted(set(['-'.join(str(lab['Name']).split('-')[0:2]) for lab in LabModel.objects.filter(Name__in=lab_filter_query_list).values('Name')]))
+        allocation_data = AllocationDetailsModel.objects.order_by('-created').prefetch_related('Location').values(
+            'id', 'Program', 'Sku', 'Vendor', 'FromWW', 'ToWW', 'Duration', 'AllocatedTo', 'NumberOfbenches', 'Remarks',
+            'Team', 'Location__Name', 'BenchData', 'approvedBy'
+        )
+        siv_count, non_siv_count, all_count = self.calculate_siv_non_siv_counts(lab_names_list)
+        formatted_data = defaultdict(list)
+        id_count_per_week = defaultdict(int)
+
+        for entry in allocation_data:
+            week_key = f"WW{entry['FromWW']}"
+            allocated_to_data = entry.pop('AllocatedTo')
+            entry['AllocatedTo'] = allocated_to_data
+            formatted_data[week_key].append(entry)
+            id_count_per_week[week_key] += len(entry['BenchData'])
+
+        current_year = datetime.now().year
+        all_work_weeks = [f"WW{str(i + 1).zfill(2)}{current_year}" for i in range(52)]
+
+        for week in all_work_weeks:
+            if week not in formatted_data:
+                formatted_data[week] = []
+
+        sorted_keys = sorted(formatted_data.keys())
+        sorted_formatted_data = {key: formatted_data[key] for key in sorted_keys}
+
+        for i in range(1, len(sorted_keys)):
+            key = sorted_keys[i]
+            previous_key = sorted_keys[i - 1]
+            id_count_per_week[key] += id_count_per_week[previous_key]
+        # Add count of allocated benches for each week with the condition
+        count_per_week_data = [{'week': key, 'count': id_count_per_week[key] if id_count_per_week[key] > 0 else 0} for key in sorted_keys]
+        percentage_data = self.calculate_percentages(count_per_week_data, siv_count, non_siv_count, all_count)
+        response_data = [
+            sorted_formatted_data,percentage_data]
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+        
+class FreeBenchReport(APIView):
+    def get(self, request):
+        try:
+            payload_work_week = request.data.get("workweek", "")
+            payload_work_week_str = str(payload_work_week).ljust(6, '0') 
+            current_work_week = timezone.now().strftime("%U%Y")
+            print(f"Current work week: {current_work_week}")
+            print(f"Payload work week: {payload_work_week_str}")
+
+            category_list = ["All", "Non-SIV", "Allocated", "Free"]
+            lab_filter_query = LabModel.objects.filter().values('Name')
+            lab_filter_query_list = [each_query['Name'] for each_query in lab_filter_query if "TOE" not in each_query['Name']]
+            lab_data = LabModel.objects.filter(Name__in=lab_filter_query_list).values('Name')
+            lab_names_list = sorted(list(set(['-'.join(str(each_lab['Name']).split('-')[0:2]) for each_lab in lab_data])))
+            master_list = []
+            
+            # Extracting the code for the "Free" category
+            if "Free" in category_list:
+                free_report_dict = {}
+                for each_location in lab_names_list:
+                    lab_data = LabModel.objects.filter(Name__icontains=each_location)
+                    free_report_lab_dict = {}
+                    for each_lab in lab_data:
+                        if (each_lab.BenchDetails is not None) and ("TOE" not in each_lab.Name):
+                            if each_lab.Name not in free_report_lab_dict.keys():
+                                free_report_lab_dict[each_lab.Name] = []
+
+                            if payload_work_week_str == current_work_week:
+                                for each_row_no in range(len(each_lab.BenchDetails)):
+                                    for each_bench_no in range(len(each_lab.BenchDetails[each_row_no]['seats'])):
+                                        if each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['IsAllocated'] == False and \
+                                                each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['team'] == "SIV":
+                                            free_report_lab_dict[each_lab.Name].append(
+                                                each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['labelNo'])
+                            
+                            elif payload_work_week_str[2:] == current_work_week[2:]:
+                                # Fetch distinct work weeks greater than or equal to the current work week
+                                allocated_benches1 = AllocationDetailsModel.objects.filter(
+                                    status="allocated",
+                                    Location__Name=each_lab.Name,
+                                    ToWW__gt=current_work_week,
+                                ).values_list('BenchData', flat=True)
+                                free_report_lab_dict[each_lab.Name].extend(allocated_benches1)
+                            else:
+                                allocated_benches1 = AllocationDetailsModel.objects.filter(
+                                    status="allocated",
+                                    Location__Name=each_lab.Name,
+                                    ToWW__gte=current_work_week,
+                                ).values_list('BenchData', flat=True)
+                                allocated_benches2 = AllocationDetailsModel.objects.filter(
+                                    status="allocated",
+                                    Location__Name=each_lab.Name,
+                                    ToWW__lte=payload_work_week_str
+                                ).values_list('BenchData', flat=True)
+                                combined_report_allocation_data = list(chain(allocated_benches1, allocated_benches2))
+                                free_report_lab_dict[each_lab.Name].extend(combined_report_allocation_data)
+                                
+                            flattened_benches = list(chain.from_iterable(free_report_lab_dict[each_lab.Name]))
+                            free_report_lab_dict[each_lab.Name] = [flattened_benches]
+                            # Include free benches for the lab
+                            for each_row_no in range(len(each_lab.BenchDetails)):
+                                for each_bench_no in range(len(each_lab.BenchDetails[each_row_no]['seats'])):
+                                    if each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['IsAllocated'] == False and \
+                                            each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['team'] == "SIV":
+                                        free_report_lab_dict[each_lab.Name].append(
+                                            each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['labelNo'])
+
+                    if free_report_lab_dict:
+                        free_report_dict[each_location] = free_report_lab_dict
+
+                if free_report_dict:
+                    master_list.append({
+                        'category': 'Free',
+                        'Report': free_report_dict,
+                    })
+
+            return Response(master_list, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)

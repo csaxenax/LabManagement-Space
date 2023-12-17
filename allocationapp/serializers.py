@@ -70,7 +70,7 @@ class BoardAllocationDataModelSerializer(serializers.ModelSerializer):
         model = BoardAllocationDataModel
         fields = [
             "id","Program","Sku","Team","Vendor","TotalBoard","createdBy","createdDate","modifiedBy","modifiedDate","deletedBy","deletedDate",
-            "isdeleted","January","February","March","April","May","June","July","August","September","October","November","December",
+            "isdeleted","year","January","February","March","April","May","June","July","August","September","October","November","December",
             ]
 class BoardAllocationDataModelSerializers(serializers.ModelSerializer):
     # Use the custom serializer for the fields that store JSON data
