@@ -243,7 +243,37 @@ class BoardAllocationDataModel(models.Model):
     November = models.JSONField()
     December = models.JSONField()
 
-   
-
     def __str__(self):
         return str(self.Program)
+    
+
+class UtilizationModel(models.Model):
+    id = models.AutoField(primary_key=True)
+    WorkWeek = models.CharField(max_length=20,blank=True)
+    Lab = models.CharField(max_length=255,blank=True)
+    Lab_Details = models.CharField(max_length=50)
+    Bench = models.JSONField(blank=True,null=True)
+    Program = models.CharField(max_length=100,blank=True)
+    SKU = models.CharField(max_length=100,blank=True)
+    Function = models.CharField(max_length=255,blank=True)
+    Vendor = models.CharField(max_length=255,blank=True)
+    Planned_Utilization = models.FloatField(default=0)
+    Actual_Utilization = models.FloatField(default=0)
+    Actual_utilization_in_percentage = models.CharField(max_length=255,blank=True, null=True)
+    Utilization_Percentage = models.CharField(max_length=255,blank=True,null=True)
+    Allocated_POC = models.CharField(max_length=100)
+    Remarks = models.CharField(max_length=255,blank=True)
+    Createdby = models.CharField(max_length=255,blank=True)
+    CreatedDate = models.DateTimeField(auto_now_add=True,null=True)
+    Modifiedby = models.CharField(max_length=255,blank=True)
+    ModifiedDate = models.DateTimeField(auto_now_add=True,null=True)
+    Deletedby = models.CharField(max_length=255,blank=True)
+    DeletedDate = models.DateTimeField(auto_now_add=True,null=True)
+    isDeleted = models.BooleanField(default=False)
+    
+    def soft_delete(self):
+        self.isDeleted = True
+        self.save()
+
+    def __str__(self):
+        return f"{self.Lab} - {self.Program} - {self.Createdby}"
