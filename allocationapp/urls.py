@@ -65,4 +65,5 @@ urlpatterns = [
     path('utilizationApi/<int:id>/', views.UtilizationAPI.as_view(), name='utilization'),
     path('utilizationApi/restore/<int:id>/', views.UtilizationAPI.as_view(), name='utilization'),
     path('utilizationSumary/', views.UtilizationSummary.as_view(), name='utilization'),
+    path('yearly-utilization/', views.YearlyUtilizationAPI.as_view(), name='yearly-utilization'),
 ]

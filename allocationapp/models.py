@@ -86,7 +86,7 @@ class AllocationDetailsModel(models.Model):
     Duration = models.CharField(max_length=10,blank=True,null=True)
     NumberOfbenches = models.IntegerField()
     Remarks = models.TextField(blank=True)
-    Location = models.ForeignKey(LabModel,on_delete=models.SET_NULL,null=True)
+    Location = models.ForeignKey(LabModel,on_delete=models.SET_NULL,null=True,db_index=True)
     IsAllocated = models.BooleanField(default=False)
     IsRequested = models.BooleanField(default=False)
     BenchData = models.JSONField(blank=True,null=True)
