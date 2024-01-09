@@ -2,11 +2,11 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework.parsers import FileUploadParser
-from .serializers import BoardAllocationDataModelSerializer,UtilizationSerializer
+from .serializers import BoardAllocationDataModelSerializer,UtilizationSerializer,UtilizationSerializer2
 from rest_framework.views  import APIView
 from rest_framework.response import Response
 from rest_framework import status,generics
-from django.db.models import Q
+from django.db.models import Q,Sum,F
 from django.db import connection
 from django.utils import timezone
 import traceback
@@ -25,7 +25,8 @@ from rest_framework.decorators import parser_classes
 from rest_framework.parsers import JSONParser
 from django.core.exceptions import FieldError
 from django.db.models import Max
-import sys,ast,cProfile
+from copy import deepcopy
+import sys,ast,cProfile,pdb
 # from allocationapp.functions import calculate_workweek
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logger = logging.getLogger(__name__)
@@ -35,7 +36,7 @@ logger_error = logging.getLogger('error_logger')
 # Local imports
 from .models import AllocationDetailsModel,LabModel,ProgramsModel,\
                     VendorsModel,TeamsModel,SkuModel,UserModel, \
-                        UserRolesModel,UserRequestModel,SuggestionsModel,ApproverUserModel,UtilizationModel,BoardAllocationDataModel
+                        UserRolesModel,UserRequestModel,SuggestionsModel,ApproverUserModel,UtilizationModel,BoardAllocationDataModel,UtilizationSummaryModel
 from .mail import Email,UserModuleMail,SuggestionsMail
 from .ldapvalidate import validate_user_mail
 # Create your views here.
@@ -2786,135 +2787,47 @@ class GetLabList(APIView):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
-class UtilizationAPI(APIView):
-    def get(self, request, id=None):
-        if id is None:
-            # If no 'id' is provided, retrieve only undeleted items
-            data = UtilizationModel.objects.all()
-            serializer = UtilizationSerializer(data, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            # Retrieve a specific record by its ID (considering isDeleted)
-            try:
-                utilization_data = UtilizationModel.objects.get(pk=id)
-                # Check if the record is marked as deleted
-                if utilization_data.isDeleted:
-                    return Response("Record marked as deleted", status=status.HTTP_404_NOT_FOUND)
-                serializer = UtilizationSerializer(utilization_data)
-                response_data = serializer.data
-                return Response(response_data, status=status.HTTP_200_OK)
-            except UtilizationModel.DoesNotExist:
-                return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
-
-    def post(self, request, *args, **kwargs):
-        try:
-            serializer = UtilizationSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()  # Save the data to the database
-                return Response("Added Successfully", status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    def put(self, request, id):
-        try:
-            utilization_data = UtilizationModel.objects.get(pk=id)
-            serializer = UtilizationSerializer(utilization_data, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response("Updated Successfully", status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except UtilizationModel.DoesNotExist:
-            return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
-        
-    def delete(self, request, id):
-        try:
-            delete_data = UtilizationModel.objects.get(pk=id)
-        except UtilizationModel.DoesNotExist:
-            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        delete_data.DeletedDate = timezone.now()
-        delete_data.soft_delete()
-        return Response({"detail": "Soft delete successful."}, status=status.HTTP_204_NO_CONTENT)
-    def restore(self, request, id):
-        try:
-            # Retrieve the soft-deleted item
-            deleted_item = get_object_or_404(UtilizationModel, pk=id, isDeleted=True)
-
-            # Update isDeleted to False and save the instance
-            deleted_item.isDeleted = False
-            deleted_item.DeletedDate = timezone.now()
-            deleted_item.save()
-            serializer = UtilizationSerializer(deleted_item)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except UtilizationModel.DoesNotExist:
-            return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
-        
-
 class UtilizationSummary(APIView):
-    def process_record(self, records, year=None):
-        if not records:
-            return []  # Return an empty list if there are no records
-        result = {}
-        for entry in records:
-            lab_key = entry['Lab_Details']
-            planned_utilization = entry['Planned_Utilization'] or 0
-            actual_utilization = entry['Actual_Utilization'] or 0
-            result.setdefault(lab_key, {
-                "Planned Utilization": 0,
-                "Actual Utilization": 0,
-                "Utilization": "0.00%"
-            })
-            result[lab_key]["Planned Utilization"] += planned_utilization
-            result[lab_key]["Actual Utilization"] += actual_utilization
-        # Calculate utilization percentages using a dictionary comprehension
-        result = [
-            {
-                "Lab_Details": lab_key,
-                "Planned Utilization": values["Planned Utilization"],
-                "Actual Utilization": values["Actual Utilization"],
-                "Utilization": f"{values['Actual Utilization'] / values['Planned Utilization'] * 100:.2f}%" if values['Planned Utilization'] > 0 else "0.00%"
-            }
-            for lab_key, values in result.items()
-        ]
-        return result
     def post(self, request, *args, **kwargs):
-        try:
-            data = request.data
-            year = data.get('Year')
-            board_id = data.get('id')
-
-            if year is not None:
-                utilization_records = UtilizationModel.objects.filter(WorkWeek__endswith=f'{year}')
-            elif board_id is not None:
-                utilization = UtilizationModel.objects.get(pk=board_id)
-                serializer = UtilizationSerializer(utilization)
-                response_data = [serializer.data]
-            else:
-                utilization_records = UtilizationModel.objects.all()
-
-            serializer = UtilizationSerializer(utilization_records, many=True)
-            response_data = self.process_record(serializer.data, year)
-
-            return Response(response_data, status=status.HTTP_200_OK if response_data else status.HTTP_201_CREATED)
-        except UtilizationModel.DoesNotExist:
-            return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+        workweek = request.data.get('workweek')
+        queryset = UtilizationSummaryModel.objects.filter(workweek=workweek)
+        # Check if the queryset is empty, return an empty list
+        if not queryset.exists():
+            return Response([])
+        # Group by Location and calculate sum of Planned_Utilization and Actual_Utilization
+        location_data = queryset.values('Location').annotate(
+            planned_utilization=Sum('Planned_Utilization'),
+            actual_utilization=Sum('Actual_Utilization')
+        )
+        response_data = []
+        for location in location_data:
+            planned_utilization = location['planned_utilization'] or 0
+            actual_utilization = location['actual_utilization'] or 0
+            # Calculate Utilization Percentage
+            utilization_percentage = (
+                f"{actual_utilization / planned_utilization * 100:.2f}%" 
+                if planned_utilization > 0 
+                else "0.00%"
+            )
+            response_data.append({
+                'LocationName': location['Location'],
+                'Planned Utilization': planned_utilization,
+                'Actual Utilization': actual_utilization,
+                'Utilization': utilization_percentage,
+            })
+        return Response(response_data)
+    
 class YearlyUtilizationAPI(APIView):
-    def get(self, request, *args, **kwargs):
-        # Retrieve all data from the database
-        queryset = UtilizationModel.objects.all()
-        serializer = UtilizationSerializer(queryset, many=True)
-        data_by_year = {}
-        current_year = str(datetime.now().year)
-        for item in serializer.data:
-            year = item['WorkWeek'][-4:] 
-            data_by_year.setdefault(year, []).append(item)
-        if current_year not in data_by_year:
-            data_by_year[current_year] = []
-        return Response(data_by_year)
+    def post(self, request, *args, **kwargs):
+        payload = request.data.get("workweek")
+        if payload:
+            existing_data = UtilizationSummaryModel.objects.filter(workweek=payload).values()
+            if existing_data.exists():
+                return Response(existing_data, status=status.HTTP_200_OK)
+            else:
+                return Response([], status=status.HTTP_200_OK)
+        else:
+            return Response("Invalid or missing 'workweek' in the request data", status=status.HTTP_400_BAD_REQUEST)
     
 class WorkWeekWiseData(APIView):
     def calculate_siv_non_siv_counts(self, lab_names_list):
@@ -2924,31 +2837,30 @@ class WorkWeekWiseData(APIView):
         for each_location in lab_names_list:
             lab_data = LabModel.objects.filter(Name__icontains=each_location)
             for each_lab in lab_data:
-                if each_lab.BenchDetails is not None and "TOE" not in each_lab.Name:
+                if (each_lab.BenchDetails is not None) and ("TOE" not in each_lab.Name):
                     for each_row_no in range(len(each_lab.BenchDetails)):
                         for each_bench_no in range(len(each_lab.BenchDetails[each_row_no]['seats'])):
-                            seat_team = each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['team']
-                            is_allocated = each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['IsAllocated']
-
-                            if seat_team == "Non-SIV":
+                            if each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['team'] == "Non-SIV":
                                 non_siv_count += 1
-                            elif seat_team == "SIV" and (is_allocated or not is_allocated):
+                                all_count += 1
+                            elif each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['IsAllocated'] and \
+                                    each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['team'] == "SIV":
                                 siv_count += 1
-                            all_count += 1
-
+                                all_count += 1
+                            elif not each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['IsAllocated'] and \
+                                    each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['team'] == "SIV":
+                                siv_count += 1  # Count free seats as well
+                                all_count += 1
         return siv_count, non_siv_count, all_count
 
-    def calculate_percentages(self, count_per_week_data, siv_count, non_siv_count, all_count, formatted_data, siv_data, non_siv_data):
+    def calculate_percentages(self, count_per_week_data, siv_count, non_siv_count, all_count, formatted_data,siv_data,non_siv_data):
         percentage_data = defaultdict(dict)
-
         for entry in count_per_week_data:
             week_key = entry['week']
             count = entry['count']
-
             siv_percentage = (count / siv_count) * 100 if siv_count > 0 else 0
             non_siv_percentage = (count / non_siv_count) * 100 if non_siv_count > 0 else 0
             all_percentage = (count / all_count) * 100 if all_count > 0 else 0
-
             percentage_data[week_key] = {
                 'siv': f"{siv_percentage:.2f}%",
                 'non_siv': f"{non_siv_percentage:.2f}%",
@@ -2957,46 +2869,20 @@ class WorkWeekWiseData(APIView):
                 'siv_data': siv_data[week_key],
                 'non_siv_data': non_siv_data[week_key]
             }
-
         return percentage_data
 
     def post(self, request):
         year = request.data.get('Year')
-
         if year is None:
             return Response({'error': 'Year is required in the payload.'}, status=status.HTTP_400_BAD_REQUEST)
 
         lab_filter_query_list = [lab['Name'] for lab in LabModel.objects.filter().values('Name') if "TOE" not in lab['Name']]
         lab_names_list = sorted(set(['-'.join(str(lab['Name']).split('-')[0:2]) for lab in LabModel.objects.filter(Name__in=lab_filter_query_list).values('Name')]))
-
-        allocation_data = AllocationDetailsModel.objects.select_related('Location').order_by('-created').values(
+        allocation_data = AllocationDetailsModel.objects.prefetch_related('Location').order_by('-created').values(
             'id', 'Program', 'Sku', 'Vendor', 'FromWW', 'ToWW', 'Duration', 'AllocatedTo', 'NumberOfbenches', 'Remarks',
             'Team', 'Location__Name', 'BenchData', 'approvedBy', 'Location__id', 'Location__BenchDetails'
-        )
-
+        )    
         siv_count, non_siv_count, all_count = self.calculate_siv_non_siv_counts(lab_names_list)
-        formatted_data, id_count_per_week, siv_data, non_siv_data = self.process_allocation_data(allocation_data, year)
-
-        all_work_weeks = [f"WW{str(i + 1).zfill(2)}{year}" for i in range(52)]
-
-        for week in all_work_weeks:
-            if week not in formatted_data:
-                formatted_data[week] = []
-
-        sorted_keys = sorted(formatted_data.keys())
-        sorted_formatted_data = {key: formatted_data[key] for key in sorted_keys}
-
-        for i in range(1, len(sorted_keys)):
-            key = sorted_keys[i]
-            previous_key = sorted_keys[i - 1]
-            id_count_per_week[key] += id_count_per_week[previous_key]
-
-        count_per_week_data = [{'week': key, 'count': id_count_per_week[key] if id_count_per_week[key] > 0 else 0} for key in sorted_keys]
-        percentage_data = self.calculate_percentages(count_per_week_data, siv_count, non_siv_count, all_count, sorted_formatted_data, siv_data, non_siv_data)
-        
-        return Response(percentage_data, status=status.HTTP_200_OK)
-
-    def process_allocation_data(self, allocation_data, year):
         formatted_data = defaultdict(list)
         id_count_per_week = defaultdict(int)
         siv_data = defaultdict(list)
@@ -3004,7 +2890,6 @@ class WorkWeekWiseData(APIView):
 
         for entry in allocation_data:
             entry_year = datetime.strptime(entry['FromWW'][-4:], '%Y').year
-
             if year == entry_year:
                 week_key = f"WW{entry['FromWW']}"
                 allocated_to_data = entry.pop('AllocatedTo')
@@ -3014,16 +2899,170 @@ class WorkWeekWiseData(APIView):
                 formatted_entry = dict(entry)
                 formatted_data[week_key].append(formatted_entry)
                 id_count_per_week[week_key] += len(entry['BenchData'])
- 
-                seats = [seat for row in bench_details if 'seats' in row for seat in row['seats']]
-                for seat in seats:
-                    if seat.get('team') == 'Non-SIV' and seat.get('AllocationData'):
-                        siv_data_week_key = f"WW{seat['AllocationData'][0]['FromWW']}"
-                        if siv_data_week_key == week_key:
-                            non_siv_data[week_key].extend(seat['AllocationData'])
-                    elif seat.get('team') == 'SIV' and seat.get('IsAllocated') and seat.get('AllocationData'):
-                        siv_data_week_key = f"WW{seat['AllocationData'][0]['FromWW']}"
-                        if siv_data_week_key == week_key:
-                            siv_data[week_key].extend(seat['AllocationData'])
+                lab_id = entry.get('Location__id', None)
+                lab_data = LabModel.objects.filter(id=lab_id).first()
 
-        return formatted_data, id_count_per_week, siv_data, non_siv_data
+                if lab_data:
+                    siv_found = any(seat_entry.get('team') == "SIV" and seat_entry.get('IsAllocated') for bench_data_entry in lab_data.BenchDetails for seat_entry in bench_data_entry['seats'])
+                    non_siv_found = any(seat_entry.get('team') == "Non-SIV" and seat_entry.get('IsAllocated') for bench_data_entry in lab_data.BenchDetails for seat_entry in bench_data_entry['seats'])
+
+                    if siv_found:
+                        siv_data[week_key].append(entry)
+
+                    if non_siv_found:
+                        non_siv_data[week_key].append(entry)
+        all_work_weeks = [f"WW{str(i + 1).zfill(2)}{year}" for i in range(52)]
+        for week in all_work_weeks:
+            if week not in formatted_data:
+                formatted_data[week] = []
+        sorted_keys = sorted(formatted_data.keys())
+        sorted_formatted_data = {key: formatted_data[key] for key in sorted_keys}
+
+        for i in range(1, len(sorted_keys)):
+            key = sorted_keys[i]
+            previous_key = sorted_keys[i - 1]
+            id_count_per_week[key] += id_count_per_week[previous_key]
+
+        count_per_week_data = [{'week': key, 'count': id_count_per_week[key] if id_count_per_week[key] > 0 else 0} for key in sorted_keys]
+        percentage_data = self.calculate_percentages(count_per_week_data, siv_count, non_siv_count, all_count, sorted_formatted_data,siv_data,non_siv_data)
+        response_data = percentage_data
+        return Response(response_data, status=status.HTTP_200_OK)
+        
+class UtilizationApi(APIView):
+    def post(self, request):
+        """ API to get the drill down data for home page location vs counts(Allocated, Free, Non-SIV) chart """
+        try:
+            payload = request.data.get("payload")
+            workweek = payload.get("workweek")
+            created_by = payload.get("Createdby")
+            existing_data = UtilizationSummaryModel.objects.filter(workweek=workweek).values()
+            if existing_data.exists():
+                # Return existing data if payload matches the current workweek
+                return Response(existing_data, status=status.HTTP_200_OK)
+            category_list = ["Allocated", "Free"]  # Include only "Allocated" and "Free" categories
+            lab_filter_query = LabModel.objects.filter().values('Name')
+            lab_filter_query_list = [each_query['Name'] for each_query in lab_filter_query if "TOE" not in each_query['Name']]
+            lab_data = LabModel.objects.filter(Name__in=lab_filter_query_list).values('Name')
+            lab_names_list = sorted(list(set(['-'.join(str(each_lab['Name']).split('-')[0:2]) for each_lab in lab_data])))
+            allocation_data = AllocationDetailsModel.objects.filter(status="allocated").order_by('-created').\
+                values('id', 'Program', 'Sku', 'Vendor', 'FromWW', 'ToWW', 'Duration', 'AllocatedTo', 'NumberOfbenches',
+                       'Remarks', 'Team', 'Location__Name', 'BenchData', 'approvedBy')
+            free_report_dict = {}
+            for each_location in lab_names_list:
+                lab_data = LabModel.objects.filter(Name__icontains=each_location)
+                for each_lab in lab_data:
+                    if (each_lab.BenchDetails is not None) and ("TOE" not in each_lab.Name):
+                        if each_location not in free_report_dict:
+                            free_report_dict[each_location] = []
+                        for each_row_no in range(len(each_lab.BenchDetails)):
+                            for each_bench_no in range(len(each_lab.BenchDetails[each_row_no]['seats'])):
+                                if each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['IsAllocated'] == False and \
+                                        each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['team'] == "SIV":
+                                    free_report_dict[each_location].append(
+                                        each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['labelNo'])
+            result_list = []
+            new_model_objects = []
+            for allocation_item in allocation_data:
+                for bench_item in allocation_item['BenchData']:
+                    report_dict = allocation_item.copy()
+                    report_dict['BenchData'] = bench_item
+                    report_dict.update({
+                        'workweek': workweek,
+                        'Planned_Utilization': None,
+                        'Actual_Utilization': None,
+                        'Actual_utilization_in_percentage': None,
+                        'Utilization_Percentage': None,
+                        'Allocated_POC': None,
+                        'Remarks_Utilization': None,
+                        'Createdby': created_by,
+                        'CreatedDate': None,
+                        'Modifiedby': "",
+                        'ModifiedDate': None,
+                        'Deletedby': "",
+                        'DeletedDate': None,
+                        'isDeleted': False,
+                    })
+                    # Create an instance of the new model and populate its fields
+                    new_model_instance = UtilizationSummaryModel(
+                        workweek=report_dict['workweek'],Program=report_dict['Program'],Location = report_dict['Location__Name'],BenchData = report_dict['BenchData'],Sku=report_dict['Sku'],
+                        Vendor=report_dict['Vendor'],FromWW=report_dict['FromWW'],ToWW=report_dict['ToWW'],Duration=report_dict['Duration'],AllocatedTo=report_dict['AllocatedTo'],NumberOfbenches=report_dict['NumberOfbenches'],
+                        Remarks=report_dict['Remarks'],Team=report_dict['Team'],approvedBy=report_dict['approvedBy'],Planned_Utilization=report_dict['Planned_Utilization'],
+                        Actual_Utilization=report_dict['Actual_Utilization'],Actual_utilization_in_percentage=report_dict['Actual_utilization_in_percentage'],
+                        Utilization_Percentage=report_dict['Utilization_Percentage'],Allocated_POC=report_dict['Allocated_POC'],Remarks_Utilization=report_dict['Remarks_Utilization'],
+                        Createdby=report_dict['Createdby'],CreatedDate=report_dict['CreatedDate'],Modifiedby=report_dict['Modifiedby'],ModifiedDate=report_dict['ModifiedDate'],Deletedby=report_dict['Deletedby'],
+                        DeletedDate=report_dict['DeletedDate'],isDeleted=report_dict['isDeleted'],)
+                    new_model_objects.append(new_model_instance)
+            for location, bench_items in free_report_dict.items():
+                for bench_item in bench_items:
+                    result_list.append({
+                        'Location': location,
+                        'BenchData': bench_item,
+                        'workweek':workweek,
+                        'Planned_Utilization': None,
+                        'Actual_Utilization': None,
+                        'Actual_utilization_in_percentage': None,
+                        'Utilization_Percentage': None,
+                        'Allocated_POC': None,
+                        'Remarks_Utilization': None,
+                        'Createdby':created_by,
+                        'CreatedDate':None,
+                        'Modifiedby':"",
+                        'ModifiedDate':None,
+                        'Deletedby':"",
+                        'DeletedDate':None,
+                        'isDeleted':False,
+                    })
+                    new_model_instance = UtilizationSummaryModel(**result_list[-1])
+                    new_model_objects.append(new_model_instance)
+            UtilizationSummaryModel.objects.bulk_create(new_model_objects)
+            inserted_data = [model_instance.__dict__ for model_instance in new_model_objects]
+            for data in inserted_data:
+                data.pop('_state', None)
+            return Response(inserted_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+class UpdateNewModelData(APIView):
+    def get(self, request, id=None):
+        try:
+            if id is not None:
+                # Retrieve data for a specific ID
+                data_instance = UtilizationSummaryModel.objects.get(pk=id)
+                if data_instance:
+                    # Check and replace None with an empty list for AllocatedTo
+                    data_instance.AllocatedTo = data_instance.AllocatedTo or []
+                    serializer = UtilizationSerializer2(data_instance)
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
+            else:
+                all_data = UtilizationSummaryModel.objects.all()
+                if all_data.exists():
+                    # Serialize the queryset
+                    serializer = UtilizationSerializer2(all_data, many=True)
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response("No records found", status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def put(self, request, id):
+        try:
+            new_model_instance = UtilizationSummaryModel.objects.get(pk=id)
+            serializer = UtilizationSerializer2(new_model_instance, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response("Updated Successfully", status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except UtilizationSummaryModel.DoesNotExist:
+            return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
+        
+    def delete(self, request, id):
+        try:
+            data_instance = UtilizationSummaryModel.objects.get(pk=id)
+            data_instance.delete()
+            return Response("Deleted Successfully", status=status.HTTP_200_OK)
+        except UtilizationSummaryModel.DoesNotExist:
+            return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)

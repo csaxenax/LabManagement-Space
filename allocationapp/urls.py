@@ -61,9 +61,9 @@ urlpatterns = [
     path('excelUpload/', views.excelUpload.as_view(), name='excel'),
     path('freeBenchReport/',views.FreeBenchReport.as_view(),name='free-bench'),
     path('get_lab_list/', views.GetLabList.as_view(), name='get_lab_list'),
-    path('utilizationApi/', views.UtilizationAPI.as_view(), name='utilization'),
-    path('utilizationApi/<int:id>/', views.UtilizationAPI.as_view(), name='utilization'),
-    path('utilizationApi/restore/<int:id>/', views.UtilizationAPI.as_view(), name='utilization'),
     path('utilizationSumary/', views.UtilizationSummary.as_view(), name='utilization'),
     path('yearly-utilization/', views.YearlyUtilizationAPI.as_view(), name='yearly-utilization'),
+    path('UtilizationApi/',views.UtilizationApi.as_view(),name='getdrilldownchartdata'),
+    path('updateUtilization/<int:id>/', views.UpdateNewModelData.as_view(), name='update_new_model'),
+    path('updateUtilization/', views.UpdateNewModelData.as_view(), name='update_new_model'),
 ]

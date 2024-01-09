@@ -277,3 +277,36 @@ class UtilizationModel(models.Model):
 
     def __str__(self):
         return f"{self.Lab} - {self.Program} - {self.Createdby}"
+    
+class UtilizationSummaryModel(models.Model):
+    id = models.AutoField(primary_key=True)
+    workweek = models.CharField(max_length=20,blank=True)
+    Location = models.CharField(max_length=100,blank=True)
+    BenchData = models.CharField(max_length=255)
+    Program = models.CharField(max_length=100,blank=True)
+    Sku = models.CharField(max_length=100,blank=True)
+    Vendor = models.CharField(max_length=100,blank=True)
+    FromWW = models.CharField(max_length=20,blank=True)
+    ToWW = models.CharField(max_length=20,blank=True)
+    Duration = models.CharField(max_length=10,blank=True)
+    AllocatedTo = models.ArrayField(model_container=AllocatedToModel,blank=True)
+    NumberOfbenches = models.IntegerField()
+    Remarks = models.TextField(blank=True)
+    Team = models.CharField(max_length=100,blank=True)
+    approvedBy = models.CharField(max_length=255,blank=True)
+    Planned_Utilization = models.FloatField(default=0)
+    Actual_Utilization = models.FloatField(default=0)
+    Actual_utilization_in_percentage = models.CharField(max_length=255,blank=True, null=True)
+    Utilization_Percentage = models.CharField(max_length=255,blank=True,null=True)
+    Allocated_POC = models.CharField(max_length=100)
+    Remarks_Utilization = models.CharField(max_length=255,blank=True)
+    Createdby = models.CharField(max_length=255,blank=True)
+    CreatedDate = models.DateTimeField(auto_now_add=True,null=True)
+    Modifiedby = models.CharField(max_length=255,blank=True)
+    ModifiedDate = models.DateTimeField(auto_now_add=True,null=True)
+    Deletedby = models.CharField(max_length=255,blank=True)
+    DeletedDate = models.DateTimeField(auto_now_add=True,null=True)
+    isDeleted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.workweek} - {self.Location}"

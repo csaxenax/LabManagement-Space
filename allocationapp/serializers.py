@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import AllocationDetailsModel,LabModel,BoardAllocationDataModel,UtilizationModel
+from .models import AllocationDetailsModel,LabModel,BoardAllocationDataModel,UtilizationModel,UtilizationSummaryModel
 import json
 
 class LabModelSerializer(serializers.ModelSerializer):
@@ -104,3 +104,10 @@ class UtilizationSerializer(serializers.ModelSerializer):
         if instance.isDeleted:
             data['Deleted'] = True
         return data
+    
+class UtilizationSerializer2(serializers.ModelSerializer):
+    AllocatedTo = serializers.JSONField(default=list)
+    class Meta:
+        model = UtilizationSummaryModel
+        fields = '__all__'
+    
