@@ -1,6 +1,7 @@
 #from django.db import models
 from djongo import models
 from django import forms
+from simple_history.models import HistoricalRecords
 
 # Create your models here.
 class AllocatedToModel(models.Model):
@@ -242,41 +243,27 @@ class BoardAllocationDataModel(models.Model):
     October = models.JSONField()
     November = models.JSONField()
     December = models.JSONField()
+    history = HistoricalRecords()
+    operation_type = models.CharField(max_length=250, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            # This is an insert operation
+            self.operation_type = 'insert'
+        elif not getattr(self, 'isdeleted', False):
+            # This is an update operation (excluding soft deletes)
+            self.operation_type = 'update'
+        super(BoardAllocationDataModel, self).save(*args, **kwargs)
+
+    def delete(self, using=None, keep_parents=False):
+        # Handle soft delete separately
+        self.isdeleted = True
+        self.operation_type = 'delete'
+        super(BoardAllocationDataModel, self).delete(using, keep_parents)
 
     def __str__(self):
         return str(self.Program)
     
-
-class UtilizationModel(models.Model):
-    id = models.AutoField(primary_key=True)
-    WorkWeek = models.CharField(max_length=20,blank=True)
-    Lab = models.CharField(max_length=255,blank=True)
-    Lab_Details = models.CharField(max_length=50)
-    Bench = models.JSONField(blank=True,null=True)
-    Program = models.CharField(max_length=100,blank=True)
-    SKU = models.CharField(max_length=100,blank=True)
-    Function = models.CharField(max_length=255,blank=True)
-    Vendor = models.CharField(max_length=255,blank=True)
-    Planned_Utilization = models.FloatField(default=0)
-    Actual_Utilization = models.FloatField(default=0)
-    Actual_utilization_in_percentage = models.CharField(max_length=255,blank=True, null=True)
-    Utilization_Percentage = models.CharField(max_length=255,blank=True,null=True)
-    Allocated_POC = models.CharField(max_length=100)
-    Remarks = models.CharField(max_length=255,blank=True)
-    Createdby = models.CharField(max_length=255,blank=True)
-    CreatedDate = models.DateTimeField(auto_now_add=True,null=True)
-    Modifiedby = models.CharField(max_length=255,blank=True)
-    ModifiedDate = models.DateTimeField(auto_now_add=True,null=True)
-    Deletedby = models.CharField(max_length=255,blank=True)
-    DeletedDate = models.DateTimeField(auto_now_add=True,null=True)
-    isDeleted = models.BooleanField(default=False)
-    
-    def soft_delete(self):
-        self.isDeleted = True
-        self.save()
-
-    def __str__(self):
-        return f"{self.Lab} - {self.Program} - {self.Createdby}"
     
 class UtilizationSummaryModel(models.Model):
     id = models.AutoField(primary_key=True)
@@ -307,6 +294,18 @@ class UtilizationSummaryModel(models.Model):
     Deletedby = models.CharField(max_length=255,blank=True)
     DeletedDate = models.DateTimeField(auto_now_add=True,null=True)
     isDeleted = models.BooleanField(default=False)
+
+    def soft_delete(self):
+        self.isDeleted = True
+        self.save()
+
+    def undelete(self):
+        self.isDeleted = False
+        self.save()
+
+    objects = models.Manager()  # The default manager
+    active_objects = models.Manager()  # A manager that includes only non-deleted records
+
 
     def __str__(self):
         return f"{self.workweek} - {self.Location}"

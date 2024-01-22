@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'allocationapp',
     'rest_framework.authtoken',
+    'simple_history',
 ]
 
 

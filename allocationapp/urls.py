@@ -66,4 +66,5 @@ urlpatterns = [
     path('UtilizationApi/',views.UtilizationApi.as_view(),name='getdrilldownchartdata'),
     path('updateUtilization/<int:id>/', views.UpdateNewModelData.as_view(), name='update_new_model'),
     path('updateUtilization/', views.UpdateNewModelData.as_view(), name='update_new_model'),
+    path('utilization-summary/', views.UtilizationSummaryAPIView.as_view(), name='utilization-summary'),
 ]

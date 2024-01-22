@@ -2,14 +2,17 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework.parsers import FileUploadParser
-from .serializers import BoardAllocationDataModelSerializer,UtilizationSerializer,UtilizationSerializer2
+from .serializers import BoardAllocationDataModelSerializer,UtilizationSerializer2
 from rest_framework.views  import APIView
 from rest_framework.response import Response
 from rest_framework import status,generics
-from django.db.models import Q,Sum,F
+from django.db.models import Q,Sum,F,FloatField, ExpressionWrapper,Count
 from django.db import connection
 from django.utils import timezone
 import traceback
+from django.db.models.signals import pre_save
+from django.core.management.base import BaseCommand
+from django.dispatch import receiver
 from django.shortcuts import get_object_or_404
 from django.db.models.functions import Coalesce
 from itertools import chain
@@ -36,7 +39,7 @@ logger_error = logging.getLogger('error_logger')
 # Local imports
 from .models import AllocationDetailsModel,LabModel,ProgramsModel,\
                     VendorsModel,TeamsModel,SkuModel,UserModel, \
-                        UserRolesModel,UserRequestModel,SuggestionsModel,ApproverUserModel,UtilizationModel,BoardAllocationDataModel,UtilizationSummaryModel
+                        UserRolesModel,UserRequestModel,SuggestionsModel,ApproverUserModel,BoardAllocationDataModel,UtilizationSummaryModel
 from .mail import Email,UserModuleMail,SuggestionsMail
 from .ldapvalidate import validate_user_mail
 # Create your views here.
@@ -2320,10 +2323,6 @@ class DeleteApproverUserView(APIView):
             logger_error.error(str(e))
             return Response(e,status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-
-
-
 class EditAPIView(APIView):
     def post(self, request):
         """
@@ -2353,8 +2352,37 @@ class EditAPIView(APIView):
             logger_error.error(str(e))
             return Response(e,status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-
-
+@receiver(pre_save, sender=BoardAllocationDataModel)
+def board_allocation_data_model_pre_save(sender, instance, **kwargs):
+    # Check if it's an update (not a new record)
+    if instance.pk is not None:
+        # Retrieve the original data before the update
+        
+        original_data = BoardAllocationDataModel.objects.get(pk=instance.pk)
+        # Check if any field has changed
+        if original_data != instance:
+            # Log the changes to history only if not already logged
+            if not instance.history.filter(id=original_data.id).exists():
+                instance.history.create(
+                    Program=original_data.Program,
+                    Sku=original_data.Sku,
+                    Team=original_data.Team,
+                    Vendor=original_data.Vendor,
+                    TotalBoard=original_data.TotalBoard,
+                    year=original_data.year,
+                    January=original_data.January,
+                    February=original_data.February,
+                    March=original_data.March,
+                    April=original_data.April,
+                    May=original_data.May,
+                    June=original_data.June,
+                    July=original_data.July,
+                    August=original_data.August,
+                    September=original_data.September,
+                    October=original_data.October,
+                    November=original_data.November,
+                    December=original_data.December,
+                )
 class BoardAPI(APIView):
     queryset = BoardAllocationDataModel.objects.all()
     
@@ -2375,65 +2403,117 @@ class BoardAPI(APIView):
                 return Response(response_data, status=status.HTTP_200_OK)
             except BoardAllocationDataModel.DoesNotExist:
                 return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
-    def put(self, request, id):
-        # Update an existing record by its ID using a PUT request
+    def post(self, request):
         try:
-            board = self.queryset.get(pk=id)
+            existing_records = BoardAllocationDataModel.objects.filter(
+                Program=request.data['Program'],
+                Sku=request.data['Sku'],
+                Team=request.data['Team'],
+                Vendor=request.data['Vendor'],
+                TotalBoard=request.data['TotalBoard'],
+                year=request.data['year'],
+            )
+            for record in existing_records:
+                # Check for duplicates based on specific fields
+                if all(record.__dict__[field] == request.data[field] for field in ['Program', 'Sku', 'Team', 'Vendor', 'TotalBoard', 'year']):
+                    # Check for duplicates based on month-specific data
+                    if all(record.__dict__[month] == request.data[month] for month in ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']):
+                        # Duplicate record found, return a response with a duplicate message
+                        return Response("Duplicate record found", status=status.HTTP_400_BAD_REQUEST)
+
+            # If the loop did not break, it means no duplicate was found, insert the record
+            serializer = BoardAllocationDataModelSerializer(data=request.data)
+            if serializer.is_valid():
+                instance = serializer.save()  # Save the data to the database
+                # Check if it's a new record before creating a historical record
+                if not instance.pk:
+                    # Log the creation to history with the operation_type field set to 'insert'
+                    instance.history.create(operation_type='insert', **serializer.data)
+                return Response("Added Successfully", status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def put(self, request, id):
+        try:
+            board = BoardAllocationDataModel.objects.get(pk=id)
+            original_data = BoardAllocationDataModelSerializer(board).data
             serializer = BoardAllocationDataModelSerializer(board, data=request.data)
             if serializer.is_valid():
-                serializer.save()
+                # Store the validated data before making changes
+                validated_data = serializer.validated_data
+                # Check if any field has changed before updating and creating a historical record
+                if original_data != validated_data:
+                    # Log the update to history with the operation_type field set to 'update'
+                    serializer.save()
+                # board.history.create(operation_type='update', **original_data)
                 return Response("Updated Successfully", status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except BoardAllocationDataModel.DoesNotExist:
             return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
 
-    
-    def post(self, request):
-        """ API to add new board allocation data """
+    def delete(self, request, id=None):
         try:
-            serializer = BoardAllocationDataModelSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()  # Save the data to the database
-                return Response("Added Successfully", status=status.HTTP_201_CREATED)
+            if id is not None:
+                board = BoardAllocationDataModel.objects.get(pk=id)
+                # Soft delete the record
+                board.isdeleted = True
+                board.operation_type = 'delete'
+                board.save()
+                response_data = 'soft deleted successfully'
+                return Response(response_data, status=status.HTTP_200_OK)
             else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-    def delete(self, request, id):
-        # Delete a specific record by its ID
-        try:
-            board = BoardAllocationDataModel.objects.get(pk=id)
-            board.delete()
-            response_data = 'Record deleted successfully'
-            return Response(response_data, status=status.HTTP_200_OK)
+                return Response('Please provide an ID for deletion', status=status.HTTP_400_BAD_REQUEST)
         except BoardAllocationDataModel.DoesNotExist:
             return Response('Record not found', status=status.HTTP_404_NOT_FOUND)
-        
-class excelUpload(APIView):
+    
+class excelUpload(APIView):       
+    def recursive_dict_compare(self, dict1, dict2):
+        for key, value in dict1.items():
+            if key not in dict2:
+                return False
+            if isinstance(value, dict):
+                if not self.recursive_dict_compare(value, dict2[key]):
+                    return False
+            elif value != dict2[key]:
+                return False
+        return True
+
     def post(self, request):
-        """API to add new board allocation data from Excel"""
         try:
-            excel_data_array = request.data  # Assuming the Excel data is sent as an array of dictionaries
+            excel_data_array = request.data
+            response_data = {'inserted': 0, 'duplicates': 0}
 
-            # Serialize and save each item in the array
-            response_data = []
             for item_data in excel_data_array:
-                serializer = BoardAllocationDataModelSerializer(data=item_data)
-                if serializer.is_valid():
-                    serializer.save()
-                    response_data.append(serializer.data)
+                existing_record = BoardAllocationDataModel.objects.all()
+                for record in existing_record:
+                    # Check for duplicates by excluding month-specific data
+                    if self.recursive_dict_compare(item_data, record.__dict__):
+                        # Update the existing record with new month-specific data
+                        for month, values in item_data.items():
+                            if isinstance(values, dict):
+                                for field, val in values.items():
+                                    setattr(record, f"{month}_{field}", val)
+                        record.save()
+                        response_data['duplicates'] += 1
+                        break  # Break out of the loop since the record is updated
                 else:
-                    # If any item is not valid, return the errors
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-            # Additional message when 201 is created
-            success_message = "Records created successfully"
-
-            return Response({'message': success_message, 'data': response_data}, status=status.HTTP_200_OK)
+                    # If the loop did not break, it means no duplicate was found, insert the record
+                    serializer = BoardAllocationDataModelSerializer(data=item_data)
+                    if serializer.is_valid():
+                        serializer.save()
+                        response_data['inserted'] += 1
+                    else:
+                        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            if response_data['duplicates'] > 0:
+                response_message = {'message': f'{response_data["duplicates"]} duplicate record(s) and {response_data["inserted"]} records inserted'}
+            else:
+                response_message = {'message': f'{response_data["inserted"]} record(s) inserted'}
+            return Response(response_message, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
-        
+            
 class YearListAPI(APIView):
     def get(self, request):
         years = sorted(BoardAllocationDataModel.objects.values_list('year', flat=True).distinct())
@@ -2487,6 +2567,10 @@ class ForecastSummary(APIView):
                 "intel": sum(int(record[month]['boardsIntelBench'] or 0) + int(record[month]['boardIntelRack'] or 0) for record in records),
                 "ODC": sum(int(record[month]['boardsODCBench'] or 0) + int(record[month]['boardsODCRack'] or 0) for record in records),
                 "WSE_BENCH_Allocation": allocated_count if int(year) == current_year else 0,
+                "Bench_Demand_Intel": sum(int(record[month]['boardsIntelBench'] or 0) for record in records),
+                "Rack_Demand_Intel": sum(int(record[month]['boardIntelRack'] or 0) for record in records),
+                "Bench_Demand_ODC": sum(int(record[month]['boardsODCBench'] or 0) for record in records),
+                "Rack_Demand_ODC": sum(int(record[month]['boardsODCRack'] or 0) for record in records),
             }
             for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
         ]
@@ -2534,15 +2618,23 @@ class ForecastSummaryRVP(APIView):
     parser_classes = [JSONParser]
     def process_record(self, records):
         result = []
-        monthly_totals = {month: {'Total': 0} for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]}
+        monthly_totals = {month: {'Bench_Demand_Intel': 0, 'Rack_Demand_Intel': 0, 'Bench_Demand_ODC': 0, 'Rack_Demand_ODC': 0, 'Total': 0} for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]}
         for record in records:
             for month in monthly_totals:
                 monthly_totals[month]['Total'] += sum(int(record[month][key] or 0) for key in ['boardsIntelBench', 'boardIntelRack', 'boardsODCBench', 'boardsODCRack'])
+                monthly_totals[month]['Bench_Demand_Intel'] += int(record[month]['boardsIntelBench'] or 0)
+                monthly_totals[month]['Rack_Demand_Intel'] += int(record[month]['boardIntelRack'] or 0)
+                monthly_totals[month]['Bench_Demand_ODC'] += int(record[month]['boardsODCBench'] or 0)
+                monthly_totals[month]['Rack_Demand_ODC'] += int(record[month]['boardsODCRack'] or 0)
         for month, total_data in monthly_totals.items():
             result.append({
                 "category": month,
-                "intel": sum(int(record[month]['boardsIntelBench'] or 0) + int(record[month]['boardIntelRack'] or 0) for record in records),
-                "ODC": sum(int(record[month]['boardsODCBench'] or 0) + int(record[month]['boardsODCRack'] or 0) for record in records),
+                "Bench_Demand_Intel": total_data['Bench_Demand_Intel'],
+                "Rack_Demand_Intel": total_data['Rack_Demand_Intel'],
+                "Bench_Demand_ODC": total_data['Bench_Demand_ODC'],
+                "Rack_Demand_ODC": total_data['Rack_Demand_ODC'],
+                # "intel": sum(int(record[month]['boardsIntelBench'] or 0) + int(record[month]['boardIntelRack'] or 0) for record in records),
+                # "ODC": sum(int(record[month]['boardsODCBench'] or 0) + int(record[month]['boardsODCRack'] or 0) for record in records),
                 "Total": total_data['Total'],
             })
         return result
@@ -2594,6 +2686,8 @@ class ForecastSummaryTable(APIView):
                 "Total": total,
                 "Intel_percentage": f"{round((total_data['Bench_Demand_Intel'] + total_data['Rack_Demand_Intel']) / total * 100, 2)}%" if total != 0 else "0%",
                 "ODC_percentage": f"{round((total_data['Bench_Demand_ODC'] + total_data['Rack_Demand_ODC']) / total * 100, 2)}%" if total != 0 else "0%",
+                "Total_Bench_Intel" : round(total_data['Bench_Demand_Intel'] / 1.5),
+                "Total_Rack_Intel" : 0
             })
         return result
 
@@ -2627,10 +2721,10 @@ class ForecastQuaterWiseSummary(APIView):
     parser_classes = [JSONParser]
     def process_record(self, records, year):
         quarterly_data = {
-            "Q1": {"intel": 0, "ODC": 0},
-            "Q2": {"intel": 0, "ODC": 0},
-            "Q3": {"intel": 0, "ODC": 0},
-            "Q4": {"intel": 0, "ODC": 0},
+            "Q1": {"intel": 0, "ODC": 0,"Bench_Demand_Intel":0,"Rack_Demand_Intel":0,"Bench_Demand_ODC":0,"Rack_Demand_ODC":0},
+            "Q2": {"intel": 0, "ODC": 0,"Bench_Demand_Intel":0,"Rack_Demand_Intel":0,"Bench_Demand_ODC":0,"Rack_Demand_ODC":0},
+            "Q3": {"intel": 0, "ODC": 0,"Bench_Demand_Intel":0,"Rack_Demand_Intel":0,"Bench_Demand_ODC":0,"Rack_Demand_ODC":0},
+            "Q4": {"intel": 0, "ODC": 0,"Bench_Demand_Intel":0,"Rack_Demand_Intel":0,"Bench_Demand_ODC":0,"Rack_Demand_ODC":0},
         }
         for record in records:
             if record["year"] == year:
@@ -2642,12 +2736,24 @@ class ForecastQuaterWiseSummary(APIView):
                         # Handle potential empty strings during conversion to integers
                         quarterly_data[quarter]["intel"] += int(record[month]['boardsIntelBench'] or 0) + int(record[month]['boardIntelRack'] or 0)
                         quarterly_data[quarter]["ODC"] += int(record[month]['boardsODCBench'] or 0) + int(record[month]['boardsODCRack'] or 0)
+                        quarterly_data[quarter]["Bench_Demand_Intel"] += int(record[month]['boardsIntelBench'] or 0)
+                        quarterly_data[quarter]["Rack_Demand_Intel"] += int(record[month]['boardIntelRack'] or 0)
+                        quarterly_data[quarter]["Bench_Demand_ODC"] += int(record[month]['boardsODCBench'] or 0)
+                        quarterly_data[quarter]["Rack_Demand_ODC"] += int(record[month]['boardsODCRack'] or 0)
         result = {
             year: [
                 {
                     "category": quarter,
                     "intel": quarterly_data[quarter]["intel"],
+                    "intel_average_value": int(quarterly_data[quarter]["intel"] / 3),
+                    "intel_average_percentage": round((int(quarterly_data[quarter]["intel"] / 3) / (int(quarterly_data[quarter]["intel"] / 3)  + int(quarterly_data[quarter]["ODC"] / 3))) * 100, 2),
                     "ODC": quarterly_data[quarter]["ODC"],
+                    "ODC_average_value": int(quarterly_data[quarter]["ODC"] / 3),
+                    "ODC_average_percentage": round((int(quarterly_data[quarter]["ODC"] / 3) / (int(quarterly_data[quarter]["intel"] / 3)  + int(quarterly_data[quarter]["ODC"] / 3))) * 100, 2),
+                    "Bench_Demand_Intel":quarterly_data[quarter]["Bench_Demand_Intel"],
+                    "Rack_Demand_Intel":quarterly_data[quarter]["Rack_Demand_Intel"],
+                    "Bench_Demand_ODC":quarterly_data[quarter]["Bench_Demand_ODC"],
+                    "Rack_Demand_ODC":quarterly_data[quarter]["Rack_Demand_ODC"],
                     "intel_percentage": round((quarterly_data[quarter]["intel"] / (quarterly_data[quarter]["intel"] + quarterly_data[quarter]["ODC"])) * 100, 2),
                     "ODC_percentage": round((quarterly_data[quarter]["ODC"] / (quarterly_data[quarter]["intel"] + quarterly_data[quarter]["ODC"])) * 100, 2),
                 }
@@ -2820,14 +2926,19 @@ class UtilizationSummary(APIView):
 class YearlyUtilizationAPI(APIView):
     def post(self, request, *args, **kwargs):
         payload = request.data.get("workweek")
-        if payload:
-            existing_data = UtilizationSummaryModel.objects.filter(workweek=payload).values()
-            if existing_data.exists():
-                return Response(existing_data, status=status.HTTP_200_OK)
-            else:
-                return Response([], status=status.HTTP_200_OK)
-        else:
+        
+        if not payload:
             return Response("Invalid or missing 'workweek' in the request data", status=status.HTTP_400_BAD_REQUEST)
+        
+        existing_data = UtilizationSummaryModel.objects.filter(workweek=payload).values()
+
+        # Use list comprehension to filter data based on isDeleted condition
+        filtered_data = [data for data in existing_data if not data['isDeleted']]
+
+        if filtered_data:
+            return Response(filtered_data, status=status.HTTP_200_OK)
+        else:
+            return Response([], status=status.HTTP_200_OK)
     
 class WorkWeekWiseData(APIView):
     def calculate_siv_non_siv_counts(self, lab_names_list):
@@ -2887,7 +2998,8 @@ class WorkWeekWiseData(APIView):
         id_count_per_week = defaultdict(int)
         siv_data = defaultdict(list)
         non_siv_data = defaultdict(list)
-
+        lab_ids = [entry.get('Location__id', None) for entry in allocation_data]
+        lab_data = LabModel.objects.filter(id__in=lab_ids).values('id', 'BenchDetails')
         for entry in allocation_data:
             entry_year = datetime.strptime(entry['FromWW'][-4:], '%Y').year
             if year == entry_year:
@@ -2900,17 +3012,15 @@ class WorkWeekWiseData(APIView):
                 formatted_data[week_key].append(formatted_entry)
                 id_count_per_week[week_key] += len(entry['BenchData'])
                 lab_id = entry.get('Location__id', None)
-                lab_data = LabModel.objects.filter(id=lab_id).first()
-
-                if lab_data:
-                    siv_found = any(seat_entry.get('team') == "SIV" and seat_entry.get('IsAllocated') for bench_data_entry in lab_data.BenchDetails for seat_entry in bench_data_entry['seats'])
-                    non_siv_found = any(seat_entry.get('team') == "Non-SIV" and seat_entry.get('IsAllocated') for bench_data_entry in lab_data.BenchDetails for seat_entry in bench_data_entry['seats'])
-
+                lab_entry = next((lab for lab in lab_data if lab['id'] == lab_id), None)
+                if lab_entry:
+                    siv_found = any(seat_entry.get('team') == "SIV" and seat_entry.get('IsAllocated') for bench_data_entry in lab_entry['BenchDetails'] for seat_entry in bench_data_entry['seats'])
+                    non_siv_found = any(seat_entry.get('team') == "Non-SIV" and seat_entry.get('IsAllocated') for bench_data_entry in lab_entry['BenchDetails'] for seat_entry in bench_data_entry['seats'])
                     if siv_found:
                         siv_data[week_key].append(entry)
-
                     if non_siv_found:
                         non_siv_data[week_key].append(entry)
+
         all_work_weeks = [f"WW{str(i + 1).zfill(2)}{year}" for i in range(52)]
         for week in all_work_weeks:
             if week not in formatted_data:
@@ -2937,8 +3047,13 @@ class UtilizationApi(APIView):
             created_by = payload.get("Createdby")
             existing_data = UtilizationSummaryModel.objects.filter(workweek=workweek).values()
             if existing_data.exists():
-                # Return existing data if payload matches the current workweek
-                return Response(existing_data, status=status.HTTP_200_OK)
+                # Perform soft delete for all instances with the specified workweek using bulk update
+                UtilizationSummaryModel.objects.filter(workweek=workweek).update(isDeleted=False, Createdby=created_by)
+
+                restored_records = UtilizationSummaryModel.objects.filter(workweek=workweek)
+                serializer = UtilizationSerializer2(restored_records, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            
             category_list = ["Allocated", "Free"]  # Include only "Allocated" and "Free" categories
             lab_filter_query = LabModel.objects.filter().values('Name')
             lab_filter_query_list = [each_query['Name'] for each_query in lab_filter_query if "TOE" not in each_query['Name']]
@@ -3057,11 +3172,64 @@ class UpdateNewModelData(APIView):
         except UtilizationSummaryModel.DoesNotExist:
             return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
         
-    def delete(self, request, id):
+    def delete(self, request, *args, **kwargs):
+        workweek = request.data.get('workweek', None)
+        if not workweek:
+            return Response({'error': 'Workweek is required in the payload'}, status=status.HTTP_400_BAD_REQUEST)
+        # Perform soft delete for all instances with the specified workweek using bulk update
+        UtilizationSummaryModel.objects.filter(workweek=workweek).update(isDeleted=True)
+        return Response([], status=status.HTTP_200_OK)
+
+class UtilizationSummaryAPIView(APIView):
+    def process_record(self, records, year=None):
+        result = defaultdict(lambda: {"Planned": 0, "Actual": 0, "Count": 0})
+
+        week_keys_range = [f"WW{str(week).zfill(2)}{year}" for week in range(1, 53)]
+        for week_key in week_keys_range:
+            result[week_key]
+
+        for entry in records:
+            week_key = f"WW{entry.workweek}"
+            planned_utilization = entry.Planned_Utilization or 0
+            actual_utilization = entry.Actual_Utilization or 0
+
+            result[week_key]["Planned"] += planned_utilization
+            result[week_key]["Actual"] += actual_utilization
+            result[week_key]["Count"] += 1  # Increment count for each record
+
+        utilization_data = [
+            {
+                "category": week_key,
+                "Planned": result[week_key]["Planned"],
+                "Actual": result[week_key]["Actual"],
+                "Actual_Utilization_Percentage": f"{result[week_key]['Actual'] / result[week_key]['Planned'] * 100:.2f}%" if result[week_key]['Planned'] > 0 else "0%",
+                "Utilization_Percentage": f"{result[week_key]['Actual'] / result[week_key]['Count'] * 100:.2f}%" if result[week_key]['Count'] > 0 else "0%"
+            }
+            for week_key in sorted(result.keys())
+        ]
+
+        return utilization_data
+
+    def post(self, request, *args, **kwargs):
         try:
-            data_instance = UtilizationSummaryModel.objects.get(pk=id)
-            data_instance.delete()
-            return Response("Deleted Successfully", status=status.HTTP_200_OK)
+            data = request.data
+            year = data.get('Year')
+            board_id = data.get('id')
+
+            if year is not None:
+                utilization_records = UtilizationSummaryModel.objects.filter(workweek__endswith=f'{year}')
+                if not utilization_records:
+                    return Response([], status=status.HTTP_200_OK)
+            elif board_id is not None:
+                utilization = UtilizationSummaryModel.objects.get(pk=board_id)
+                serializer = UtilizationSerializer2(utilization)
+                response_data = [serializer.data]
+            else:
+                utilization_records = UtilizationSummaryModel.objects.all()
+
+            response_data = self.process_record(utilization_records, year)
+
+            return Response(response_data, status=status.HTTP_200_OK if response_data else status.HTTP_201_CREATED)
         except UtilizationSummaryModel.DoesNotExist:
             return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
         except Exception as e:

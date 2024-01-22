@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import AllocationDetailsModel,LabModel,BoardAllocationDataModel,UtilizationModel,UtilizationSummaryModel
+from .models import AllocationDetailsModel,LabModel,BoardAllocationDataModel,UtilizationSummaryModel
 import json
 
 class LabModelSerializer(serializers.ModelSerializer):
@@ -93,17 +93,6 @@ class BoardAllocationDataModelSerializers(serializers.ModelSerializer):
         fields = [
             "January","February","March","April","May","June","July","August","September","October","November","December",
             ]
-
-class UtilizationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UtilizationModel
-        fields = '__all__'
-        
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        if instance.isDeleted:
-            data['Deleted'] = True
-        return data
     
 class UtilizationSerializer2(serializers.ModelSerializer):
     AllocatedTo = serializers.JSONField(default=list)
