@@ -95,3 +95,41 @@ ERROR 2023-10-09 20:41:22,151 views post 2400 string indices must be integers
 ERROR 2023-10-09 20:44:34,325 views post 2400 string indices must be integers
 ERROR 2023-10-27 14:49:16,452 views get 801 Cannot resolve keyword 'isAllocated' into field. Choices are: AllocatedDate, AllocatedTo, BenchData, DeallocatedBenchData, DeallocatedBy, DeallocatedDate, Duration, FromWW, IsAllocated, IsRequested, Location, Location_id, NotifyTo, NumberOfbenches, Program, Reason, RejectedBy, RejectedDate, Remarks, Sku, Team, ToWW, Vendor, approvedBy, created, id, status
 ERROR 2023-11-23 20:30:37,260 views get 817 Cannot resolve keyword 'isAllocated' into field. Choices are: AllocatedDate, AllocatedTo, BenchData, DeallocatedBenchData, DeallocatedBy, DeallocatedDate, Duration, FromWW, IsAllocated, IsRequested, Location, Location_id, NotifyTo, NumberOfbenches, Program, Reason, RejectedBy, RejectedDate, Remarks, Sku, Team, ToWW, Vendor, approvedBy, created, id, status
+ERROR 2024-01-23 16:21:36,541 views post 3223 JSON parse error - Expecting value: line 3 column 1 (char 16)
+ERROR 2024-01-23 19:18:38,702 views post 3240 JSON parse error - Expecting property name enclosed in double quotes: line 3 column 1 (char 22)
+ERROR 2024-01-24 16:07:26,908 views post 3261 unsupported operand type(s) for +: 'QuerySet' and 'QuerySet'
+ERROR 2024-02-02 11:15:21,858 views post 1382 Value: Saxena, CharuX must be an instance of <class 'list'>
+ERROR 2024-02-02 11:39:19,335 views post 1379 pop from empty list
+ERROR 2024-02-05 14:15:25,035 views post 580 string indices must be integers
+ERROR 2024-02-05 14:16:06,150 views post 580 'RequestedBy'
+ERROR 2024-02-05 14:19:10,764 views post 580 string indices must be integers
+ERROR 2024-02-05 14:20:00,656 views post 581 string indices must be integers
+ERROR 2024-02-05 14:55:28,014 views post 582 JSON parse error - Expecting ',' delimiter: line 31 column 1 (char 608)
+ERROR 2024-02-05 14:56:57,741 views post 583 JSON parse error - Expecting ',' delimiter: line 31 column 1 (char 608)
+ERROR 2024-02-05 14:58:58,710 views post 583 string indices must be integers
+ERROR 2024-02-05 15:04:09,286 views post 583 string indices must be integers
+ERROR 2024-02-05 15:05:48,175 views post 583 string indices must be integers
+ERROR 2024-02-05 15:07:39,021 views post 586 string indices must be integers
+ERROR 2024-02-05 15:10:09,028 views post 586 string indices must be integers
+ERROR 2024-02-05 15:35:56,310 views post 587 string indices must be integers
+ERROR 2024-02-05 15:36:21,305 views post 588 string indices must be integers
+ERROR 2024-02-05 16:12:03,121 views post 608 sendmail() missing 1 required positional argument: 'self'
+ERROR 2024-02-05 16:14:45,542 views post 604 pop from empty list
+ERROR 2024-02-05 18:57:45,254 views post 579 'list' object has no attribute 'get'
+ERROR 2024-02-05 18:58:12,657 views post 579 'list' object has no attribute 'get'
+ERROR 2024-02-05 18:59:53,912 views post 581 local variable 'requested_user_name' referenced before assignment
+ERROR 2024-02-05 19:01:51,494 views post 583 pop from empty list
+ERROR 2024-02-05 19:14:38,208 views post 583 'RequestedDate'
+ERROR 2024-02-05 19:18:41,697 views post 583 'RequestedDate'
+ERROR 2024-02-05 19:19:14,658 views post 583 sendmail() takes 1 positional argument but 2 were given
+ERROR 2024-02-05 19:19:43,268 views post 583 pop from empty list
+ERROR 2024-02-05 19:34:04,770 views post 585 'AllocatedToModel' object is not subscriptable
+ERROR 2024-02-05 19:35:30,204 views post 583 sendmail() takes 1 positional argument but 2 were given
+ERROR 2024-02-05 19:35:55,276 views post 583 pop from empty list
+ERROR 2024-02-05 19:39:34,598 views post 582 local variable 'Cc' referenced before assignment
+ERROR 2024-02-05 19:41:55,963 views post 581 pop from empty list
+ERROR 2024-02-05 19:45:51,874 views post 585 
+ERROR 2024-02-05 19:50:49,456 views post 585 
+ERROR 2024-02-05 19:51:03,785 views post 581 pop from empty list
+ERROR 2024-02-05 19:52:25,237 views post 581 pop from empty list
+ERROR 2024-02-05 20:16:21,936 views post 718 pop from empty list

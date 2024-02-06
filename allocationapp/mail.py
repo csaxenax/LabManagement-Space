@@ -15,16 +15,46 @@ context = ssl.create_default_context()
 
 #https://ilam.intel.com/#/home
 
-def SendEmail(From: str ,To: list, Cc: list, Subject: str, Message: str):
+# def SendEmail(From: str ,To: list, Cc: list, Subject: str, Message: str):
+#     msg = MIMEMultipart('alternative')
+#     msg['Subject'] = Subject
+#     msg['From'] = From
+#     msg['To'] = ",".join(To)
+#     msg['Bcc'] = "sakthirajanx.sembulingam@intel.com"
+#     if len(Cc)>=1:
+#         reciepients = list(set(To+Cc))
+#         msg['Cc'] = ",".join(Cc)
+#     else:
+#         reciepients = To 
+#     context = ssl.create_default_context()
+#     try:
+#         server = smtplib.SMTP(SMTP_SERVER,PORT)
+#         server.ehlo()
+#         server.starttls(context=context)
+#         server.ehlo()
+#         server.login(USERNAME,PASSWORD)
+#         actual_message = MIMEText(Message,'html')
+#         msg.attach(actual_message)
+#         server.sendmail(From,reciepients,msg.as_string())
+#         print("Successfully sent mail")
+#     except Exception:
+#         print(traceback.format_exc())
+def SendEmail(From: str, To: list, Cc: list, Bcc: list, Subject: str, Message: str):
     msg = MIMEMultipart('alternative')
     msg['Subject'] = Subject
     msg['From'] = From
     msg['To'] = ",".join(To)
-    if len(Cc)>=1:
-        reciepients = list(set(To+Cc))
+ 
+    if len(Cc) >= 1:
+        recipients = list(set(To + Cc))
         msg['Cc'] = ",".join(Cc)
     else:
-        reciepients = To
+        recipients = To
+ 
+    if len(Bcc) >= 1:
+        recipients += Bcc
+        msg['Bcc'] = ",".join(Bcc)
+ 
     context = ssl.create_default_context()
     try:
         server = smtplib.SMTP(SMTP_SERVER,PORT)
@@ -34,7 +64,7 @@ def SendEmail(From: str ,To: list, Cc: list, Subject: str, Message: str):
         server.login(USERNAME,PASSWORD)
         actual_message = MIMEText(Message,'html')
         msg.attach(actual_message)
-        server.sendmail(From,reciepients,msg.as_string())
+        server.sendmail(From,recipients,msg.as_string())
         print("Successfully sent mail")
     except Exception:
         print(traceback.format_exc())
@@ -343,11 +373,12 @@ table, th, td {{
 """
 
 class Email:
-    def __init__(self,From,To,Cc, data):
+    def __init__(self,From,To,Cc,data):
         self.From = From # input should be in String format
         self.Cc = Cc # input should be in List format
         self.To = To
         self.data = data
+        # self.Bcc = Bcc
 
     def sendmail(self):
         # Requester+notifyTo need to be in CC , Approver in To, Admin in Bcc
@@ -360,6 +391,7 @@ class Email:
         CC += ccs
         CC = list(set(CC))
         TO = self.To
+        # Bcc = self.Bcc
         #mail_reciepients = self.To + self.Cc.split(',')
         #print("Reciepients",mail_reciepients)
         try:
@@ -448,11 +480,12 @@ class SuggestionsMail:
 
 
 class ExpiryEmail:
-    def __init__(self,From, To ,Cc, data):
+    def __init__(self,From, To ,Cc,data):
         self.From = From # input should be in String format
         self.To = To # input should be in List format
         self.Cc = Cc # input should be in List format
         self.data = data
+        # self.Bcc = Bcc
 
     def sendmail(self):
         Subject = self.data['subject'] + str(self.data['User']) + " WWID No."  + str(self.data['WWID'])
@@ -460,6 +493,7 @@ class ExpiryEmail:
         cc_query = ApproverUserModel.objects.filter().values('Email')
         cc_list = [each_query['Email'] for each_query in cc_query]
         CC = self.Cc+cc_list
+        Bcc = self.Bcc
         CC = list(set(CC))
         TO = self.To
         #mail_reciepients = self.To + self.Cc.split(',')
@@ -486,7 +520,7 @@ class ExpiryEmail:
                                  lab_name=labname,vendor_name=vendor,allocatedto=allocatedto,
                                  from_ww=fromww,to_ww=toww,remarks=remarks,duration=duration,number_of_benches=number_of_benches,
                                  bench_data=bench_data,team=team,id=id,notifyto=notifyto)
-            SendEmail(From ,TO, CC, Subject, final_message)
+            SendEmail(From ,TO, CC,Subject, final_message)
         except Exception as e:
             print(e)
             print(traceback.format_exc())

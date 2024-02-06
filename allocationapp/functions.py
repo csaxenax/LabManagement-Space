@@ -28,7 +28,7 @@ def calculate_workweek():
 
     """
     today = datetime.today()
-    Workweek = today.strftime("%U")
+    Workweek = today.strftime("%V")
     return Workweek
 
 def DeallocationSchedular():
@@ -52,7 +52,7 @@ def DeallocationSchedular():
         next_workweek = str(int(Workweek)+1) + str(year)
     try:
         allocation_data = AllocationDetailsModel.objects.filter(status='allocated').values('id','Program','Sku','Vendor','FromWW',
-            'ToWW','Duration','AllocatedTo','NumberOfbenches','Remarks','Team','IsAllocated','IsRequested','Location__Name','BenchData','AllocatedDate','status')
+            'ToWW','Duration','AllocatedTo','NumberOfbenches','Remarks','Team','IsAllocated','IsRequested','Location__Name','BenchData','AllocatedDate','status','deallocateBy')
         #changes
         summary_data_list = []
         if allocation_data:
@@ -71,7 +71,8 @@ def DeallocationSchedular():
                 if (each_allocation['ToWW'] == current_workweek) or \
                     (each_allocation['ToWW'] == previous_workweek_1) or \
                         (each_allocation['ToWW'] == previous_workweek) or \
-                            (int(each_allocation['ToWW'][0:2]) <= int(Workweek) and int(each_allocation['ToWW'][2:]) <= int(year)):
+                            (int(each_allocation['ToWW'][2:]<int(year))) or \
+                            ((int(each_allocation['ToWW'][2:]) == int(year)) and (int(each_allocation['ToWW'][:2]) < int(current_workweek[:2]))):
                     
                 #     # If allocation expiry workweek is current week
                     current_allocation = AllocationDetailsModel.objects.get(id=each_allocation['id'])
@@ -79,7 +80,7 @@ def DeallocationSchedular():
                     current_allocation.IsAllocated=False
                     current_allocation.Reason="Allocation Completed successfully"
                     #changes
-                    current_allocation.DeallocatedBy = "Automated Deallocation"
+                    current_allocation.deallocatedBy = "Automated Deallocation"
                     current_allocation.DeallocatedDate = datetime.now()
                     current_allocation.save()
                     benchdata = current_allocation.BenchData
@@ -118,6 +119,7 @@ def DeallocationSchedular():
                                 "vendor":current_allocation.Vendor,
                                 "allocatedto":current_allocation.AllocatedTo[0]['Name'],
                                 "notifyto":','.join(notify_persons),
+                                # "Deallocatedby":allocation_data.deallocatedBy,
                                 "fromww":str(current_allocation.FromWW),
                                 "toww":str(current_allocation.ToWW),
                                 "duration":current_allocation.Duration,

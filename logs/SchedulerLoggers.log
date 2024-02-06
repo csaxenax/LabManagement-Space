@@ -683,3 +683,715 @@ INFO 2023-10-06 11:22:19,487 functions DeallocationSchedular 36 Scheduler Starte
 INFO 2023-10-06 11:22:30,972 functions DeallocationSchedular 191 Bench Expiry email sent for id 192,                     User ARBAZ ALI for benches ['B8']
 INFO 2023-10-06 11:22:41,520 functions DeallocationSchedular 191 Bench Expiry email sent for id 199,                     User Ajay Myaka for benches ['B11']
 INFO 2023-10-06 11:22:41,522 functions DeallocationSchedular 200 Scheduler Completed Execution
+INFO 2024-01-22 16:46:55,402 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 16:46:58,326 functions DeallocationSchedular 162 Bench Deallocated for id 228,                     User Dinesh Babu for benches ['C5', 'C6', 'C7']
+INFO 2024-01-22 16:46:58,326 functions DeallocationSchedular 223 Scheduler Completed Execution
+INFO 2024-01-22 16:58:17,752 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 16:58:18,591 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 16:58:19,284 functions DeallocationSchedular 228 Scheduler Completed Execution
+INFO 2024-01-22 16:58:19,818 functions DeallocationSchedular 228 Scheduler Completed Execution
+INFO 2024-01-22 16:59:17,754 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 16:59:18,445 functions DeallocationSchedular 228 Scheduler Completed Execution
+INFO 2024-01-22 16:59:18,598 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 16:59:19,291 functions DeallocationSchedular 228 Scheduler Completed Execution
+INFO 2024-01-22 17:00:17,747 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:00:18,441 functions DeallocationSchedular 228 Scheduler Completed Execution
+INFO 2024-01-22 17:00:18,590 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:00:19,291 functions DeallocationSchedular 228 Scheduler Completed Execution
+INFO 2024-01-22 17:01:17,744 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:01:18,435 functions DeallocationSchedular 228 Scheduler Completed Execution
+INFO 2024-01-22 17:01:18,587 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:01:19,300 functions DeallocationSchedular 228 Scheduler Completed Execution
+INFO 2024-01-22 17:02:17,744 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:02:18,439 functions DeallocationSchedular 228 Scheduler Completed Execution
+INFO 2024-01-22 17:03:17,753 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:03:18,454 functions DeallocationSchedular 228 Scheduler Completed Execution
+INFO 2024-01-22 17:04:08,372 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:04:09,064 functions DeallocationSchedular 230 Scheduler Completed Execution
+INFO 2024-01-22 17:04:17,745 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:04:18,440 functions DeallocationSchedular 228 Scheduler Completed Execution
+INFO 2024-01-22 17:06:07,929 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:06:08,707 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:06:09,421 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:06:10,053 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:07:07,932 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:07:08,645 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:08:06,260 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:08:06,989 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:08:07,942 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:08:08,655 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:09:07,930 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:09:08,657 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:09:40,085 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:09:40,780 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:10:07,938 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:10:08,648 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:10:40,080 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:10:40,769 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:11:07,922 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:11:08,635 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:12:07,932 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:12:08,638 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:12:11,341 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:12:12,065 functions DeallocationSchedular 233 Scheduler Completed Execution
+INFO 2024-01-22 17:13:07,936 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:13:08,638 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:13:11,355 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:13:12,081 functions DeallocationSchedular 233 Scheduler Completed Execution
+INFO 2024-01-22 17:14:07,934 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:14:08,645 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:14:16,446 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:14:17,171 functions DeallocationSchedular 234 Scheduler Completed Execution
+INFO 2024-01-22 17:15:07,936 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:15:08,648 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:15:16,435 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:15:17,179 functions DeallocationSchedular 234 Scheduler Completed Execution
+INFO 2024-01-22 17:16:07,939 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:16:08,673 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:16:16,434 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:16:17,195 functions DeallocationSchedular 234 Scheduler Completed Execution
+INFO 2024-01-22 17:17:07,926 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:17:08,637 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:17:16,436 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:17:17,163 functions DeallocationSchedular 234 Scheduler Completed Execution
+INFO 2024-01-22 17:18:07,931 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:18:08,642 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:18:16,445 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:18:17,173 functions DeallocationSchedular 234 Scheduler Completed Execution
+INFO 2024-01-22 17:19:07,928 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:19:08,633 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:19:16,447 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:19:17,169 functions DeallocationSchedular 234 Scheduler Completed Execution
+INFO 2024-01-22 17:20:07,927 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:20:08,635 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:20:16,445 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:20:17,167 functions DeallocationSchedular 234 Scheduler Completed Execution
+INFO 2024-01-22 17:21:07,934 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:21:08,637 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:21:16,444 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:21:17,171 functions DeallocationSchedular 234 Scheduler Completed Execution
+INFO 2024-01-22 17:22:07,942 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:22:08,653 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:22:16,445 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:22:17,179 functions DeallocationSchedular 234 Scheduler Completed Execution
+INFO 2024-01-22 17:23:07,928 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:23:08,643 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:23:16,436 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:23:17,161 functions DeallocationSchedular 234 Scheduler Completed Execution
+INFO 2024-01-22 17:24:07,928 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:24:08,648 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:24:16,441 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:24:17,223 functions DeallocationSchedular 234 Scheduler Completed Execution
+INFO 2024-01-22 17:25:07,933 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:25:08,670 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:25:16,436 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:25:17,201 functions DeallocationSchedular 234 Scheduler Completed Execution
+INFO 2024-01-22 17:26:07,940 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:26:08,685 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:26:16,441 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:26:17,200 functions DeallocationSchedular 234 Scheduler Completed Execution
+INFO 2024-01-22 17:27:07,926 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:27:08,665 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:27:16,444 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:27:17,205 functions DeallocationSchedular 234 Scheduler Completed Execution
+INFO 2024-01-22 17:28:07,930 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:28:08,632 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:28:16,437 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:28:17,164 functions DeallocationSchedular 234 Scheduler Completed Execution
+INFO 2024-01-22 17:29:07,921 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:29:08,621 functions DeallocationSchedular 231 Scheduler Completed Execution
+INFO 2024-01-22 17:29:16,445 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-01-22 17:29:17,173 functions DeallocationSchedular 234 Scheduler Completed Execution
+INFO 2024-01-22 17:31:38,441 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 17:31:39,234 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 17:31:43,254 functions DeallocationSchedular 176 Bench Deallocated for id 23,                     User Nikhil Bhandary for benches ['C1', 'C2', 'C3', 'C4', 'B12', 'B13']
+INFO 2024-01-22 17:31:43,599 functions DeallocationSchedular 176 Bench Deallocated for id 23,                     User Nikhil Bhandary for benches ['C1', 'C2', 'C3', 'C4', 'B12', 'B13']
+INFO 2024-01-22 17:31:44,710 functions DeallocationSchedular 176 Bench Deallocated for id 24,                     User Nikhil Bhandary for benches ['C5']
+INFO 2024-01-22 17:31:44,768 functions DeallocationSchedular 176 Bench Deallocated for id 24,                     User Nikhil Bhandary for benches ['C5']
+INFO 2024-01-22 17:31:46,630 functions DeallocationSchedular 176 Bench Deallocated for id 25,                     User Nikhil Bhandary for benches ['B14', 'B15', 'B16', 'B17']
+INFO 2024-01-22 17:31:46,633 functions DeallocationSchedular 176 Bench Deallocated for id 25,                     User Nikhil Bhandary for benches ['B14', 'B15', 'B16', 'B17']
+INFO 2024-01-22 17:31:49,468 functions DeallocationSchedular 176 Bench Deallocated for id 57,                     User Nikhila G Chandran for benches ['E1', 'E2', 'E3', 'F1', 'F7', 'F8', 'F9', 'F10']
+INFO 2024-01-22 17:31:49,475 functions DeallocationSchedular 176 Bench Deallocated for id 57,                     User Nikhila G Chandran for benches ['E1', 'E2', 'E3', 'F1', 'F7', 'F8', 'F9', 'F10']
+INFO 2024-01-22 17:32:03,900 functions DeallocationSchedular 176 Bench Deallocated for id 59,                     User Krishna Prasad M for benches ['E14', 'E15', 'E18', 'E19', 'E20', 'E21', 'E22', 'F11', 'F10', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F17', 'F18', 'F19', 'F20', 'F21', 'G4', 'G3', 'G2', 'G1', 'G16', 'G17', 'G18', 'G19', 'G20', 'G21', 'G22', 'H11', 'H10', 'H9', 'H8', 'H7', 'H6', 'H5', 'H4', 'H3', 'H2', 'H1', 'H12', 'H13', 'H14', 'H15', 'H16', 'H17', 'H18', 'H19', 'H20', 'H21', 'H22']
+INFO 2024-01-22 17:32:03,907 functions DeallocationSchedular 176 Bench Deallocated for id 59,                     User Krishna Prasad M for benches ['E14', 'E15', 'E18', 'E19', 'E20', 'E21', 'E22', 'F11', 'F10', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F17', 'F18', 'F19', 'F20', 'F21', 'G4', 'G3', 'G2', 'G1', 'G16', 'G17', 'G18', 'G19', 'G20', 'G21', 'G22', 'H11', 'H10', 'H9', 'H8', 'H7', 'H6', 'H5', 'H4', 'H3', 'H2', 'H1', 'H12', 'H13', 'H14', 'H15', 'H16', 'H17', 'H18', 'H19', 'H20', 'H21', 'H22']
+INFO 2024-01-22 17:32:08,607 functions DeallocationSchedular 176 Bench Deallocated for id 60,                     User Anjali Thakur for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14', 'A15', 'A16-Rack']
+INFO 2024-01-22 17:32:08,625 functions DeallocationSchedular 176 Bench Deallocated for id 60,                     User Anjali Thakur for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14', 'A15', 'A16-Rack']
+INFO 2024-01-22 17:32:10,003 functions DeallocationSchedular 176 Bench Deallocated for id 61,                     User Prabhu Rajendran for benches ['C-1', 'C-2']
+INFO 2024-01-22 17:32:10,014 functions DeallocationSchedular 176 Bench Deallocated for id 61,                     User Prabhu Rajendran for benches ['C-1', 'C-2']
+INFO 2024-01-22 17:32:11,177 functions DeallocationSchedular 176 Bench Deallocated for id 62,                     User Prabhu Rajendran for benches ['C-3']
+INFO 2024-01-22 17:32:11,189 functions DeallocationSchedular 176 Bench Deallocated for id 62,                     User Prabhu Rajendran for benches ['C-3']
+INFO 2024-01-22 17:32:12,566 functions DeallocationSchedular 176 Bench Deallocated for id 63,                     User Prabhu Rajendran for benches ['B-1', 'B-2']
+INFO 2024-01-22 17:32:12,609 functions DeallocationSchedular 176 Bench Deallocated for id 63,                     User Prabhu Rajendran for benches ['B-1', 'B-2']
+INFO 2024-01-22 17:32:15,675 functions DeallocationSchedular 176 Bench Deallocated for id 81,                     User Ravi Dattani for benches ['K22', 'K21', 'K20', 'K19', 'K17', 'K16', 'K14', 'K13', 'K12']
+INFO 2024-01-22 17:32:15,728 functions DeallocationSchedular 176 Bench Deallocated for id 81,                     User Ravi Dattani for benches ['K22', 'K21', 'K20', 'K19', 'K17', 'K16', 'K14', 'K13', 'K12']
+INFO 2024-01-22 17:32:16,851 functions DeallocationSchedular 176 Bench Deallocated for id 83,                     User Ankit Kumar for benches ['K2']
+INFO 2024-01-22 17:32:16,937 functions DeallocationSchedular 176 Bench Deallocated for id 83,                     User Ankit Kumar for benches ['K2']
+INFO 2024-01-22 17:32:18,269 functions DeallocationSchedular 176 Bench Deallocated for id 85,                     User Sachidananda Gowda for benches ['I10', 'K3']
+INFO 2024-01-22 17:32:18,372 functions DeallocationSchedular 176 Bench Deallocated for id 85,                     User Sachidananda Gowda for benches ['I10', 'K3']
+INFO 2024-01-22 17:32:20,234 functions DeallocationSchedular 176 Bench Deallocated for id 89,                     User Tanya Jaiswal for benches ['J19', 'J5', 'J4', 'J3']
+INFO 2024-01-22 17:32:20,292 functions DeallocationSchedular 176 Bench Deallocated for id 89,                     User Tanya Jaiswal for benches ['J19', 'J5', 'J4', 'J3']
+INFO 2024-01-22 17:32:21,640 functions DeallocationSchedular 176 Bench Deallocated for id 92,                     User Anusha Ramachandran for benches ['J1', 'J2']
+INFO 2024-01-22 17:32:21,727 functions DeallocationSchedular 176 Bench Deallocated for id 92,                     User Anusha Ramachandran for benches ['J1', 'J2']
+INFO 2024-01-22 17:32:23,049 functions DeallocationSchedular 176 Bench Deallocated for id 93,                     User Priyanka Singh for benches ['E12', 'E13']
+INFO 2024-01-22 17:32:23,160 functions DeallocationSchedular 176 Bench Deallocated for id 93,                     User Priyanka Singh for benches ['E12', 'E13']
+INFO 2024-01-22 17:32:24,441 functions DeallocationSchedular 176 Bench Deallocated for id 94,                     User Tanya Jaiswal for benches ['A8', 'A9']
+INFO 2024-01-22 17:32:24,579 functions DeallocationSchedular 176 Bench Deallocated for id 94,                     User Tanya Jaiswal for benches ['A8', 'A9']
+INFO 2024-01-22 17:32:25,864 functions DeallocationSchedular 176 Bench Deallocated for id 95,                     User Vengadesan A for benches ['B22', 'B21']
+INFO 2024-01-22 17:32:26,030 functions DeallocationSchedular 176 Bench Deallocated for id 95,                     User Vengadesan A for benches ['B22', 'B21']
+INFO 2024-01-22 17:32:28,216 functions DeallocationSchedular 176 Bench Deallocated for id 96,                     User Raghav Angadimani for benches ['F16', 'F15', 'F14', 'F13', 'F12', 'F11']
+INFO 2024-01-22 17:32:28,411 functions DeallocationSchedular 176 Bench Deallocated for id 96,                     User Raghav Angadimani for benches ['F16', 'F15', 'F14', 'F13', 'F12', 'F11']
+INFO 2024-01-22 17:32:35,067 functions DeallocationSchedular 176 Bench Deallocated for id 111,                     User Abbas Batcha for benches ['C18', 'C19', 'C20', 'D0', 'D10', 'D9', 'D8', 'D7', 'D6', 'D5', 'D4', 'D3', 'D2', 'D1', 'D21', 'D20', 'D19', 'D18', 'D17', 'D16', 'D15', 'D14', 'D13', 'D12', 'D11']
+INFO 2024-01-22 17:32:35,325 functions DeallocationSchedular 176 Bench Deallocated for id 111,                     User Abbas Batcha for benches ['C18', 'C19', 'C20', 'D0', 'D10', 'D9', 'D8', 'D7', 'D6', 'D5', 'D4', 'D3', 'D2', 'D1', 'D21', 'D20', 'D19', 'D18', 'D17', 'D16', 'D15', 'D14', 'D13', 'D12', 'D11']
+INFO 2024-01-22 17:32:37,654 functions DeallocationSchedular 176 Bench Deallocated for id 106,                     User Sreekanth Nidiganti for benches ['G5', 'G6', 'G7', 'G8', 'G9', 'G10', 'G11']
+INFO 2024-01-22 17:32:38,046 functions DeallocationSchedular 176 Bench Deallocated for id 106,                     User Sreekanth Nidiganti for benches ['G5', 'G6', 'G7', 'G8', 'G9', 'G10', 'G11']
+INFO 2024-01-22 17:32:39,520 functions DeallocationSchedular 176 Bench Deallocated for id 108,                     User Narayanan Jayaraman for benches ['B1', 'B2', 'B3', 'B4']
+INFO 2024-01-22 17:32:39,952 functions DeallocationSchedular 176 Bench Deallocated for id 108,                     User Narayanan Jayaraman for benches ['B1', 'B2', 'B3', 'B4']
+INFO 2024-01-22 17:32:47,308 functions DeallocationSchedular 176 Bench Deallocated for id 109,                     User Abbas Batcha for benches ['E12', 'E22', 'E13', 'E14', 'E15', 'E16', 'E17', 'E18', 'E19', 'E20', 'E21', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F20', 'F19', 'F18', 'F17', 'F16', 'F15', 'F14', 'F13', 'F12']
+INFO 2024-01-22 17:32:47,877 functions DeallocationSchedular 176 Bench Deallocated for id 109,                     User Abbas Batcha for benches ['E12', 'E22', 'E13', 'E14', 'E15', 'E16', 'E17', 'E18', 'E19', 'E20', 'E21', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F20', 'F19', 'F18', 'F17', 'F16', 'F15', 'F14', 'F13', 'F12']
+INFO 2024-01-22 17:32:48,484 functions DeallocationSchedular 176 Bench Deallocated for id 115,                     User Pratibha Singh for benches ['K5']
+INFO 2024-01-22 17:32:49,080 functions DeallocationSchedular 176 Bench Deallocated for id 115,                     User Pratibha Singh for benches ['K5']
+INFO 2024-01-22 17:32:50,128 functions DeallocationSchedular 176 Bench Deallocated for id 143,                     User Abbas Batcha for benches ['B5', 'B6', 'B7']
+INFO 2024-01-22 17:32:50,746 functions DeallocationSchedular 176 Bench Deallocated for id 143,                     User Abbas Batcha for benches ['B5', 'B6', 'B7']
+INFO 2024-01-22 17:32:52,469 functions DeallocationSchedular 176 Bench Deallocated for id 146,                     User Abbas Batcha for benches ['A1', 'A2', 'E4', 'E5', 'E6', 'E7']
+INFO 2024-01-22 17:32:53,133 functions DeallocationSchedular 176 Bench Deallocated for id 146,                     User Abbas Batcha for benches ['A1', 'A2', 'E4', 'E5', 'E6', 'E7']
+INFO 2024-01-22 17:32:54,325 functions DeallocationSchedular 176 Bench Deallocated for id 148,                     User Abbas Batcha for benches ['F2', 'F3', 'F4', 'F5']
+INFO 2024-01-22 17:32:55,057 functions DeallocationSchedular 176 Bench Deallocated for id 148,                     User Abbas Batcha for benches ['F2', 'F3', 'F4', 'F5']
+INFO 2024-01-22 17:32:56,467 functions DeallocationSchedular 176 Bench Deallocated for id 162,                     User Krishna Prasad M for benches ['D22', 'D23', 'D24', 'D25', 'D26']
+INFO 2024-01-22 17:32:57,202 functions DeallocationSchedular 176 Bench Deallocated for id 162,                     User Krishna Prasad M for benches ['D22', 'D23', 'D24', 'D25', 'D26']
+INFO 2024-01-22 17:32:58,326 functions DeallocationSchedular 176 Bench Deallocated for id 163,                     User Krishna Prasad M for benches ['G12', 'G13', 'G14', 'G15']
+INFO 2024-01-22 17:32:59,093 functions DeallocationSchedular 176 Bench Deallocated for id 163,                     User Krishna Prasad M for benches ['G12', 'G13', 'G14', 'G15']
+INFO 2024-01-22 17:33:01,519 functions DeallocationSchedular 176 Bench Deallocated for id 166,                     User Sabarigirish Radhakrishnan for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10']
+INFO 2024-01-22 17:33:02,377 functions DeallocationSchedular 176 Bench Deallocated for id 166,                     User Sabarigirish Radhakrishnan for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10']
+INFO 2024-01-22 17:33:10,889 functions DeallocationSchedular 176 Bench Deallocated for id 167,                     User Pradeep Kumar S for benches ['K1', 'K4', 'K9', 'K10', 'K11', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'L10', 'L21', 'L16', 'L15', 'L14', 'L13', 'L12', 'RF1', 'RF2', 'RF3', 'I6', 'I7', 'I9', 'J22', 'J21', 'J20', 'J16', 'J15', 'J12', 'J6', 'J7', 'J8']
+INFO 2024-01-22 17:33:11,950 functions DeallocationSchedular 176 Bench Deallocated for id 167,                     User Pradeep Kumar S for benches ['K1', 'K4', 'K9', 'K10', 'K11', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'L10', 'L21', 'L16', 'L15', 'L14', 'L13', 'L12', 'RF1', 'RF2', 'RF3', 'I6', 'I7', 'I9', 'J22', 'J21', 'J20', 'J16', 'J15', 'J12', 'J6', 'J7', 'J8']
+INFO 2024-01-22 17:33:12,093 functions DeallocationSchedular 176 Bench Deallocated for id 177,                     User Archana N for benches ['F6']
+INFO 2024-01-22 17:33:13,160 functions DeallocationSchedular 176 Bench Deallocated for id 177,                     User Archana N for benches ['F6']
+INFO 2024-01-22 17:33:20,289 functions DeallocationSchedular 176 Bench Deallocated for id 183,                     User Chandrashekhar Ramgond for benches ['B8', 'B10', 'B9', 'B11', 'B13', 'B12', 'B14', 'B15', 'B16', 'B17', 'C8', 'D8', 'C9', 'D9', 'C10', 'D10', 'C11', 'D11', 'C12', 'D12', 'C13', 'D13', 'C14', 'D14', 'C15', 'D15', 'C16', 'D16', 'C17', 'D17']
+INFO 2024-01-22 17:33:20,304 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 17:33:21,479 functions DeallocationSchedular 176 Bench Deallocated for id 183,                     User Chandrashekhar Ramgond for benches ['B8', 'B10', 'B9', 'B11', 'B13', 'B12', 'B14', 'B15', 'B16', 'B17', 'C8', 'D8', 'C9', 'D9', 'C10', 'D10', 'C11', 'D11', 'C12', 'D12', 'C13', 'D13', 'C14', 'D14', 'C15', 'D15', 'C16', 'D16', 'C17', 'D17']
+INFO 2024-01-22 17:33:21,495 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 17:33:38,450 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 17:33:38,937 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 17:33:39,232 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 17:33:39,750 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 17:53:31,071 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 17:53:31,944 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 17:53:35,750 functions DeallocationSchedular 176 Bench Deallocated for id 23,                     User Nikhil Bhandary for benches ['C1', 'C2', 'C3', 'C4', 'B12', 'B13']
+INFO 2024-01-22 17:53:36,189 functions DeallocationSchedular 176 Bench Deallocated for id 23,                     User Nikhil Bhandary for benches ['C1', 'C2', 'C3', 'C4', 'B12', 'B13']
+INFO 2024-01-22 17:53:37,002 functions DeallocationSchedular 176 Bench Deallocated for id 24,                     User Nikhil Bhandary for benches ['C5']
+INFO 2024-01-22 17:53:37,386 functions DeallocationSchedular 176 Bench Deallocated for id 24,                     User Nikhil Bhandary for benches ['C5']
+INFO 2024-01-22 17:53:38,931 functions DeallocationSchedular 176 Bench Deallocated for id 25,                     User Nikhil Bhandary for benches ['B14', 'B15', 'B16', 'B17']
+INFO 2024-01-22 17:53:39,266 functions DeallocationSchedular 176 Bench Deallocated for id 25,                     User Nikhil Bhandary for benches ['B14', 'B15', 'B16', 'B17']
+INFO 2024-01-22 17:53:41,808 functions DeallocationSchedular 176 Bench Deallocated for id 57,                     User Nikhila G Chandran for benches ['E1', 'E2', 'E3', 'F1', 'F7', 'F8', 'F9', 'F10']
+INFO 2024-01-22 17:53:42,071 functions DeallocationSchedular 176 Bench Deallocated for id 57,                     User Nikhila G Chandran for benches ['E1', 'E2', 'E3', 'F1', 'F7', 'F8', 'F9', 'F10']
+INFO 2024-01-22 17:53:56,888 functions DeallocationSchedular 176 Bench Deallocated for id 59,                     User Krishna Prasad M for benches ['E14', 'E15', 'E18', 'E19', 'E20', 'E21', 'E22', 'F11', 'F10', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F17', 'F18', 'F19', 'F20', 'F21', 'G4', 'G3', 'G2', 'G1', 'G16', 'G17', 'G18', 'G19', 'G20', 'G21', 'G22', 'H11', 'H10', 'H9', 'H8', 'H7', 'H6', 'H5', 'H4', 'H3', 'H2', 'H1', 'H12', 'H13', 'H14', 'H15', 'H16', 'H17', 'H18', 'H19', 'H20', 'H21', 'H22']
+INFO 2024-01-22 17:53:57,292 functions DeallocationSchedular 176 Bench Deallocated for id 59,                     User Krishna Prasad M for benches ['E14', 'E15', 'E18', 'E19', 'E20', 'E21', 'E22', 'F11', 'F10', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F17', 'F18', 'F19', 'F20', 'F21', 'G4', 'G3', 'G2', 'G1', 'G16', 'G17', 'G18', 'G19', 'G20', 'G21', 'G22', 'H11', 'H10', 'H9', 'H8', 'H7', 'H6', 'H5', 'H4', 'H3', 'H2', 'H1', 'H12', 'H13', 'H14', 'H15', 'H16', 'H17', 'H18', 'H19', 'H20', 'H21', 'H22']
+INFO 2024-01-22 17:54:01,626 functions DeallocationSchedular 176 Bench Deallocated for id 60,                     User Anjali Thakur for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14', 'A15', 'A16-Rack']
+INFO 2024-01-22 17:54:01,925 functions DeallocationSchedular 176 Bench Deallocated for id 60,                     User Anjali Thakur for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14', 'A15', 'A16-Rack']
+INFO 2024-01-22 17:54:03,046 functions DeallocationSchedular 176 Bench Deallocated for id 61,                     User Prabhu Rajendran for benches ['C-1', 'C-2']
+INFO 2024-01-22 17:54:03,342 functions DeallocationSchedular 176 Bench Deallocated for id 61,                     User Prabhu Rajendran for benches ['C-1', 'C-2']
+INFO 2024-01-22 17:54:04,248 functions DeallocationSchedular 176 Bench Deallocated for id 62,                     User Prabhu Rajendran for benches ['C-3']
+INFO 2024-01-22 17:54:04,493 functions DeallocationSchedular 176 Bench Deallocated for id 62,                     User Prabhu Rajendran for benches ['C-3']
+INFO 2024-01-22 17:54:05,657 functions DeallocationSchedular 176 Bench Deallocated for id 63,                     User Prabhu Rajendran for benches ['B-1', 'B-2']
+INFO 2024-01-22 17:54:05,857 functions DeallocationSchedular 176 Bench Deallocated for id 63,                     User Prabhu Rajendran for benches ['B-1', 'B-2']
+INFO 2024-01-22 17:54:08,796 functions DeallocationSchedular 176 Bench Deallocated for id 81,                     User Ravi Dattani for benches ['K22', 'K21', 'K20', 'K19', 'K17', 'K16', 'K14', 'K13', 'K12']
+INFO 2024-01-22 17:54:09,236 functions DeallocationSchedular 176 Bench Deallocated for id 81,                     User Ravi Dattani for benches ['K22', 'K21', 'K20', 'K19', 'K17', 'K16', 'K14', 'K13', 'K12']
+INFO 2024-01-22 17:54:10,049 functions DeallocationSchedular 176 Bench Deallocated for id 83,                     User Ankit Kumar for benches ['K2']
+INFO 2024-01-22 17:54:10,440 functions DeallocationSchedular 176 Bench Deallocated for id 83,                     User Ankit Kumar for benches ['K2']
+INFO 2024-01-22 17:54:11,518 functions DeallocationSchedular 176 Bench Deallocated for id 85,                     User Sachidananda Gowda for benches ['I10', 'K3']
+INFO 2024-01-22 17:54:11,927 functions DeallocationSchedular 176 Bench Deallocated for id 85,                     User Sachidananda Gowda for benches ['I10', 'K3']
+INFO 2024-01-22 17:54:13,480 functions DeallocationSchedular 176 Bench Deallocated for id 89,                     User Tanya Jaiswal for benches ['J19', 'J5', 'J4', 'J3']
+INFO 2024-01-22 17:54:14,288 functions DeallocationSchedular 176 Bench Deallocated for id 89,                     User Tanya Jaiswal for benches ['J19', 'J5', 'J4', 'J3']
+INFO 2024-01-22 17:54:14,934 functions DeallocationSchedular 176 Bench Deallocated for id 92,                     User Anusha Ramachandran for benches ['J1', 'J2']
+INFO 2024-01-22 17:54:15,697 functions DeallocationSchedular 176 Bench Deallocated for id 92,                     User Anusha Ramachandran for benches ['J1', 'J2']
+INFO 2024-01-22 17:54:16,392 functions DeallocationSchedular 176 Bench Deallocated for id 93,                     User Priyanka Singh for benches ['E12', 'E13']
+INFO 2024-01-22 17:54:17,122 functions DeallocationSchedular 176 Bench Deallocated for id 93,                     User Priyanka Singh for benches ['E12', 'E13']
+INFO 2024-01-22 17:54:17,825 functions DeallocationSchedular 176 Bench Deallocated for id 94,                     User Tanya Jaiswal for benches ['A8', 'A9']
+INFO 2024-01-22 17:54:18,541 functions DeallocationSchedular 176 Bench Deallocated for id 94,                     User Tanya Jaiswal for benches ['A8', 'A9']
+INFO 2024-01-22 17:54:19,276 functions DeallocationSchedular 176 Bench Deallocated for id 95,                     User Vengadesan A for benches ['B22', 'B21']
+INFO 2024-01-22 17:54:19,959 functions DeallocationSchedular 176 Bench Deallocated for id 95,                     User Vengadesan A for benches ['B22', 'B21']
+INFO 2024-01-22 17:54:21,711 functions DeallocationSchedular 176 Bench Deallocated for id 96,                     User Raghav Angadimani for benches ['F16', 'F15', 'F14', 'F13', 'F12', 'F11']
+INFO 2024-01-22 17:54:22,317 functions DeallocationSchedular 176 Bench Deallocated for id 96,                     User Raghav Angadimani for benches ['F16', 'F15', 'F14', 'F13', 'F12', 'F11']
+INFO 2024-01-22 17:54:28,775 functions DeallocationSchedular 176 Bench Deallocated for id 111,                     User Abbas Batcha for benches ['C18', 'C19', 'C20', 'D0', 'D10', 'D9', 'D8', 'D7', 'D6', 'D5', 'D4', 'D3', 'D2', 'D1', 'D21', 'D20', 'D19', 'D18', 'D17', 'D16', 'D15', 'D14', 'D13', 'D12', 'D11']
+INFO 2024-01-22 17:54:29,236 functions DeallocationSchedular 176 Bench Deallocated for id 111,                     User Abbas Batcha for benches ['C18', 'C19', 'C20', 'D0', 'D10', 'D9', 'D8', 'D7', 'D6', 'D5', 'D4', 'D3', 'D2', 'D1', 'D21', 'D20', 'D19', 'D18', 'D17', 'D16', 'D15', 'D14', 'D13', 'D12', 'D11']
+INFO 2024-01-22 17:54:31,425 functions DeallocationSchedular 176 Bench Deallocated for id 106,                     User Sreekanth Nidiganti for benches ['G5', 'G6', 'G7', 'G8', 'G9', 'G10', 'G11']
+INFO 2024-01-22 17:54:31,863 functions DeallocationSchedular 176 Bench Deallocated for id 106,                     User Sreekanth Nidiganti for benches ['G5', 'G6', 'G7', 'G8', 'G9', 'G10', 'G11']
+INFO 2024-01-22 17:54:33,326 functions DeallocationSchedular 176 Bench Deallocated for id 108,                     User Narayanan Jayaraman for benches ['B1', 'B2', 'B3', 'B4']
+INFO 2024-01-22 17:54:33,734 functions DeallocationSchedular 176 Bench Deallocated for id 108,                     User Narayanan Jayaraman for benches ['B1', 'B2', 'B3', 'B4']
+INFO 2024-01-22 17:54:41,317 functions DeallocationSchedular 176 Bench Deallocated for id 109,                     User Abbas Batcha for benches ['E12', 'E22', 'E13', 'E14', 'E15', 'E16', 'E17', 'E18', 'E19', 'E20', 'E21', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F20', 'F19', 'F18', 'F17', 'F16', 'F15', 'F14', 'F13', 'F12']
+INFO 2024-01-22 17:54:41,463 functions DeallocationSchedular 176 Bench Deallocated for id 109,                     User Abbas Batcha for benches ['E12', 'E22', 'E13', 'E14', 'E15', 'E16', 'E17', 'E18', 'E19', 'E20', 'E21', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F20', 'F19', 'F18', 'F17', 'F16', 'F15', 'F14', 'F13', 'F12']
+INFO 2024-01-22 17:54:42,526 functions DeallocationSchedular 176 Bench Deallocated for id 115,                     User Pratibha Singh for benches ['K5']
+INFO 2024-01-22 17:54:42,639 functions DeallocationSchedular 176 Bench Deallocated for id 115,                     User Pratibha Singh for benches ['K5']
+INFO 2024-01-22 17:54:44,193 functions DeallocationSchedular 176 Bench Deallocated for id 143,                     User Abbas Batcha for benches ['B5', 'B6', 'B7']
+INFO 2024-01-22 17:54:44,248 functions DeallocationSchedular 176 Bench Deallocated for id 143,                     User Abbas Batcha for benches ['B5', 'B6', 'B7']
+INFO 2024-01-22 17:54:46,571 functions DeallocationSchedular 176 Bench Deallocated for id 146,                     User Abbas Batcha for benches ['A1', 'A2', 'E4', 'E5', 'E6', 'E7']
+INFO 2024-01-22 17:54:48,456 functions DeallocationSchedular 176 Bench Deallocated for id 148,                     User Abbas Batcha for benches ['F2', 'F3', 'F4', 'F5']
+INFO 2024-01-22 17:54:48,475 functions DeallocationSchedular 176 Bench Deallocated for id 148,                     User Abbas Batcha for benches ['F2', 'F3', 'F4', 'F5']
+INFO 2024-01-22 17:54:50,590 functions DeallocationSchedular 176 Bench Deallocated for id 162,                     User Krishna Prasad M for benches ['D22', 'D23', 'D24', 'D25', 'D26']
+INFO 2024-01-22 17:54:50,625 functions DeallocationSchedular 176 Bench Deallocated for id 162,                     User Krishna Prasad M for benches ['D22', 'D23', 'D24', 'D25', 'D26']
+INFO 2024-01-22 17:54:52,468 functions DeallocationSchedular 176 Bench Deallocated for id 163,                     User Krishna Prasad M for benches ['G12', 'G13', 'G14', 'G15']
+INFO 2024-01-22 17:54:52,531 functions DeallocationSchedular 176 Bench Deallocated for id 163,                     User Krishna Prasad M for benches ['G12', 'G13', 'G14', 'G15']
+INFO 2024-01-22 17:54:55,656 functions DeallocationSchedular 176 Bench Deallocated for id 166,                     User Sabarigirish Radhakrishnan for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10']
+INFO 2024-01-22 17:54:55,768 functions DeallocationSchedular 176 Bench Deallocated for id 166,                     User Sabarigirish Radhakrishnan for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10']
+INFO 2024-01-22 17:55:04,661 functions DeallocationSchedular 176 Bench Deallocated for id 167,                     User Pradeep Kumar S for benches ['K1', 'K4', 'K9', 'K10', 'K11', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'L10', 'L21', 'L16', 'L15', 'L14', 'L13', 'L12', 'RF1', 'RF2', 'RF3', 'I6', 'I7', 'I9', 'J22', 'J21', 'J20', 'J16', 'J15', 'J12', 'J6', 'J7', 'J8']
+INFO 2024-01-22 17:55:04,807 functions DeallocationSchedular 176 Bench Deallocated for id 167,                     User Pradeep Kumar S for benches ['K1', 'K4', 'K9', 'K10', 'K11', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'L10', 'L21', 'L16', 'L15', 'L14', 'L13', 'L12', 'RF1', 'RF2', 'RF3', 'I6', 'I7', 'I9', 'J22', 'J21', 'J20', 'J16', 'J15', 'J12', 'J6', 'J7', 'J8']
+INFO 2024-01-22 17:55:05,824 functions DeallocationSchedular 176 Bench Deallocated for id 177,                     User Archana N for benches ['F6']
+INFO 2024-01-22 17:55:05,994 functions DeallocationSchedular 176 Bench Deallocated for id 177,                     User Archana N for benches ['F6']
+INFO 2024-01-22 17:55:13,770 functions DeallocationSchedular 176 Bench Deallocated for id 183,                     User Chandrashekhar Ramgond for benches ['B8', 'B10', 'B9', 'B11', 'B13', 'B12', 'B14', 'B15', 'B16', 'B17', 'C8', 'D8', 'C9', 'D9', 'C10', 'D10', 'C11', 'D11', 'C12', 'D12', 'C13', 'D13', 'C14', 'D14', 'C15', 'D15', 'C16', 'D16', 'C17', 'D17']
+INFO 2024-01-22 17:55:13,780 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 17:55:13,992 functions DeallocationSchedular 176 Bench Deallocated for id 183,                     User Chandrashekhar Ramgond for benches ['B8', 'B10', 'B9', 'B11', 'B13', 'B12', 'B14', 'B15', 'B16', 'B17', 'C8', 'D8', 'C9', 'D9', 'C10', 'D10', 'C11', 'D11', 'C12', 'D12', 'C13', 'D13', 'C14', 'D14', 'C15', 'D15', 'C16', 'D16', 'C17', 'D17']
+INFO 2024-01-22 17:55:14,002 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 17:55:31,076 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 17:55:31,574 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 17:55:31,950 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 17:55:32,515 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 17:56:31,073 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 17:56:31,546 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 17:56:31,949 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 17:56:32,433 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 17:57:31,074 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 17:57:31,572 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 17:57:31,948 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 17:57:32,454 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 17:58:31,077 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 17:58:31,563 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 17:58:31,951 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 17:58:32,444 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 17:59:31,064 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 17:59:31,570 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 17:59:31,952 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 17:59:32,473 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 18:00:31,067 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 18:00:31,555 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 18:00:31,953 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 18:00:32,446 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:37:31,063 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:37:31,952 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:37:32,469 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:37:33,460 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:38:31,076 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:38:31,631 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:38:31,957 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:38:32,559 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:39:31,066 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:39:31,954 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:39:32,060 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:39:32,556 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:40:31,070 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:40:31,743 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:40:31,959 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:40:32,436 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:41:31,073 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:41:31,756 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:41:31,950 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:41:32,576 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:42:31,084 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:42:31,646 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:42:31,948 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:42:32,566 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:43:31,065 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:43:31,757 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:43:31,953 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:43:32,581 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:44:31,061 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:44:31,663 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:44:31,956 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:44:32,457 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:45:31,065 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:45:31,647 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:45:31,953 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:45:32,585 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:46:31,061 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:46:31,546 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:46:31,949 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:46:32,459 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:47:31,066 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:47:31,659 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:47:31,957 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:47:32,500 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:48:31,073 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:48:31,664 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:48:31,959 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:48:32,586 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:49:31,077 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:49:31,665 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:49:31,949 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:49:32,594 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:50:31,076 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:50:31,621 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:50:31,950 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:50:32,505 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:51:31,084 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:51:31,572 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:51:31,955 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:51:32,503 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:52:31,073 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:52:31,592 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:52:31,944 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:52:32,540 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:53:31,078 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:53:31,646 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:53:31,950 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:53:32,445 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:54:31,072 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:54:31,610 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:54:31,947 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:54:32,526 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:55:31,078 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:55:31,706 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:55:31,947 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:55:32,737 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:56:31,070 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:56:31,600 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:56:31,957 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:56:32,463 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:57:31,069 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:57:31,597 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:57:31,959 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:57:32,487 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:58:31,074 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:58:31,688 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:58:31,948 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:58:32,543 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:59:31,077 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:59:31,633 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 19:59:31,947 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 19:59:32,535 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:00:31,069 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:00:31,805 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:00:31,953 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:00:32,500 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:01:31,074 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:01:31,679 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:01:31,962 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:01:32,585 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:16:05,538 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:16:06,367 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:16:07,046 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:16:08,195 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:17:05,545 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:17:06,153 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:17:06,378 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:17:06,955 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:18:05,552 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:18:06,148 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:18:06,377 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:18:06,989 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:19:05,541 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:19:06,141 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:19:06,387 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:19:06,995 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:20:05,534 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:20:06,158 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:20:06,378 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:20:06,986 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:21:05,547 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:21:06,248 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:21:06,379 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:21:07,003 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:22:05,545 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:22:06,268 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:22:06,375 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:22:06,969 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:23:05,548 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:23:06,118 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:23:06,386 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:23:07,095 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:24:05,546 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:24:06,178 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:24:06,373 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:24:07,013 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:25:05,535 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:25:06,099 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:25:06,376 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:25:06,934 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:26:05,538 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:26:06,082 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:26:06,379 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:26:07,092 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:27:05,534 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:27:06,102 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:27:06,375 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:27:06,995 functions DeallocationSchedular 237 Scheduler Completed Execution
+INFO 2024-01-22 20:43:09,083 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:43:09,997 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 20:43:16,398 functions DeallocationSchedular 175 Bench Deallocated for id 23,                     User Nikhil Bhandary for benches ['C1', 'C2', 'C3', 'C4', 'B12', 'B13']
+INFO 2024-01-22 20:43:17,596 functions DeallocationSchedular 175 Bench Deallocated for id 23,                     User Nikhil Bhandary for benches ['C1', 'C2', 'C3', 'C4', 'B12', 'B13']
+INFO 2024-01-22 20:43:18,766 functions DeallocationSchedular 175 Bench Deallocated for id 24,                     User Nikhil Bhandary for benches ['C5']
+INFO 2024-01-22 20:43:19,943 functions DeallocationSchedular 175 Bench Deallocated for id 24,                     User Nikhil Bhandary for benches ['C5']
+INFO 2024-01-22 20:43:23,460 functions DeallocationSchedular 175 Bench Deallocated for id 25,                     User Nikhil Bhandary for benches ['B14', 'B15', 'B16', 'B17']
+INFO 2024-01-22 20:43:25,069 functions DeallocationSchedular 175 Bench Deallocated for id 25,                     User Nikhil Bhandary for benches ['B14', 'B15', 'B16', 'B17']
+INFO 2024-01-22 20:43:31,875 functions DeallocationSchedular 175 Bench Deallocated for id 57,                     User Nikhila G Chandran for benches ['E1', 'E2', 'E3', 'F1', 'F7', 'F8', 'F9', 'F10']
+INFO 2024-01-22 20:43:32,599 functions DeallocationSchedular 175 Bench Deallocated for id 57,                     User Nikhila G Chandran for benches ['E1', 'E2', 'E3', 'F1', 'F7', 'F8', 'F9', 'F10']
+INFO 2024-01-22 20:44:35,011 functions DeallocationSchedular 175 Bench Deallocated for id 59,                     User Krishna Prasad M for benches ['E14', 'E15', 'E18', 'E19', 'E20', 'E21', 'E22', 'F11', 'F10', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F17', 'F18', 'F19', 'F20', 'F21', 'G4', 'G3', 'G2', 'G1', 'G16', 'G17', 'G18', 'G19', 'G20', 'G21', 'G22', 'H11', 'H10', 'H9', 'H8', 'H7', 'H6', 'H5', 'H4', 'H3', 'H2', 'H1', 'H12', 'H13', 'H14', 'H15', 'H16', 'H17', 'H18', 'H19', 'H20', 'H21', 'H22']
+INFO 2024-01-22 20:44:36,275 functions DeallocationSchedular 175 Bench Deallocated for id 59,                     User Krishna Prasad M for benches ['E14', 'E15', 'E18', 'E19', 'E20', 'E21', 'E22', 'F11', 'F10', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F17', 'F18', 'F19', 'F20', 'F21', 'G4', 'G3', 'G2', 'G1', 'G16', 'G17', 'G18', 'G19', 'G20', 'G21', 'G22', 'H11', 'H10', 'H9', 'H8', 'H7', 'H6', 'H5', 'H4', 'H3', 'H2', 'H1', 'H12', 'H13', 'H14', 'H15', 'H16', 'H17', 'H18', 'H19', 'H20', 'H21', 'H22']
+INFO 2024-01-22 20:44:40,049 functions DeallocationSchedular 175 Bench Deallocated for id 60,                     User Anjali Thakur for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14', 'A15', 'A16-Rack']
+INFO 2024-01-22 20:44:41,553 functions DeallocationSchedular 175 Bench Deallocated for id 61,                     User Prabhu Rajendran for benches ['C-1', 'C-2']
+INFO 2024-01-22 20:44:42,020 functions DeallocationSchedular 175 Bench Deallocated for id 60,                     User Anjali Thakur for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14', 'A15', 'A16-Rack']
+INFO 2024-01-22 20:44:42,757 functions DeallocationSchedular 175 Bench Deallocated for id 62,                     User Prabhu Rajendran for benches ['C-3']
+INFO 2024-01-22 20:44:43,446 functions DeallocationSchedular 175 Bench Deallocated for id 61,                     User Prabhu Rajendran for benches ['C-1', 'C-2']
+INFO 2024-01-22 20:44:44,176 functions DeallocationSchedular 175 Bench Deallocated for id 63,                     User Prabhu Rajendran for benches ['B-1', 'B-2']
+INFO 2024-01-22 20:44:44,619 functions DeallocationSchedular 175 Bench Deallocated for id 62,                     User Prabhu Rajendran for benches ['C-3']
+INFO 2024-01-22 20:44:46,014 functions DeallocationSchedular 175 Bench Deallocated for id 63,                     User Prabhu Rajendran for benches ['B-1', 'B-2']
+INFO 2024-01-22 20:44:52,512 functions DeallocationSchedular 175 Bench Deallocated for id 81,                     User Ravi Dattani for benches ['K22', 'K21', 'K20', 'K19', 'K17', 'K16', 'K14', 'K13', 'K12']
+INFO 2024-01-22 20:44:54,888 functions DeallocationSchedular 175 Bench Deallocated for id 83,                     User Ankit Kumar for benches ['K2']
+INFO 2024-01-22 20:44:58,014 functions DeallocationSchedular 175 Bench Deallocated for id 81,                     User Ravi Dattani for benches ['K22', 'K21', 'K20', 'K19', 'K17', 'K16', 'K14', 'K13', 'K12']
+INFO 2024-01-22 20:44:58,515 functions DeallocationSchedular 175 Bench Deallocated for id 85,                     User Sachidananda Gowda for benches ['I10', 'K3']
+INFO 2024-01-22 20:45:00,539 functions DeallocationSchedular 175 Bench Deallocated for id 83,                     User Ankit Kumar for benches ['K2']
+INFO 2024-01-22 20:45:04,051 functions DeallocationSchedular 175 Bench Deallocated for id 85,                     User Sachidananda Gowda for benches ['I10', 'K3']
+INFO 2024-01-22 20:45:04,483 functions DeallocationSchedular 175 Bench Deallocated for id 89,                     User Tanya Jaiswal for benches ['J19', 'J5', 'J4', 'J3']
+INFO 2024-01-22 20:45:08,012 functions DeallocationSchedular 175 Bench Deallocated for id 92,                     User Anusha Ramachandran for benches ['J1', 'J2']
+INFO 2024-01-22 20:45:09,949 functions DeallocationSchedular 175 Bench Deallocated for id 89,                     User Tanya Jaiswal for benches ['J19', 'J5', 'J4', 'J3']
+INFO 2024-01-22 20:45:11,135 functions DeallocationSchedular 175 Bench Deallocated for id 93,                     User Priyanka Singh for benches ['E12', 'E13']
+INFO 2024-01-22 20:45:13,233 functions DeallocationSchedular 175 Bench Deallocated for id 92,                     User Anusha Ramachandran for benches ['J1', 'J2']
+INFO 2024-01-22 20:45:13,791 functions DeallocationSchedular 175 Bench Deallocated for id 94,                     User Tanya Jaiswal for benches ['A8', 'A9']
+INFO 2024-01-22 20:45:16,497 functions DeallocationSchedular 175 Bench Deallocated for id 93,                     User Priyanka Singh for benches ['E12', 'E13']
+INFO 2024-01-22 20:45:17,593 functions DeallocationSchedular 175 Bench Deallocated for id 95,                     User Vengadesan A for benches ['B22', 'B21']
+INFO 2024-01-22 20:45:19,082 functions DeallocationSchedular 175 Bench Deallocated for id 94,                     User Tanya Jaiswal for benches ['A8', 'A9']
+INFO 2024-01-22 20:45:21,688 functions DeallocationSchedular 175 Bench Deallocated for id 95,                     User Vengadesan A for benches ['B22', 'B21']
+INFO 2024-01-22 20:45:25,994 functions DeallocationSchedular 175 Bench Deallocated for id 96,                     User Raghav Angadimani for benches ['F16', 'F15', 'F14', 'F13', 'F12', 'F11']
+INFO 2024-01-22 20:45:26,477 functions DeallocationSchedular 175 Bench Deallocated for id 96,                     User Raghav Angadimani for benches ['F16', 'F15', 'F14', 'F13', 'F12', 'F11']
+INFO 2024-01-22 20:45:45,517 functions DeallocationSchedular 175 Bench Deallocated for id 111,                     User Abbas Batcha for benches ['C18', 'C19', 'C20', 'D0', 'D10', 'D9', 'D8', 'D7', 'D6', 'D5', 'D4', 'D3', 'D2', 'D1', 'D21', 'D20', 'D19', 'D18', 'D17', 'D16', 'D15', 'D14', 'D13', 'D12', 'D11']
+INFO 2024-01-22 20:45:49,940 functions DeallocationSchedular 175 Bench Deallocated for id 111,                     User Abbas Batcha for benches ['C18', 'C19', 'C20', 'D0', 'D10', 'D9', 'D8', 'D7', 'D6', 'D5', 'D4', 'D3', 'D2', 'D1', 'D21', 'D20', 'D19', 'D18', 'D17', 'D16', 'D15', 'D14', 'D13', 'D12', 'D11']
+INFO 2024-01-22 20:45:54,062 functions DeallocationSchedular 175 Bench Deallocated for id 106,                     User Sreekanth Nidiganti for benches ['G5', 'G6', 'G7', 'G8', 'G9', 'G10', 'G11']
+INFO 2024-01-22 20:45:58,873 functions DeallocationSchedular 175 Bench Deallocated for id 106,                     User Sreekanth Nidiganti for benches ['G5', 'G6', 'G7', 'G8', 'G9', 'G10', 'G11']
+INFO 2024-01-22 20:45:59,108 functions DeallocationSchedular 175 Bench Deallocated for id 108,                     User Narayanan Jayaraman for benches ['B1', 'B2', 'B3', 'B4']
+INFO 2024-01-22 20:46:02,954 functions DeallocationSchedular 175 Bench Deallocated for id 108,                     User Narayanan Jayaraman for benches ['B1', 'B2', 'B3', 'B4']
+INFO 2024-01-22 20:46:22,468 functions DeallocationSchedular 175 Bench Deallocated for id 109,                     User Abbas Batcha for benches ['E12', 'E22', 'E13', 'E14', 'E15', 'E16', 'E17', 'E18', 'E19', 'E20', 'E21', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F20', 'F19', 'F18', 'F17', 'F16', 'F15', 'F14', 'F13', 'F12']
+INFO 2024-01-22 20:46:25,000 functions DeallocationSchedular 175 Bench Deallocated for id 115,                     User Pratibha Singh for benches ['K5']
+INFO 2024-01-22 20:46:25,346 functions DeallocationSchedular 175 Bench Deallocated for id 109,                     User Abbas Batcha for benches ['E12', 'E22', 'E13', 'E14', 'E15', 'E16', 'E17', 'E18', 'E19', 'E20', 'E21', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F20', 'F19', 'F18', 'F17', 'F16', 'F15', 'F14', 'F13', 'F12']
+INFO 2024-01-22 20:46:28,195 functions DeallocationSchedular 175 Bench Deallocated for id 115,                     User Pratibha Singh for benches ['K5']
+INFO 2024-01-22 20:46:28,308 functions DeallocationSchedular 175 Bench Deallocated for id 143,                     User Abbas Batcha for benches ['B5', 'B6', 'B7']
+INFO 2024-01-22 20:46:31,813 functions DeallocationSchedular 175 Bench Deallocated for id 143,                     User Abbas Batcha for benches ['B5', 'B6', 'B7']
+INFO 2024-01-22 20:46:33,032 functions DeallocationSchedular 175 Bench Deallocated for id 146,                     User Abbas Batcha for benches ['A1', 'A2', 'E4', 'E5', 'E6', 'E7']
+INFO 2024-01-22 20:46:36,601 functions DeallocationSchedular 175 Bench Deallocated for id 148,                     User Abbas Batcha for benches ['F2', 'F3', 'F4', 'F5']
+INFO 2024-01-22 20:46:37,674 functions DeallocationSchedular 175 Bench Deallocated for id 146,                     User Abbas Batcha for benches ['A1', 'A2', 'E4', 'E5', 'E6', 'E7']
+INFO 2024-01-22 20:46:40,804 functions DeallocationSchedular 175 Bench Deallocated for id 162,                     User Krishna Prasad M for benches ['D22', 'D23', 'D24', 'D25', 'D26']
+INFO 2024-01-22 20:46:42,225 functions DeallocationSchedular 175 Bench Deallocated for id 148,                     User Abbas Batcha for benches ['F2', 'F3', 'F4', 'F5']
+INFO 2024-01-22 20:46:45,104 functions DeallocationSchedular 175 Bench Deallocated for id 163,                     User Krishna Prasad M for benches ['G12', 'G13', 'G14', 'G15']
+INFO 2024-01-22 20:46:47,070 functions DeallocationSchedular 175 Bench Deallocated for id 162,                     User Krishna Prasad M for benches ['D22', 'D23', 'D24', 'D25', 'D26']
+INFO 2024-01-22 20:46:48,985 functions DeallocationSchedular 175 Bench Deallocated for id 166,                     User Sabarigirish Radhakrishnan for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10']
+INFO 2024-01-22 20:46:52,155 functions DeallocationSchedular 175 Bench Deallocated for id 163,                     User Krishna Prasad M for benches ['G12', 'G13', 'G14', 'G15']
+INFO 2024-01-22 20:46:55,467 functions DeallocationSchedular 175 Bench Deallocated for id 166,                     User Sabarigirish Radhakrishnan for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10']
+INFO 2024-01-22 20:47:22,627 functions DeallocationSchedular 175 Bench Deallocated for id 167,                     User Pradeep Kumar S for benches ['K1', 'K4', 'K9', 'K10', 'K11', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'L10', 'L21', 'L16', 'L15', 'L14', 'L13', 'L12', 'RF1', 'RF2', 'RF3', 'I6', 'I7', 'I9', 'J22', 'J21', 'J20', 'J16', 'J15', 'J12', 'J6', 'J7', 'J8']
+INFO 2024-01-22 20:47:24,685 functions DeallocationSchedular 175 Bench Deallocated for id 177,                     User Archana N for benches ['F6']
+INFO 2024-01-22 20:47:30,887 functions DeallocationSchedular 175 Bench Deallocated for id 167,                     User Pradeep Kumar S for benches ['K1', 'K4', 'K9', 'K10', 'K11', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'L10', 'L21', 'L16', 'L15', 'L14', 'L13', 'L12', 'RF1', 'RF2', 'RF3', 'I6', 'I7', 'I9', 'J22', 'J21', 'J20', 'J16', 'J15', 'J12', 'J6', 'J7', 'J8']
+INFO 2024-01-22 20:47:32,564 functions DeallocationSchedular 175 Bench Deallocated for id 177,                     User Archana N for benches ['F6']
+INFO 2024-01-22 20:47:45,907 functions DeallocationSchedular 175 Bench Deallocated for id 183,                     User Chandrashekhar Ramgond for benches ['B8', 'B10', 'B9', 'B11', 'B13', 'B12', 'B14', 'B15', 'B16', 'B17', 'C8', 'D8', 'C9', 'D9', 'C10', 'D10', 'C11', 'D11', 'C12', 'D12', 'C13', 'D13', 'C14', 'D14', 'C15', 'D15', 'C16', 'D16', 'C17', 'D17']
+INFO 2024-01-22 20:47:45,908 functions DeallocationSchedular 236 Scheduler Completed Execution
+INFO 2024-01-22 20:47:46,638 functions DeallocationSchedular 175 Bench Deallocated for id 183,                     User Chandrashekhar Ramgond for benches ['B8', 'B10', 'B9', 'B11', 'B13', 'B12', 'B14', 'B15', 'B16', 'B17', 'C8', 'D8', 'C9', 'D9', 'C10', 'D10', 'C11', 'D11', 'C12', 'D12', 'C13', 'D13', 'C14', 'D14', 'C15', 'D15', 'C16', 'D16', 'C17', 'D17']
+INFO 2024-01-22 20:47:46,638 functions DeallocationSchedular 236 Scheduler Completed Execution
+INFO 2024-01-22 21:48:18,704 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 21:48:19,561 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 21:48:20,273 functions DeallocationSchedular 175 Bench Deallocated for id 24,                     User Nikhil Bhandary for benches ['C5']
+INFO 2024-01-22 21:48:20,736 functions DeallocationSchedular 175 Bench Deallocated for id 23,                     User Nikhil Bhandary for benches ['C1', 'C2', 'C3', 'C4', 'B12', 'B13']
+INFO 2024-01-22 21:48:21,061 functions DeallocationSchedular 175 Bench Deallocated for id 25,                     User Nikhil Bhandary for benches ['B14', 'B15', 'B16', 'B17']
+INFO 2024-01-22 21:48:21,237 functions DeallocationSchedular 175 Bench Deallocated for id 24,                     User Nikhil Bhandary for benches ['C5']
+INFO 2024-01-22 21:48:22,257 functions DeallocationSchedular 175 Bench Deallocated for id 57,                     User Nikhila G Chandran for benches ['E1', 'E2', 'E3', 'F1', 'F7', 'F8', 'F9', 'F10']
+INFO 2024-01-22 21:48:22,628 functions DeallocationSchedular 175 Bench Deallocated for id 25,                     User Nikhil Bhandary for benches ['B14', 'B15', 'B16', 'B17']
+INFO 2024-01-22 21:48:24,723 functions DeallocationSchedular 175 Bench Deallocated for id 57,                     User Nikhila G Chandran for benches ['E1', 'E2', 'E3', 'F1', 'F7', 'F8', 'F9', 'F10']
+INFO 2024-01-22 21:48:35,713 functions DeallocationSchedular 175 Bench Deallocated for id 59,                     User Krishna Prasad M for benches ['E14', 'E15', 'E18', 'E19', 'E20', 'E21', 'E22', 'F11', 'F10', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F17', 'F18', 'F19', 'F20', 'F21', 'G4', 'G3', 'G2', 'G1', 'G16', 'G17', 'G18', 'G19', 'G20', 'G21', 'G22', 'H11', 'H10', 'H9', 'H8', 'H7', 'H6', 'H5', 'H4', 'H3', 'H2', 'H1', 'H12', 'H13', 'H14', 'H15', 'H16', 'H17', 'H18', 'H19', 'H20', 'H21', 'H22']
+INFO 2024-01-22 21:48:37,803 functions DeallocationSchedular 175 Bench Deallocated for id 60,                     User Anjali Thakur for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14', 'A15', 'A16-Rack']
+INFO 2024-01-22 21:48:38,268 functions DeallocationSchedular 175 Bench Deallocated for id 61,                     User Prabhu Rajendran for benches ['C-1', 'C-2']
+INFO 2024-01-22 21:48:38,627 functions DeallocationSchedular 175 Bench Deallocated for id 62,                     User Prabhu Rajendran for benches ['C-3']
+INFO 2024-01-22 21:48:39,077 functions DeallocationSchedular 175 Bench Deallocated for id 63,                     User Prabhu Rajendran for benches ['B-1', 'B-2']
+INFO 2024-01-22 21:48:41,955 functions DeallocationSchedular 175 Bench Deallocated for id 59,                     User Krishna Prasad M for benches ['E14', 'E15', 'E18', 'E19', 'E20', 'E21', 'E22', 'F11', 'F10', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F17', 'F18', 'F19', 'F20', 'F21', 'G4', 'G3', 'G2', 'G1', 'G16', 'G17', 'G18', 'G19', 'G20', 'G21', 'G22', 'H11', 'H10', 'H9', 'H8', 'H7', 'H6', 'H5', 'H4', 'H3', 'H2', 'H1', 'H12', 'H13', 'H14', 'H15', 'H16', 'H17', 'H18', 'H19', 'H20', 'H21', 'H22']
+INFO 2024-01-22 21:48:42,468 functions DeallocationSchedular 175 Bench Deallocated for id 81,                     User Ravi Dattani for benches ['K22', 'K21', 'K20', 'K19', 'K17', 'K16', 'K14', 'K13', 'K12']
+INFO 2024-01-22 21:48:43,153 functions DeallocationSchedular 175 Bench Deallocated for id 83,                     User Ankit Kumar for benches ['K2']
+INFO 2024-01-22 21:48:43,404 functions DeallocationSchedular 175 Bench Deallocated for id 60,                     User Anjali Thakur for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14', 'A15', 'A16-Rack']
+INFO 2024-01-22 21:48:43,825 functions DeallocationSchedular 175 Bench Deallocated for id 85,                     User Sachidananda Gowda for benches ['I10', 'K3']
+INFO 2024-01-22 21:48:43,845 functions DeallocationSchedular 175 Bench Deallocated for id 61,                     User Prabhu Rajendran for benches ['C-1', 'C-2']
+INFO 2024-01-22 21:48:44,165 functions DeallocationSchedular 175 Bench Deallocated for id 62,                     User Prabhu Rajendran for benches ['C-3']
+INFO 2024-01-22 21:48:44,565 functions DeallocationSchedular 175 Bench Deallocated for id 63,                     User Prabhu Rajendran for benches ['B-1', 'B-2']
+INFO 2024-01-22 21:48:45,045 functions DeallocationSchedular 175 Bench Deallocated for id 89,                     User Tanya Jaiswal for benches ['J19', 'J5', 'J4', 'J3']
+INFO 2024-01-22 21:48:45,783 functions DeallocationSchedular 175 Bench Deallocated for id 92,                     User Anusha Ramachandran for benches ['J1', 'J2']
+INFO 2024-01-22 21:48:46,412 functions DeallocationSchedular 175 Bench Deallocated for id 93,                     User Priyanka Singh for benches ['E12', 'E13']
+INFO 2024-01-22 21:48:47,123 functions DeallocationSchedular 175 Bench Deallocated for id 94,                     User Tanya Jaiswal for benches ['A8', 'A9']
+INFO 2024-01-22 21:48:47,366 functions DeallocationSchedular 175 Bench Deallocated for id 81,                     User Ravi Dattani for benches ['K22', 'K21', 'K20', 'K19', 'K17', 'K16', 'K14', 'K13', 'K12']
+INFO 2024-01-22 21:48:48,017 functions DeallocationSchedular 175 Bench Deallocated for id 83,                     User Ankit Kumar for benches ['K2']
+INFO 2024-01-22 21:48:48,062 functions DeallocationSchedular 175 Bench Deallocated for id 95,                     User Vengadesan A for benches ['B22', 'B21']
+INFO 2024-01-22 21:48:49,118 functions DeallocationSchedular 175 Bench Deallocated for id 85,                     User Sachidananda Gowda for benches ['I10', 'K3']
+INFO 2024-01-22 21:48:49,785 functions DeallocationSchedular 175 Bench Deallocated for id 96,                     User Raghav Angadimani for benches ['F16', 'F15', 'F14', 'F13', 'F12', 'F11']
+INFO 2024-01-22 21:48:50,458 functions DeallocationSchedular 175 Bench Deallocated for id 89,                     User Tanya Jaiswal for benches ['J19', 'J5', 'J4', 'J3']
+INFO 2024-01-22 21:48:51,431 functions DeallocationSchedular 175 Bench Deallocated for id 92,                     User Anusha Ramachandran for benches ['J1', 'J2']
+INFO 2024-01-22 21:48:52,361 functions DeallocationSchedular 175 Bench Deallocated for id 93,                     User Priyanka Singh for benches ['E12', 'E13']
+INFO 2024-01-22 21:48:53,057 functions DeallocationSchedular 175 Bench Deallocated for id 94,                     User Tanya Jaiswal for benches ['A8', 'A9']
+INFO 2024-01-22 21:48:54,333 functions DeallocationSchedular 175 Bench Deallocated for id 95,                     User Vengadesan A for benches ['B22', 'B21']
+INFO 2024-01-22 21:48:56,167 functions DeallocationSchedular 175 Bench Deallocated for id 111,                     User Abbas Batcha for benches ['C18', 'C19', 'C20', 'D0', 'D10', 'D9', 'D8', 'D7', 'D6', 'D5', 'D4', 'D3', 'D2', 'D1', 'D21', 'D20', 'D19', 'D18', 'D17', 'D16', 'D15', 'D14', 'D13', 'D12', 'D11']
+INFO 2024-01-22 21:48:56,351 functions DeallocationSchedular 175 Bench Deallocated for id 96,                     User Raghav Angadimani for benches ['F16', 'F15', 'F14', 'F13', 'F12', 'F11']
+INFO 2024-01-22 21:48:58,263 functions DeallocationSchedular 175 Bench Deallocated for id 106,                     User Sreekanth Nidiganti for benches ['G5', 'G6', 'G7', 'G8', 'G9', 'G10', 'G11']
+INFO 2024-01-22 21:48:59,257 functions DeallocationSchedular 175 Bench Deallocated for id 108,                     User Narayanan Jayaraman for benches ['B1', 'B2', 'B3', 'B4']
+INFO 2024-01-22 21:49:02,048 functions DeallocationSchedular 175 Bench Deallocated for id 111,                     User Abbas Batcha for benches ['C18', 'C19', 'C20', 'D0', 'D10', 'D9', 'D8', 'D7', 'D6', 'D5', 'D4', 'D3', 'D2', 'D1', 'D21', 'D20', 'D19', 'D18', 'D17', 'D16', 'D15', 'D14', 'D13', 'D12', 'D11']
+INFO 2024-01-22 21:49:03,579 functions DeallocationSchedular 175 Bench Deallocated for id 106,                     User Sreekanth Nidiganti for benches ['G5', 'G6', 'G7', 'G8', 'G9', 'G10', 'G11']
+INFO 2024-01-22 21:49:04,581 functions DeallocationSchedular 175 Bench Deallocated for id 108,                     User Narayanan Jayaraman for benches ['B1', 'B2', 'B3', 'B4']
+INFO 2024-01-22 21:49:06,172 functions DeallocationSchedular 175 Bench Deallocated for id 109,                     User Abbas Batcha for benches ['E12', 'E22', 'E13', 'E14', 'E15', 'E16', 'E17', 'E18', 'E19', 'E20', 'E21', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F20', 'F19', 'F18', 'F17', 'F16', 'F15', 'F14', 'F13', 'F12']
+INFO 2024-01-22 21:49:06,781 functions DeallocationSchedular 175 Bench Deallocated for id 115,                     User Pratibha Singh for benches ['K5']
+INFO 2024-01-22 21:49:07,575 functions DeallocationSchedular 175 Bench Deallocated for id 143,                     User Abbas Batcha for benches ['B5', 'B6', 'B7']
+INFO 2024-01-22 21:49:08,852 functions DeallocationSchedular 175 Bench Deallocated for id 146,                     User Abbas Batcha for benches ['A1', 'A2', 'E4', 'E5', 'E6', 'E7']
+INFO 2024-01-22 21:49:09,968 functions DeallocationSchedular 175 Bench Deallocated for id 148,                     User Abbas Batcha for benches ['F2', 'F3', 'F4', 'F5']
+INFO 2024-01-22 21:49:11,320 functions DeallocationSchedular 175 Bench Deallocated for id 162,                     User Krishna Prasad M for benches ['D22', 'D23', 'D24', 'D25', 'D26']
+INFO 2024-01-22 21:49:11,884 functions DeallocationSchedular 175 Bench Deallocated for id 109,                     User Abbas Batcha for benches ['E12', 'E22', 'E13', 'E14', 'E15', 'E16', 'E17', 'E18', 'E19', 'E20', 'E21', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F20', 'F19', 'F18', 'F17', 'F16', 'F15', 'F14', 'F13', 'F12']
+INFO 2024-01-22 21:49:12,632 functions DeallocationSchedular 175 Bench Deallocated for id 163,                     User Krishna Prasad M for benches ['G12', 'G13', 'G14', 'G15']
+INFO 2024-01-22 21:49:12,659 functions DeallocationSchedular 175 Bench Deallocated for id 115,                     User Pratibha Singh for benches ['K5']
+INFO 2024-01-22 21:49:13,524 functions DeallocationSchedular 175 Bench Deallocated for id 143,                     User Abbas Batcha for benches ['B5', 'B6', 'B7']
+INFO 2024-01-22 21:49:13,525 functions DeallocationSchedular 175 Bench Deallocated for id 166,                     User Sabarigirish Radhakrishnan for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10']
+INFO 2024-01-22 21:49:14,888 functions DeallocationSchedular 175 Bench Deallocated for id 146,                     User Abbas Batcha for benches ['A1', 'A2', 'E4', 'E5', 'E6', 'E7']
+INFO 2024-01-22 21:49:15,664 functions DeallocationSchedular 175 Bench Deallocated for id 148,                     User Abbas Batcha for benches ['F2', 'F3', 'F4', 'F5']
+INFO 2024-01-22 21:49:16,909 functions DeallocationSchedular 175 Bench Deallocated for id 162,                     User Krishna Prasad M for benches ['D22', 'D23', 'D24', 'D25', 'D26']
+INFO 2024-01-22 21:49:17,701 functions DeallocationSchedular 175 Bench Deallocated for id 163,                     User Krishna Prasad M for benches ['G12', 'G13', 'G14', 'G15']
+INFO 2024-01-22 21:49:18,581 functions DeallocationSchedular 175 Bench Deallocated for id 166,                     User Sabarigirish Radhakrishnan for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10']
+INFO 2024-01-22 21:49:22,105 functions DeallocationSchedular 175 Bench Deallocated for id 167,                     User Pradeep Kumar S for benches ['K1', 'K4', 'K9', 'K10', 'K11', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'L10', 'L21', 'L16', 'L15', 'L14', 'L13', 'L12', 'RF1', 'RF2', 'RF3', 'I6', 'I7', 'I9', 'J22', 'J21', 'J20', 'J16', 'J15', 'J12', 'J6', 'J7', 'J8']
+INFO 2024-01-22 21:49:22,644 functions DeallocationSchedular 175 Bench Deallocated for id 177,                     User Archana N for benches ['F6']
+INFO 2024-01-22 21:49:26,049 functions DeallocationSchedular 175 Bench Deallocated for id 167,                     User Pradeep Kumar S for benches ['K1', 'K4', 'K9', 'K10', 'K11', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'L10', 'L21', 'L16', 'L15', 'L14', 'L13', 'L12', 'RF1', 'RF2', 'RF3', 'I6', 'I7', 'I9', 'J22', 'J21', 'J20', 'J16', 'J15', 'J12', 'J6', 'J7', 'J8']
+INFO 2024-01-22 21:49:26,566 functions DeallocationSchedular 175 Bench Deallocated for id 177,                     User Archana N for benches ['F6']
+INFO 2024-01-22 21:49:28,012 functions DeallocationSchedular 175 Bench Deallocated for id 183,                     User Chandrashekhar Ramgond for benches ['B8', 'B10', 'B9', 'B11', 'B13', 'B12', 'B14', 'B15', 'B16', 'B17', 'C8', 'D8', 'C9', 'D9', 'C10', 'D10', 'C11', 'D11', 'C12', 'D12', 'C13', 'D13', 'C14', 'D14', 'C15', 'D15', 'C16', 'D16', 'C17', 'D17']
+INFO 2024-01-22 21:49:28,012 functions DeallocationSchedular 236 Scheduler Completed Execution
+INFO 2024-01-22 21:49:31,868 functions DeallocationSchedular 175 Bench Deallocated for id 183,                     User Chandrashekhar Ramgond for benches ['B8', 'B10', 'B9', 'B11', 'B13', 'B12', 'B14', 'B15', 'B16', 'B17', 'C8', 'D8', 'C9', 'D9', 'C10', 'D10', 'C11', 'D11', 'C12', 'D12', 'C13', 'D13', 'C14', 'D14', 'C15', 'D15', 'C16', 'D16', 'C17', 'D17']
+INFO 2024-01-22 21:49:31,868 functions DeallocationSchedular 236 Scheduler Completed Execution
+INFO 2024-01-22 21:53:39,065 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 21:53:39,666 functions DeallocationSchedular 236 Scheduler Completed Execution
+INFO 2024-01-22 21:53:39,877 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 21:53:40,027 functions DeallocationSchedular 236 Scheduler Completed Execution
+INFO 2024-01-22 22:11:22,815 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 22:11:23,623 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-22 22:11:24,688 functions DeallocationSchedular 175 Bench Deallocated for id 23,                     User Nikhil Bhandary for benches ['C1', 'C2', 'C3', 'C4', 'B12', 'B13']
+INFO 2024-01-22 22:11:24,881 functions DeallocationSchedular 175 Bench Deallocated for id 23,                     User Nikhil Bhandary for benches ['C1', 'C2', 'C3', 'C4', 'B12', 'B13']
+INFO 2024-01-22 22:11:25,100 functions DeallocationSchedular 175 Bench Deallocated for id 24,                     User Nikhil Bhandary for benches ['C5']
+INFO 2024-01-22 22:11:25,232 functions DeallocationSchedular 175 Bench Deallocated for id 24,                     User Nikhil Bhandary for benches ['C5']
+INFO 2024-01-22 22:11:25,836 functions DeallocationSchedular 175 Bench Deallocated for id 25,                     User Nikhil Bhandary for benches ['B14', 'B15', 'B16', 'B17']
+INFO 2024-01-22 22:11:25,837 functions DeallocationSchedular 175 Bench Deallocated for id 25,                     User Nikhil Bhandary for benches ['B14', 'B15', 'B16', 'B17']
+INFO 2024-01-22 22:11:26,782 functions DeallocationSchedular 175 Bench Deallocated for id 57,                     User Nikhila G Chandran for benches ['E1', 'E2', 'E3', 'F1', 'F7', 'F8', 'F9', 'F10']
+INFO 2024-01-22 22:11:27,296 functions DeallocationSchedular 175 Bench Deallocated for id 57,                     User Nikhila G Chandran for benches ['E1', 'E2', 'E3', 'F1', 'F7', 'F8', 'F9', 'F10']
+INFO 2024-01-22 22:11:40,555 functions DeallocationSchedular 175 Bench Deallocated for id 59,                     User Krishna Prasad M for benches ['E14', 'E15', 'E18', 'E19', 'E20', 'E21', 'E22', 'F11', 'F10', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F17', 'F18', 'F19', 'F20', 'F21', 'G4', 'G3', 'G2', 'G1', 'G16', 'G17', 'G18', 'G19', 'G20', 'G21', 'G22', 'H11', 'H10', 'H9', 'H8', 'H7', 'H6', 'H5', 'H4', 'H3', 'H2', 'H1', 'H12', 'H13', 'H14', 'H15', 'H16', 'H17', 'H18', 'H19', 'H20', 'H21', 'H22']
+INFO 2024-01-22 22:11:41,643 functions DeallocationSchedular 175 Bench Deallocated for id 59,                     User Krishna Prasad M for benches ['E14', 'E15', 'E18', 'E19', 'E20', 'E21', 'E22', 'F11', 'F10', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F17', 'F18', 'F19', 'F20', 'F21', 'G4', 'G3', 'G2', 'G1', 'G16', 'G17', 'G18', 'G19', 'G20', 'G21', 'G22', 'H11', 'H10', 'H9', 'H8', 'H7', 'H6', 'H5', 'H4', 'H3', 'H2', 'H1', 'H12', 'H13', 'H14', 'H15', 'H16', 'H17', 'H18', 'H19', 'H20', 'H21', 'H22']
+INFO 2024-01-22 22:11:41,875 functions DeallocationSchedular 175 Bench Deallocated for id 60,                     User Anjali Thakur for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14', 'A15', 'A16-Rack']
+INFO 2024-01-22 22:11:42,267 functions DeallocationSchedular 175 Bench Deallocated for id 61,                     User Prabhu Rajendran for benches ['C-1', 'C-2']
+INFO 2024-01-22 22:11:42,574 functions DeallocationSchedular 175 Bench Deallocated for id 62,                     User Prabhu Rajendran for benches ['C-3']
+INFO 2024-01-22 22:11:42,952 functions DeallocationSchedular 175 Bench Deallocated for id 63,                     User Prabhu Rajendran for benches ['B-1', 'B-2']
+INFO 2024-01-22 22:11:43,045 functions DeallocationSchedular 175 Bench Deallocated for id 60,                     User Anjali Thakur for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14', 'A15', 'A16-Rack']
+INFO 2024-01-22 22:11:43,413 functions DeallocationSchedular 175 Bench Deallocated for id 61,                     User Prabhu Rajendran for benches ['C-1', 'C-2']
+INFO 2024-01-22 22:11:43,726 functions DeallocationSchedular 175 Bench Deallocated for id 62,                     User Prabhu Rajendran for benches ['C-3']
+INFO 2024-01-22 22:11:44,115 functions DeallocationSchedular 175 Bench Deallocated for id 63,                     User Prabhu Rajendran for benches ['B-1', 'B-2']
+INFO 2024-01-22 22:11:45,895 functions DeallocationSchedular 175 Bench Deallocated for id 81,                     User Ravi Dattani for benches ['K22', 'K21', 'K20', 'K19', 'K17', 'K16', 'K14', 'K13', 'K12']
+INFO 2024-01-22 22:11:46,445 functions DeallocationSchedular 175 Bench Deallocated for id 83,                     User Ankit Kumar for benches ['K2']
+INFO 2024-01-22 22:11:46,821 functions DeallocationSchedular 175 Bench Deallocated for id 81,                     User Ravi Dattani for benches ['K22', 'K21', 'K20', 'K19', 'K17', 'K16', 'K14', 'K13', 'K12']
+INFO 2024-01-22 22:11:47,107 functions DeallocationSchedular 175 Bench Deallocated for id 85,                     User Sachidananda Gowda for benches ['I10', 'K3']
+INFO 2024-01-22 22:11:47,469 functions DeallocationSchedular 175 Bench Deallocated for id 83,                     User Ankit Kumar for benches ['K2']
+INFO 2024-01-22 22:11:48,284 functions DeallocationSchedular 175 Bench Deallocated for id 89,                     User Tanya Jaiswal for benches ['J19', 'J5', 'J4', 'J3']
+INFO 2024-01-22 22:11:48,453 functions DeallocationSchedular 175 Bench Deallocated for id 85,                     User Sachidananda Gowda for benches ['I10', 'K3']
+INFO 2024-01-22 22:11:49,042 functions DeallocationSchedular 175 Bench Deallocated for id 92,                     User Anusha Ramachandran for benches ['J1', 'J2']
+INFO 2024-01-22 22:11:49,803 functions DeallocationSchedular 175 Bench Deallocated for id 93,                     User Priyanka Singh for benches ['E12', 'E13']
+INFO 2024-01-22 22:11:50,036 functions DeallocationSchedular 175 Bench Deallocated for id 89,                     User Tanya Jaiswal for benches ['J19', 'J5', 'J4', 'J3']
+INFO 2024-01-22 22:11:50,394 functions DeallocationSchedular 175 Bench Deallocated for id 94,                     User Tanya Jaiswal for benches ['A8', 'A9']
+INFO 2024-01-22 22:11:50,934 functions DeallocationSchedular 175 Bench Deallocated for id 92,                     User Anusha Ramachandran for benches ['J1', 'J2']
+INFO 2024-01-22 22:11:51,046 functions DeallocationSchedular 175 Bench Deallocated for id 95,                     User Vengadesan A for benches ['B22', 'B21']
+INFO 2024-01-22 22:11:51,658 functions DeallocationSchedular 175 Bench Deallocated for id 93,                     User Priyanka Singh for benches ['E12', 'E13']
+INFO 2024-01-22 22:11:52,262 functions DeallocationSchedular 175 Bench Deallocated for id 94,                     User Tanya Jaiswal for benches ['A8', 'A9']
+INFO 2024-01-22 22:11:52,397 functions DeallocationSchedular 175 Bench Deallocated for id 96,                     User Raghav Angadimani for benches ['F16', 'F15', 'F14', 'F13', 'F12', 'F11']
+INFO 2024-01-22 22:11:52,897 functions DeallocationSchedular 175 Bench Deallocated for id 95,                     User Vengadesan A for benches ['B22', 'B21']
+INFO 2024-01-22 22:11:54,366 functions DeallocationSchedular 175 Bench Deallocated for id 96,                     User Raghav Angadimani for benches ['F16', 'F15', 'F14', 'F13', 'F12', 'F11']
+INFO 2024-01-22 22:11:58,835 functions DeallocationSchedular 175 Bench Deallocated for id 111,                     User Abbas Batcha for benches ['C18', 'C19', 'C20', 'D0', 'D10', 'D9', 'D8', 'D7', 'D6', 'D5', 'D4', 'D3', 'D2', 'D1', 'D21', 'D20', 'D19', 'D18', 'D17', 'D16', 'D15', 'D14', 'D13', 'D12', 'D11']
+INFO 2024-01-22 22:12:00,673 functions DeallocationSchedular 175 Bench Deallocated for id 106,                     User Sreekanth Nidiganti for benches ['G5', 'G6', 'G7', 'G8', 'G9', 'G10', 'G11']
+INFO 2024-01-22 22:12:00,951 functions DeallocationSchedular 175 Bench Deallocated for id 111,                     User Abbas Batcha for benches ['C18', 'C19', 'C20', 'D0', 'D10', 'D9', 'D8', 'D7', 'D6', 'D5', 'D4', 'D3', 'D2', 'D1', 'D21', 'D20', 'D19', 'D18', 'D17', 'D16', 'D15', 'D14', 'D13', 'D12', 'D11']
+INFO 2024-01-22 22:12:01,741 functions DeallocationSchedular 175 Bench Deallocated for id 108,                     User Narayanan Jayaraman for benches ['B1', 'B2', 'B3', 'B4']
+INFO 2024-01-22 22:12:02,821 functions DeallocationSchedular 175 Bench Deallocated for id 106,                     User Sreekanth Nidiganti for benches ['G5', 'G6', 'G7', 'G8', 'G9', 'G10', 'G11']
+INFO 2024-01-22 22:12:03,598 functions DeallocationSchedular 175 Bench Deallocated for id 108,                     User Narayanan Jayaraman for benches ['B1', 'B2', 'B3', 'B4']
+INFO 2024-01-22 22:12:07,286 functions DeallocationSchedular 175 Bench Deallocated for id 109,                     User Abbas Batcha for benches ['E12', 'E22', 'E13', 'E14', 'E15', 'E16', 'E17', 'E18', 'E19', 'E20', 'E21', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F20', 'F19', 'F18', 'F17', 'F16', 'F15', 'F14', 'F13', 'F12']
+INFO 2024-01-22 22:12:07,771 functions DeallocationSchedular 175 Bench Deallocated for id 115,                     User Pratibha Singh for benches ['K5']
+INFO 2024-01-22 22:12:08,573 functions DeallocationSchedular 175 Bench Deallocated for id 143,                     User Abbas Batcha for benches ['B5', 'B6', 'B7']
+INFO 2024-01-22 22:12:09,149 functions DeallocationSchedular 175 Bench Deallocated for id 109,                     User Abbas Batcha for benches ['E12', 'E22', 'E13', 'E14', 'E15', 'E16', 'E17', 'E18', 'E19', 'E20', 'E21', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F20', 'F19', 'F18', 'F17', 'F16', 'F15', 'F14', 'F13', 'F12']
+INFO 2024-01-22 22:12:09,762 functions DeallocationSchedular 175 Bench Deallocated for id 115,                     User Pratibha Singh for benches ['K5']
+INFO 2024-01-22 22:12:09,922 functions DeallocationSchedular 175 Bench Deallocated for id 146,                     User Abbas Batcha for benches ['A1', 'A2', 'E4', 'E5', 'E6', 'E7']
+INFO 2024-01-22 22:12:10,584 functions DeallocationSchedular 175 Bench Deallocated for id 143,                     User Abbas Batcha for benches ['B5', 'B6', 'B7']
+INFO 2024-01-22 22:12:10,662 functions DeallocationSchedular 175 Bench Deallocated for id 148,                     User Abbas Batcha for benches ['F2', 'F3', 'F4', 'F5']
+INFO 2024-01-22 22:12:11,563 functions DeallocationSchedular 175 Bench Deallocated for id 162,                     User Krishna Prasad M for benches ['D22', 'D23', 'D24', 'D25', 'D26']
+INFO 2024-01-22 22:12:11,895 functions DeallocationSchedular 175 Bench Deallocated for id 146,                     User Abbas Batcha for benches ['A1', 'A2', 'E4', 'E5', 'E6', 'E7']
+INFO 2024-01-22 22:12:12,507 functions DeallocationSchedular 175 Bench Deallocated for id 163,                     User Krishna Prasad M for benches ['G12', 'G13', 'G14', 'G15']
+INFO 2024-01-22 22:12:12,646 functions DeallocationSchedular 175 Bench Deallocated for id 148,                     User Abbas Batcha for benches ['F2', 'F3', 'F4', 'F5']
+INFO 2024-01-22 22:12:13,431 functions DeallocationSchedular 175 Bench Deallocated for id 166,                     User Sabarigirish Radhakrishnan for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10']
+INFO 2024-01-22 22:12:13,887 functions DeallocationSchedular 175 Bench Deallocated for id 162,                     User Krishna Prasad M for benches ['D22', 'D23', 'D24', 'D25', 'D26']
+INFO 2024-01-22 22:12:14,900 functions DeallocationSchedular 175 Bench Deallocated for id 163,                     User Krishna Prasad M for benches ['G12', 'G13', 'G14', 'G15']
+INFO 2024-01-22 22:12:15,800 functions DeallocationSchedular 175 Bench Deallocated for id 166,                     User Sabarigirish Radhakrishnan for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10']
+INFO 2024-01-22 22:12:21,799 functions DeallocationSchedular 175 Bench Deallocated for id 167,                     User Pradeep Kumar S for benches ['K1', 'K4', 'K9', 'K10', 'K11', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'L10', 'L21', 'L16', 'L15', 'L14', 'L13', 'L12', 'RF1', 'RF2', 'RF3', 'I6', 'I7', 'I9', 'J22', 'J21', 'J20', 'J16', 'J15', 'J12', 'J6', 'J7', 'J8']
+INFO 2024-01-22 22:12:22,287 functions DeallocationSchedular 175 Bench Deallocated for id 177,                     User Archana N for benches ['F6']
+INFO 2024-01-22 22:12:24,178 functions DeallocationSchedular 175 Bench Deallocated for id 167,                     User Pradeep Kumar S for benches ['K1', 'K4', 'K9', 'K10', 'K11', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'L10', 'L21', 'L16', 'L15', 'L14', 'L13', 'L12', 'RF1', 'RF2', 'RF3', 'I6', 'I7', 'I9', 'J22', 'J21', 'J20', 'J16', 'J15', 'J12', 'J6', 'J7', 'J8']
+INFO 2024-01-22 22:12:24,712 functions DeallocationSchedular 175 Bench Deallocated for id 177,                     User Archana N for benches ['F6']
+INFO 2024-01-22 22:12:27,300 functions DeallocationSchedular 175 Bench Deallocated for id 183,                     User Chandrashekhar Ramgond for benches ['B8', 'B10', 'B9', 'B11', 'B13', 'B12', 'B14', 'B15', 'B16', 'B17', 'C8', 'D8', 'C9', 'D9', 'C10', 'D10', 'C11', 'D11', 'C12', 'D12', 'C13', 'D13', 'C14', 'D14', 'C15', 'D15', 'C16', 'D16', 'C17', 'D17']
+INFO 2024-01-22 22:12:27,301 functions DeallocationSchedular 236 Scheduler Completed Execution
+INFO 2024-01-22 22:12:29,842 functions DeallocationSchedular 175 Bench Deallocated for id 183,                     User Chandrashekhar Ramgond for benches ['B8', 'B10', 'B9', 'B11', 'B13', 'B12', 'B14', 'B15', 'B16', 'B17', 'C8', 'D8', 'C9', 'D9', 'C10', 'D10', 'C11', 'D11', 'C12', 'D12', 'C13', 'D13', 'C14', 'D14', 'C15', 'D15', 'C16', 'D16', 'C17', 'D17']
+INFO 2024-01-22 22:12:29,842 functions DeallocationSchedular 236 Scheduler Completed Execution
+INFO 2024-01-23 15:06:56,932 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:07:56,939 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:08:56,940 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:12:31,398 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:12:32,203 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:13:31,389 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:13:32,205 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:14:31,391 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:14:32,208 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:15:31,398 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:15:32,204 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:16:31,397 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:16:32,197 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:17:31,387 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:17:32,200 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:18:31,391 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:18:32,201 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:24:03,401 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:24:04,221 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:24:10,514 functions DeallocationSchedular 178 Bench Deallocated for id 62,                     User Prabhu Rajendran for benches ['C-3']
+INFO 2024-01-23 15:24:11,389 functions DeallocationSchedular 178 Bench Deallocated for id 62,                     User Prabhu Rajendran for benches ['C-3']
+INFO 2024-01-23 15:24:17,756 functions DeallocationSchedular 178 Bench Deallocated for id 63,                     User Prabhu Rajendran for benches ['B-1', 'B-2']
+INFO 2024-01-23 15:24:18,001 functions DeallocationSchedular 178 Bench Deallocated for id 63,                     User Prabhu Rajendran for benches ['B-1', 'B-2']
+INFO 2024-01-23 15:24:26,802 functions DeallocationSchedular 178 Bench Deallocated for id 81,                     User Ravi Dattani for benches ['K22', 'K21', 'K20', 'K19', 'K17', 'K16', 'K14', 'K13', 'K12']
+INFO 2024-01-23 15:24:29,355 functions DeallocationSchedular 178 Bench Deallocated for id 81,                     User Ravi Dattani for benches ['K22', 'K21', 'K20', 'K19', 'K17', 'K16', 'K14', 'K13', 'K12']
+INFO 2024-01-23 15:24:33,142 functions DeallocationSchedular 178 Bench Deallocated for id 83,                     User Ankit Kumar for benches ['K2']
+INFO 2024-01-23 15:24:35,774 functions DeallocationSchedular 178 Bench Deallocated for id 83,                     User Ankit Kumar for benches ['K2']
+INFO 2024-01-23 15:24:39,954 functions DeallocationSchedular 178 Bench Deallocated for id 85,                     User Sachidananda Gowda for benches ['I10', 'K3']
+INFO 2024-01-23 15:24:42,356 functions DeallocationSchedular 178 Bench Deallocated for id 85,                     User Sachidananda Gowda for benches ['I10', 'K3']
+INFO 2024-01-23 15:24:47,072 functions DeallocationSchedular 178 Bench Deallocated for id 89,                     User Tanya Jaiswal for benches ['J19', 'J5', 'J4', 'J3']
+INFO 2024-01-23 15:24:49,629 functions DeallocationSchedular 178 Bench Deallocated for id 89,                     User Tanya Jaiswal for benches ['J19', 'J5', 'J4', 'J3']
+INFO 2024-01-23 15:24:54,034 functions DeallocationSchedular 178 Bench Deallocated for id 92,                     User Anusha Ramachandran for benches ['J1', 'J2']
+INFO 2024-01-23 15:24:56,594 functions DeallocationSchedular 178 Bench Deallocated for id 92,                     User Anusha Ramachandran for benches ['J1', 'J2']
+INFO 2024-01-23 15:25:01,305 functions DeallocationSchedular 178 Bench Deallocated for id 93,                     User Priyanka Singh for benches ['E12', 'E13']
+INFO 2024-01-23 15:25:02,840 functions DeallocationSchedular 178 Bench Deallocated for id 93,                     User Priyanka Singh for benches ['E12', 'E13']
+INFO 2024-01-23 15:25:07,652 functions DeallocationSchedular 178 Bench Deallocated for id 94,                     User Tanya Jaiswal for benches ['A8', 'A9']
+INFO 2024-01-23 15:25:09,191 functions DeallocationSchedular 178 Bench Deallocated for id 94,                     User Tanya Jaiswal for benches ['A8', 'A9']
+INFO 2024-01-23 15:25:14,555 functions DeallocationSchedular 178 Bench Deallocated for id 95,                     User Vengadesan A for benches ['B22', 'B21']
+INFO 2024-01-23 15:25:16,073 functions DeallocationSchedular 178 Bench Deallocated for id 95,                     User Vengadesan A for benches ['B22', 'B21']
+INFO 2024-01-23 15:25:21,579 functions DeallocationSchedular 178 Bench Deallocated for id 96,                     User Raghav Angadimani for benches ['F16', 'F15', 'F14', 'F13', 'F12', 'F11']
+INFO 2024-01-23 15:25:23,627 functions DeallocationSchedular 178 Bench Deallocated for id 96,                     User Raghav Angadimani for benches ['F16', 'F15', 'F14', 'F13', 'F12', 'F11']
+INFO 2024-01-23 15:25:35,095 functions DeallocationSchedular 178 Bench Deallocated for id 111,                     User Abbas Batcha for benches ['C18', 'C19', 'C20', 'D0', 'D10', 'D9', 'D8', 'D7', 'D6', 'D5', 'D4', 'D3', 'D2', 'D1', 'D21', 'D20', 'D19', 'D18', 'D17', 'D16', 'D15', 'D14', 'D13', 'D12', 'D11']
+INFO 2024-01-23 15:25:36,938 functions DeallocationSchedular 178 Bench Deallocated for id 111,                     User Abbas Batcha for benches ['C18', 'C19', 'C20', 'D0', 'D10', 'D9', 'D8', 'D7', 'D6', 'D5', 'D4', 'D3', 'D2', 'D1', 'D21', 'D20', 'D19', 'D18', 'D17', 'D16', 'D15', 'D14', 'D13', 'D12', 'D11']
+INFO 2024-01-23 15:25:43,370 functions DeallocationSchedular 178 Bench Deallocated for id 106,                     User Sreekanth Nidiganti for benches ['G5', 'G6', 'G7', 'G8', 'G9', 'G10', 'G11']
+INFO 2024-01-23 15:25:44,927 functions DeallocationSchedular 178 Bench Deallocated for id 106,                     User Sreekanth Nidiganti for benches ['G5', 'G6', 'G7', 'G8', 'G9', 'G10', 'G11']
+INFO 2024-01-23 15:25:49,841 functions DeallocationSchedular 178 Bench Deallocated for id 108,                     User Narayanan Jayaraman for benches ['B1', 'B2', 'B3', 'B4']
+INFO 2024-01-23 15:25:51,481 functions DeallocationSchedular 178 Bench Deallocated for id 108,                     User Narayanan Jayaraman for benches ['B1', 'B2', 'B3', 'B4']
+INFO 2024-01-23 15:26:04,181 functions DeallocationSchedular 178 Bench Deallocated for id 109,                     User Abbas Batcha for benches ['E12', 'E22', 'E13', 'E14', 'E15', 'E16', 'E17', 'E18', 'E19', 'E20', 'E21', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F20', 'F19', 'F18', 'F17', 'F16', 'F15', 'F14', 'F13', 'F12']
+INFO 2024-01-23 15:26:05,716 functions DeallocationSchedular 178 Bench Deallocated for id 109,                     User Abbas Batcha for benches ['E12', 'E22', 'E13', 'E14', 'E15', 'E16', 'E17', 'E18', 'E19', 'E20', 'E21', 'F9', 'F8', 'F7', 'F6', 'F5', 'F4', 'F3', 'F2', 'F1', 'F20', 'F19', 'F18', 'F17', 'F16', 'F15', 'F14', 'F13', 'F12']
+INFO 2024-01-23 15:26:10,219 functions DeallocationSchedular 178 Bench Deallocated for id 115,                     User Pratibha Singh for benches ['K5']
+INFO 2024-01-23 15:26:11,583 functions DeallocationSchedular 178 Bench Deallocated for id 115,                     User Pratibha Singh for benches ['K5']
+INFO 2024-01-23 15:26:16,475 functions DeallocationSchedular 178 Bench Deallocated for id 143,                     User Abbas Batcha for benches ['B5', 'B6', 'B7']
+INFO 2024-01-23 15:26:17,581 functions DeallocationSchedular 178 Bench Deallocated for id 143,                     User Abbas Batcha for benches ['B5', 'B6', 'B7']
+INFO 2024-01-23 15:26:23,465 functions DeallocationSchedular 178 Bench Deallocated for id 146,                     User Abbas Batcha for benches ['A1', 'A2', 'E4', 'E5', 'E6', 'E7']
+INFO 2024-01-23 15:26:24,082 functions DeallocationSchedular 178 Bench Deallocated for id 146,                     User Abbas Batcha for benches ['A1', 'A2', 'E4', 'E5', 'E6', 'E7']
+INFO 2024-01-23 15:26:29,515 functions DeallocationSchedular 178 Bench Deallocated for id 148,                     User Abbas Batcha for benches ['F2', 'F3', 'F4', 'F5']
+INFO 2024-01-23 15:26:30,098 functions DeallocationSchedular 178 Bench Deallocated for id 148,                     User Abbas Batcha for benches ['F2', 'F3', 'F4', 'F5']
+INFO 2024-01-23 15:26:36,163 functions DeallocationSchedular 178 Bench Deallocated for id 162,                     User Krishna Prasad M for benches ['D22', 'D23', 'D24', 'D25', 'D26']
+INFO 2024-01-23 15:26:36,649 functions DeallocationSchedular 178 Bench Deallocated for id 162,                     User Krishna Prasad M for benches ['D22', 'D23', 'D24', 'D25', 'D26']
+INFO 2024-01-23 15:26:43,143 functions DeallocationSchedular 178 Bench Deallocated for id 163,                     User Krishna Prasad M for benches ['G12', 'G13', 'G14', 'G15']
+INFO 2024-01-23 15:26:43,714 functions DeallocationSchedular 178 Bench Deallocated for id 163,                     User Krishna Prasad M for benches ['G12', 'G13', 'G14', 'G15']
+INFO 2024-01-23 15:26:51,390 functions DeallocationSchedular 178 Bench Deallocated for id 166,                     User Sabarigirish Radhakrishnan for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10']
+INFO 2024-01-23 15:26:51,958 functions DeallocationSchedular 178 Bench Deallocated for id 166,                     User Sabarigirish Radhakrishnan for benches ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10']
+INFO 2024-01-23 15:27:07,485 functions DeallocationSchedular 178 Bench Deallocated for id 167,                     User Pradeep Kumar S for benches ['K1', 'K4', 'K9', 'K10', 'K11', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'L10', 'L21', 'L16', 'L15', 'L14', 'L13', 'L12', 'RF1', 'RF2', 'RF3', 'I6', 'I7', 'I9', 'J22', 'J21', 'J20', 'J16', 'J15', 'J12', 'J6', 'J7', 'J8']
+INFO 2024-01-23 15:27:07,738 functions DeallocationSchedular 178 Bench Deallocated for id 167,                     User Pradeep Kumar S for benches ['K1', 'K4', 'K9', 'K10', 'K11', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'L10', 'L21', 'L16', 'L15', 'L14', 'L13', 'L12', 'RF1', 'RF2', 'RF3', 'I6', 'I7', 'I9', 'J22', 'J21', 'J20', 'J16', 'J15', 'J12', 'J6', 'J7', 'J8']
+INFO 2024-01-23 15:27:13,300 functions DeallocationSchedular 178 Bench Deallocated for id 177,                     User Archana N for benches ['F6']
+INFO 2024-01-23 15:27:13,525 functions DeallocationSchedular 178 Bench Deallocated for id 177,                     User Archana N for benches ['F6']
+INFO 2024-01-23 15:27:27,200 functions DeallocationSchedular 178 Bench Deallocated for id 183,                     User Chandrashekhar Ramgond for benches ['B8', 'B10', 'B9', 'B11', 'B13', 'B12', 'B14', 'B15', 'B16', 'B17', 'C8', 'D8', 'C9', 'D9', 'C10', 'D10', 'C11', 'D11', 'C12', 'D12', 'C13', 'D13', 'C14', 'D14', 'C15', 'D15', 'C16', 'D16', 'C17', 'D17']
+INFO 2024-01-23 15:27:27,201 functions DeallocationSchedular 240 Scheduler Completed Execution
+INFO 2024-01-23 15:27:27,422 functions DeallocationSchedular 178 Bench Deallocated for id 183,                     User Chandrashekhar Ramgond for benches ['B8', 'B10', 'B9', 'B11', 'B13', 'B12', 'B14', 'B15', 'B16', 'B17', 'C8', 'D8', 'C9', 'D9', 'C10', 'D10', 'C11', 'D11', 'C12', 'D12', 'C13', 'D13', 'C14', 'D14', 'C15', 'D15', 'C16', 'D16', 'C17', 'D17']
+INFO 2024-01-23 15:27:27,422 functions DeallocationSchedular 240 Scheduler Completed Execution
+INFO 2024-01-23 15:28:03,406 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:28:03,887 functions DeallocationSchedular 240 Scheduler Completed Execution
+INFO 2024-01-23 15:28:04,217 functions DeallocationSchedular 37 Scheduler Started
+INFO 2024-01-23 15:28:04,728 functions DeallocationSchedular 240 Scheduler Completed Execution

@@ -67,4 +67,7 @@ urlpatterns = [
     path('updateUtilization/<int:id>/', views.UpdateNewModelData.as_view(), name='update_new_model'),
     path('updateUtilization/', views.UpdateNewModelData.as_view(), name='update_new_model'),
     path('utilization-summary/', views.UtilizationSummaryAPIView.as_view(), name='utilization-summary'),
+    path('Program_list/', views.GetProgramList.as_view(), name='utilization-summary'),
+    path('Sku_list/', views.GetSkuList.as_view(), name='utilization-summary'),
+    path('YearWiseComaprision/', views.YearWiseComparison.as_view(), name='utilization-summary'),
 ]

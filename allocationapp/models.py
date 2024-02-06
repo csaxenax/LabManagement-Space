@@ -1,7 +1,10 @@
 #from django.db import models
 from djongo import models
 from django import forms
-from simple_history.models import HistoricalRecords
+from django.utils import timezone
+from django.contrib.postgres.fields import ArrayField
+# from simple_history.models import HistoricalRecords
+
 
 # Create your models here.
 class AllocatedToModel(models.Model):
@@ -100,7 +103,9 @@ class AllocationDetailsModel(models.Model):
     #changes
     RejectedBy = models.CharField(max_length=255,blank=True,null=True)
     RejectedDate = models.CharField(blank=True, max_length=255, null=True)
-    DeallocatedBy = models.CharField(max_length=255,blank=True,null=True)
+    RequestedBy = models.ArrayField(model_container=AllocatedToModel,blank=True,null=True)
+    RequestedDate = models.DateTimeField(auto_now_add=True,null=True)
+    deallocatedBy = models.CharField(max_length=255,blank=True,null=True)
     DeallocatedDate = models.CharField(blank=True, max_length=255, null=True)
     def __str__(self):
         return str(self.id)
@@ -243,27 +248,88 @@ class BoardAllocationDataModel(models.Model):
     October = models.JSONField()
     November = models.JSONField()
     December = models.JSONField()
-    history = HistoricalRecords()
-    operation_type = models.CharField(max_length=250, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            # This is an insert operation
-            self.operation_type = 'insert'
+            action = 'insert'
         elif not getattr(self, 'isdeleted', False):
             # This is an update operation (excluding soft deletes)
-            self.operation_type = 'update'
+            action = 'update'
+        else:
+            action = 'delete',
+            self.isdeleted = True
+        
         super(BoardAllocationDataModel, self).save(*args, **kwargs)
-
-    def delete(self, using=None, keep_parents=False):
-        # Handle soft delete separately
-        self.isdeleted = True
-        self.operation_type = 'delete'
-        super(BoardAllocationDataModel, self).delete(using, keep_parents)
+        # Create a historical record
+        BoardAllocationDataModelTrackData.objects.create(
+            instance_id=self.id,
+            action=action,
+            Program = self.Program,
+            Sku = self.Sku,
+            Team = self.Team,
+            Vendor = self.Vendor,
+            TotalBoard = self.TotalBoard,
+            createdBy = self.createdBy,
+            createdDate = self.createdDate,
+            modifiedBy = self.modifiedBy,
+            modifiedDate = self.modifiedDate,
+            deletedBy = self.deletedBy,
+            deletedDate = self.deletedDate,
+            isdeleted = self.isdeleted,
+            year = self.year,
+            January=self.January or {},
+            February=self.February or {},
+            March = self.March or {},
+            April = self.April or {},
+            May = self.May or {},
+            June = self.June or {},
+            July = self.July or {},
+            August = self.August or {},
+            September = self.September or {},
+            October = self.October or {},
+            November = self.November or {},
+            December = self.December or {}
+        )
 
     def __str__(self):
         return str(self.Program)
     
+class BoardAllocationDataModelTrackData(models.Model):
+    ACTION_CHOICES = (
+        ('insert', 'Insert'),
+        ('update', 'Update'),
+        ('delete', 'Delete'),
+    )
+
+    id = models.AutoField(primary_key=True)
+    instance_id = models.IntegerField()  # ID of the instance in BoardAllocationDataModel
+    Program = models.CharField(max_length=100,blank=True)
+    Sku = models.CharField(max_length=100,blank=True)
+    Team = models.CharField(max_length=255,blank=True)
+    Vendor = models.CharField(max_length=255,blank=True)
+    TotalBoard = models.IntegerField(default=0)
+    createdBy = models.CharField(max_length=255,blank=True)
+    createdDate = models.DateTimeField(auto_now_add=True,null=True)
+    modifiedBy = models.CharField(max_length=255,null=True,blank=True)
+    modifiedDate = models.DateTimeField(auto_now_add=True,null=True)
+    deletedBy = models.CharField(max_length=255,blank=True)
+    deletedDate = models.DateTimeField(auto_now_add=True,null=True)
+    isdeleted = models.BooleanField(default=False)
+    year = models.PositiveIntegerField()
+    January = models.JSONField()
+    February = models.JSONField()
+    March = models.JSONField()
+    April = models.JSONField()
+    May = models.JSONField()
+    June = models.JSONField()
+    July = models.JSONField()
+    August = models.JSONField()
+    September = models.JSONField()
+    October = models.JSONField()
+    November = models.JSONField()
+    December = models.JSONField()
+    action = models.CharField(max_length=250, choices=ACTION_CHOICES)
+    timestamp = models.DateTimeField(auto_now_add=True)
     
 class UtilizationSummaryModel(models.Model):
     id = models.AutoField(primary_key=True)
