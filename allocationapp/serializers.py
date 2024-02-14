@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import AllocationDetailsModel,LabModel,BoardAllocationDataModel,UtilizationSummaryModel
+from .models import AllocationDetailsModel,LabModel,BoardAllocationDataModel,UtilizationSummaryModel,BroadcastModel
 import json
 
 class LabModelSerializer(serializers.ModelSerializer):
@@ -100,3 +100,7 @@ class UtilizationSerializer2(serializers.ModelSerializer):
         model = UtilizationSummaryModel
         fields = '__all__'
     
+class BroadcastSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BroadcastModel
+        fields = ['id', 'Subject', 'Content', 'BroadCast_by', 'CreatedDate', 'User_mail_list']

@@ -2,7 +2,6 @@
 from djongo import models
 from django import forms
 from django.utils import timezone
-from django.contrib.postgres.fields import ArrayField
 # from simple_history.models import HistoricalRecords
 
 
@@ -103,10 +102,11 @@ class AllocationDetailsModel(models.Model):
     #changes
     RejectedBy = models.CharField(max_length=255,blank=True,null=True)
     RejectedDate = models.CharField(blank=True, max_length=255, null=True)
+    DeallocatedBy = models.CharField(max_length=255,blank=True,null=True)
+    deallocatedDate = models.DateTimeField(auto_now=True,blank=True,null=True)
+    # changes
     RequestedBy = models.ArrayField(model_container=AllocatedToModel,blank=True,null=True)
-    RequestedDate = models.DateTimeField(auto_now_add=True,null=True)
-    deallocatedBy = models.CharField(max_length=255,blank=True,null=True)
-    DeallocatedDate = models.CharField(blank=True, max_length=255, null=True)
+    RequestedDate = models.DateTimeField(auto_now=True,blank=True,null=True)
     def __str__(self):
         return str(self.id)
     
@@ -375,3 +375,15 @@ class UtilizationSummaryModel(models.Model):
 
     def __str__(self):
         return f"{self.workweek} - {self.Location}"
+    
+class BroadcastModel(models.Model):
+    """ Models for Broadcast Page"""
+    id = models.AutoField(primary_key=True)
+    Subject = models.CharField(max_length=100,null=True,blank=True)
+    Content = models.CharField(max_length=100,null=True,blank=True)
+    BroadCast_by = models.ArrayField(model_container=AllocatedToModel,blank=True,null=True)
+    CreatedDate = models.DateTimeField(auto_now_add=True,null=True)
+    User_mail_list = models.CharField(max_length=100,null=True,blank=True)
+
+    def __str__(self):
+        return self.id

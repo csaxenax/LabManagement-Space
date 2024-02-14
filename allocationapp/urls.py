@@ -68,6 +68,9 @@ urlpatterns = [
     path('updateUtilization/', views.UpdateNewModelData.as_view(), name='update_new_model'),
     path('utilization-summary/', views.UtilizationSummaryAPIView.as_view(), name='utilization-summary'),
     path('Program_list/', views.GetProgramList.as_view(), name='utilization-summary'),
-    path('Sku_list/', views.GetSkuList.as_view(), name='utilization-summary'),
+    path('Skulist/', views.GetSkuList.as_view(), name='utilization-summary'),
     path('YearWiseComaprision/', views.YearWiseComparison.as_view(), name='utilization-summary'),
+    path('broadcastmail/',views.BroadCastEmail.as_view(),name='broadcast'),
+    path('broadcastdetail/',views.GetBroadCastDetails.as_view(),name='broadcast'),
+    path('lab-details/',views.LabLocation.as_view(),name='lablocation'),
 ]

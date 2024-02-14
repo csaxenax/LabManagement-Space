@@ -52,7 +52,7 @@ def DeallocationSchedular():
         next_workweek = str(int(Workweek)+1) + str(year)
     try:
         allocation_data = AllocationDetailsModel.objects.filter(status='allocated').values('id','Program','Sku','Vendor','FromWW',
-            'ToWW','Duration','AllocatedTo','NumberOfbenches','Remarks','Team','IsAllocated','IsRequested','Location__Name','BenchData','AllocatedDate','status','deallocateBy')
+            'ToWW','Duration','AllocatedTo','NumberOfbenches','Remarks','Team','IsAllocated','IsRequested','Location__Name','BenchData','AllocatedDate','status')
         #changes
         summary_data_list = []
         if allocation_data:
@@ -80,7 +80,7 @@ def DeallocationSchedular():
                     current_allocation.IsAllocated=False
                     current_allocation.Reason="Allocation Completed successfully"
                     #changes
-                    current_allocation.deallocatedBy = "Automated Deallocation"
+                    current_allocation.DeallocatedBy = "Automated Deallocation"
                     current_allocation.DeallocatedDate = datetime.now()
                     current_allocation.save()
                     benchdata = current_allocation.BenchData
@@ -119,7 +119,6 @@ def DeallocationSchedular():
                                 "vendor":current_allocation.Vendor,
                                 "allocatedto":current_allocation.AllocatedTo[0]['Name'],
                                 "notifyto":','.join(notify_persons),
-                                # "Deallocatedby":allocation_data.deallocatedBy,
                                 "fromww":str(current_allocation.FromWW),
                                 "toww":str(current_allocation.ToWW),
                                 "duration":current_allocation.Duration,

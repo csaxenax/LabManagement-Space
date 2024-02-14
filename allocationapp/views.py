@@ -2,7 +2,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework.parsers import FileUploadParser
-from .serializers import BoardAllocationDataModelSerializer,UtilizationSerializer2
+from .serializers import BoardAllocationDataModelSerializer,UtilizationSerializer2,BroadcastSerializer
 from rest_framework.views  import APIView
 from rest_framework.response import Response
 from rest_framework import status,generics
@@ -16,8 +16,8 @@ from django.shortcuts import get_object_or_404
 from django.db.models.functions import Coalesce
 from itertools import chain
 from datetime import datetime
-import traceback
-import os,re
+import traceback , requests
+import os,re,json
 import urllib3 
 import logging
 from .UserAuthentication import GetUserData
@@ -38,8 +38,8 @@ logger_error = logging.getLogger('error_logger')
 # Local imports
 from .models import AllocationDetailsModel,LabModel,ProgramsModel,\
                     VendorsModel,TeamsModel,SkuModel,UserModel, \
-                        UserRolesModel,UserRequestModel,SuggestionsModel,ApproverUserModel,BoardAllocationDataModel,UtilizationSummaryModel,BoardAllocationDataModelTrackData
-from .mail import Email,UserModuleMail,SuggestionsMail
+                        UserRolesModel,UserRequestModel,SuggestionsModel,ApproverUserModel,BoardAllocationDataModel,UtilizationSummaryModel,BroadcastModel
+from .mail import Email,UserModuleMail,SuggestionsMail,BroadcastMail
 from .ldapvalidate import validate_user_mail
 # Create your views here.
 
@@ -400,12 +400,6 @@ class BookBenchView(APIView):
         """
         try:
             data = request.data
-            requested_user_name = None
-            requested_user_email = None
-            if data['RequestedBy']:
-                requested_by_data = data['RequestedBy'][0]  # Access the first item in the array
-                requested_user_name = requested_by_data.get('Name')
-                requested_user_email = requested_by_data.get('Email')
             # validation of allocated to field
             if data['AllocatedTo']:
                 for each_data in data['AllocatedTo']:
@@ -434,6 +428,35 @@ class BookBenchView(APIView):
                             return Response("Enter Valid WWID for AllocatedToField",status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     except KeyError:
                         return Response("Enter Valid WWID for AllocatedToField",status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                return Response("Allocated To Details Not Valid",status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            if data['RequestedBy']:
+                for each_data in data['RequestedBy']:
+                    try:
+                        Name = each_data['Name']
+                        if isinstance(Name,str):
+                            pass
+                        else:
+                            return Response("Enter Valid Name for RequestedBy",status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    except KeyError:
+                        return Response("Enter Valid Name for RequestedBy",status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+                    try:
+                        email = each_data['Email']
+                        if '@intel.com' in email:
+                            pass
+                        else:
+                            return Response("Enter Valid Email for RequestedBy",status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    except KeyError:
+                        return Response("Enter Valid Name for RequestedBy",status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    try:
+                        WWID = each_data['WWID']
+                        if isinstance(WWID,int):
+                            pass
+                        else:
+                            return Response("Enter Valid WWID for RequestedBy",status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    except KeyError:
+                        return Response("Enter Valid WWID for RequestedBy",status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
                 return Response("Allocated To Details Not Valid",status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
@@ -492,7 +515,7 @@ class BookBenchView(APIView):
                     AllocatedTo=data['AllocatedTo'],NotifyTo=data['NotifyTo'],FromWW=data['FromWW'],ToWW=data['ToWW'],NumberOfbenches=data['NumberOfBenches'],
                     Team=data['Team'],AllocatedDate=None,Remarks=data['Remarks'],Location=lab_data,
                     IsAllocated=data['IsAllocated'],IsRequested=data['IsRequested'],BenchData=data['BenchData'],
-                    Duration=data['Duration'],created=timezone.now(),status='requested',DeallocatedBenchData=[],RequestedBy=data['RequestedBy'])
+                    Duration=data['Duration'],created=timezone.now(),status='requested',DeallocatedBenchData=[],RequestedBy=data['RequestedBy'],DeallocatedBy=data['DeallocatedBy'])
 
                 # To Do : Send Mail for the Request is recieved
                 program = data["Program"]
@@ -507,6 +530,8 @@ class BookBenchView(APIView):
                 bench_data = data["BenchData"]
                 team = data['Team']
                 duration = data['Duration']
+                RequestedBy=data['RequestedBy']
+                # deallocatedby = data['DeallocatedBy']
                 message = "This email is a confirmation of your Lab Bench <b>Submitted<b>  "
                 subject = "Bench Request Submitted for "
                 try:
@@ -534,7 +559,7 @@ class BookBenchView(APIView):
                             "vendor":vendor,
                             "allocatedto":allocatedTo[0]['Name'],
                             "notifyto":','.join(notify_persons),
-                            "requestedBy":requested_user_name,
+                            "requestedBy":RequestedBy[0]['Name'],
                             "fromww":fromWW,
                             "toww":toWW,
                             "duration":duration,
@@ -543,20 +568,22 @@ class BookBenchView(APIView):
                             "numberofbenches":numberofbenches,
                             "bench_data":bench_data,
                             "message":message,
-                            "subject":subject
+                            "subject":subject,
+                            "deallocatedby":None
                         }
-                # TO.append(str(allocatedTo[0]['Email']))
-
-                Cc = []  # Initialize Cc as an empty list before using it
-                if requested_user_email:
-                    Cc.append(requested_user_email)
-                if notify_emails:
-                    Cc += notify_emails
+                TO.append(str(allocatedTo[0]['Email']))
+                RequestedBy_email = data['RequestedBy'][0]['Email'] if data.get('RequestedBy') else None
+                print(RequestedBy_email)
+                Cc = []
+                if RequestedBy_email:
+                    Cc.append(RequestedBy_email)
+                
+                if notify_persons:
+                    Cc.extend(notify_persons)
                 try:
-
-                    Cc = Cc+CC
-                    
-                    mail = Email(FROM,TO,Cc,mail_data)
+                    Cc = Cc + CC
+                    print(Cc)
+                    mail = Email(FROM, TO, Cc, mail_data)
                 except Exception:
                     print(traceback.format_exc())
                 mail.sendmail()
@@ -589,8 +616,7 @@ class ApproveViewPage(APIView):
         """
         try:
             pending_data = AllocationDetailsModel.objects.filter(Q(IsAllocated__in=[False]) & Q(IsRequested__in=[True])).order_by('-created').values('id','Program','Sku','Vendor','FromWW',
-            'ToWW','Duration','AllocatedTo','NotifyTo','NumberOfbenches','Team','Remarks','IsAllocated','IsRequested','Location__Name','BenchData','RequestedBy')
-            print(pending_data)
+            'ToWW','Duration','AllocatedTo','NotifyTo','NumberOfbenches','Team','Remarks','IsAllocated','IsRequested','Location__Name','BenchData','RequestedBy','RequestedDate','DeallocatedBy','deallocatedDate')
             if pending_data is not None:
                 #serializer = ApproveViewSerializer(pending_data,many=True)
                 return Response(pending_data, status.HTTP_200_OK)
@@ -604,7 +630,6 @@ class ApproveViewPage(APIView):
         """This method stores the Approved requests from Approved page"""
         data = request.data["requestIdList"]
         approved_by = request.data['approvedBy']
-        unique_emails = set() 
         try:
             for each_data in data:
                 # This If Statement executes when the request gets approved
@@ -623,6 +648,8 @@ class ApproveViewPage(APIView):
                     team = allocation_query.Team
                     duration = allocation_query.Duration
                     bench_data = allocation_query.BenchData
+                    RequestedBy = allocation_query.RequestedBy
+                    deallocatedby = allocation_query.DeallocatedBy
                     message = "This email is a confirmation of your Lab Bench <b>Approved<b>  "
                     subject = "Bench Request Approved for "
                     # Save the Allocated status to allocations Model
@@ -635,53 +662,48 @@ class ApproveViewPage(APIView):
                             query.status='allocated'
                             query.approvedBy = approved_by
                             # # To DO : Send a mail that the request been approved
-                            requested_by_email = allocation_query.RequestedBy[0]['Email']
-                            if requested_by_email != approved_by:
-                                # If they are not the same, proceed with sending the email
-                                if requested_by_email not in unique_emails:  # Check if email is already added
-                                    unique_emails.add(requested_by_email)  # Add email to set
-                                try:
-                                    if allocation_query.NotifyTo is not None and allocation_query.NotifyTo:
-                                        notifyTo = allocation_query.NotifyTo
-                                        notify_persons = allocation_query.NotifyTo
-                                        notify_emails = allocation_query.NotifyTo
-                                    else:
-                                        notifyTo = None
-                                        notify_persons = []
-                                        notify_emails = []
-                                except KeyError:
-                                    notifyTo = None
-                                    notify_persons = []
-                                    notify_emails = []
-                                
-                                mail_data = {
-                                    "User":allocatedTo[0]['Name'],
-                                    "WWID":allocatedTo[0]['WWID'],
-                                    "id":id,
-                                    "program":program,
-                                    "sku":sku,
-                                    "lab_name":location,
-                                    "vendor":vendor,
-                                    "allocatedto":allocatedTo[0]['Name'],
-                                    "notifyto":','.join(notify_persons),
-                                    "fromww":fromWW,
-                                    "toww":toWW,
-                                "duration":duration,
-                                    "remarks":remarks,
-                                    "team":team,
-                                    "numberofbenches":numberofbenches,
-                                    "bench_data":bench_data,
-                                    "message":message,
-                                    "subject":subject
-                                }
-                                # TO.append(str(allocatedTo[0]['Email']))
-                                if notify_emails:
-                                    Cc = notify_emails
+                            try:
+                                requested_by_email = ""
+                                if query.RequestedBy:
+                                    requested_by_email = query.RequestedBy[0]['Email']
+                                if requested_by_email == approved_by:
+                                    notify_persons = [approved_by]
                                 else:
-                                    Cc=[]
-                                Cc = Cc+CC
-                                mail = Email(FROM,TO,Cc,mail_data)
-                                mail.sendmail()
+                                    notify_persons = query.NotifyTo if query.NotifyTo else []
+                                notify_emails = notify_persons
+                            except KeyError:
+                                notify_emails = []
+                            
+                            mail_data = {
+                                "User":allocatedTo[0]['Name'],
+                                "WWID":allocatedTo[0]['WWID'],
+                                "id":id,
+                                "program":program,
+                                "sku":sku,
+                                "lab_name":location,
+                                "vendor":vendor,
+                                "allocatedto":allocatedTo[0]['Name'],
+                                "notifyto":','.join(notify_persons),
+                                "requestedBy":RequestedBy[0]['Name'],
+                                "fromww":fromWW,
+                                "toww":toWW,
+                               "duration":duration,
+                                "remarks":remarks,
+                                "team":team,
+                                "numberofbenches":numberofbenches,
+                                "bench_data":bench_data,
+                                "message":message,
+                                "subject":subject,
+                                "deallocatedby":""
+                            }
+                            TO.append(str(allocatedTo[0]['Email']))
+                            if notify_emails:
+                                Cc = notify_emails
+                            else:
+                                Cc=[]
+                            Cc = Cc+CC
+                            mail = Email(FROM,TO,Cc,mail_data)
+                            mail.sendmail()
                             query.save()
                             TO.pop()
                             # Assign the benches to the requested persons once approved
@@ -887,7 +909,7 @@ class ReportPageView(APIView):
         """ API used in the report page to generate all allocation data"""
         try:
             pending_data = AllocationDetailsModel.objects.filter().order_by('-created').values('id','Program','Sku','Vendor','FromWW',
-            'ToWW','Duration','AllocatedTo','NumberOfbenches','Remarks','Team','IsAllocated','IsRequested','Location__Name','BenchData','AllocatedDate','status','approvedBy','RejectedBy','RejectedDate','DeallocatedBy','DeallocatedDate','Reason')
+            'ToWW','Duration','AllocatedTo','NumberOfbenches','Remarks','Team','IsAllocated','IsRequested','Location__Name','BenchData','AllocatedDate','status','approvedBy','RejectedBy','RequestedBy','RequestedDate','RejectedDate','DeallocatedBy','deallocatedDate','Reason')
             if pending_data is not None:
                 #serializer = ApproveViewSerializer(pending_data,many=True)
                 return Response(pending_data, status.HTTP_200_OK)
@@ -1275,44 +1297,55 @@ class DeallocateBenchesView(APIView):
         """ API to list all allocations"""
         try:
             allocated_data = AllocationDetailsModel.objects.filter(IsAllocated__in=['True']).values('id','Program','Sku','Vendor','FromWW',
-            'ToWW','Duration','AllocatedTo','NotifyTo','NumberOfbenches','Remarks','Team','IsAllocated','IsRequested','Location__Name','BenchData','AllocatedDate','status')
+            'ToWW','Duration','AllocatedTo','NotifyTo','NumberOfbenches','Remarks','Team','IsAllocated','IsRequested','Location__Name','BenchData','AllocatedDate','status','DeallocatedBy')
             allocated_data_list = [each_allocation for each_allocation in allocated_data]
             return  Response(allocated_data_list,status=status.HTTP_200_OK)
         except Exception as e:
             logger_error.error(str(e))
             return Response(e,status=status.HTTP_500_INTERNAL_SERVER_ERROR)     
     
-    def post(self, request):
+    def post(self,request):
         """ API to deallocate benches manually"""
         data = request.data
+
+        # CHANGES
+        user_name = data[0]["DeallcationUserInfo"]["name"]
+        user_email = data[0]["DeallcationUserInfo"]["emailId"]
+        allocation_time = data[0]["DateandTime"]
+
+        # # Print the extracted values
+        # print("User Name:", user_name)
+        # print("Allocation Time:", allocation_time)
         try:
             lab_name = data[0]['LabName']
             reason = data[0]['Reason']
+            # changes
             user_name = data[0]["DeallcationUserInfo"]["name"]
             user_email = data[0]["DeallcationUserInfo"]["emailId"]
             allocation_time = data[0]["DateandTime"]
-            
+
             lab_data = LabModel.objects.get(Q(Name=lab_name))
             for each_data in data:
                 id = each_data['id']
                 bench_data = each_data['BenchData'][0]
                 allocation_data = AllocationDetailsModel.objects.get(id=id)
-                
                 if bench_data in allocation_data.BenchData:
                     allocation_data.BenchData.remove(bench_data)
                     allocation_data.DeallocatedBenchData.append(bench_data)
-                    allocation_data.deallocatedBy = user_name
-                    allocation_data.DeallocatedDate = allocation_time
+                    allocation_data.DeallocatedBy = user_name
+                    allocation_data.deallocatedDate = allocation_time
                     allocation_data.save()
-                    
+                    # If all benches are deallocated
                     if not allocation_data.BenchData:
                         allocation_data.IsAllocated = False
                         allocation_data.IsRequested = False
                         allocation_data.status = "complete"
                         allocation_data.BenchData = allocation_data.DeallocatedBenchData
-                        allocation_data.Reason = f"{bench_data}: {reason} {allocation_data.Reason}"
+                        allocation_data.Reason = str(bench_data) + ":" +str(reason) + str(allocation_data.Reason)
+                        # changes
+                        allocation_data.DeallocatedBy = user_name
+                        allocation_data.deallocatedDate = datetime.now()
                         allocation_data.save()
-                        
                         for each_bench_row in lab_data.BenchDetails:
                             for each_bench_column_no in range(len(each_bench_row['seats'])):
                                 if each_bench_row['seats'][each_bench_column_no]['labelNo'] == bench_data:
@@ -1328,56 +1361,58 @@ class DeallocateBenchesView(APIView):
                                     each_bench_row['seats'][each_bench_column_no]['IsAllocated'] = False
                                     each_bench_row['seats'][each_bench_column_no]['AllocationData'] = None
                                     lab_data.save()
-                                    
-                    notify_persons = []
-                    if allocation_data.NotifyTo is not None:
-                        notify_persons = allocation_data.NotifyTo
-                        notify_emails = allocation_data.NotifyTo
-                    else:
+                    try:
+                        notify_persons = []
+                        if  allocation_data.NotifyTo is not None:     
+                            notify_persons = allocation_data.NotifyTo
+                            notify_emails = allocation_data.NotifyTo
+                        else:
+                            notifyTo = None
+                            notify_persons =[]
+                            notify_emails = []
+                    except Exception as e:
                         notifyTo = None
                         notify_persons =[]
                         notify_emails = []
-                    
                     message = f"This email is a confirmation of your Lab Bench <b>Deallocated<b> for reason {reason}"
                     subject = "Bench request Deallocated for "
-                    
                     mail_data = {
-                        "User": allocation_data.AllocatedTo[0]['Name'],
-                        "WWID": allocation_data.AllocatedTo[0]['WWID'],
-                        "program": allocation_data.Program,
-                        "sku": allocation_data.Sku,
-                        "lab_name": lab_name,
-                        "vendor": allocation_data.Vendor,
-                        "allocatedto": allocation_data.AllocatedTo[0]['Name'],
-                        "notifyto": ','.join(notify_persons),
-                        "fromww": str(allocation_data.FromWW),
-                        "toww": str(allocation_data.ToWW),
-                        "duration": allocation_data.Duration,
-                        "remarks": allocation_data.Remarks,
-                        "team": allocation_data.Team,
-                        "id": id,
-                        "numberofbenches": allocation_data.NumberOfbenches,
-                        "bench_data": [bench_data],
-                        "message": message,
-                        "subject": subject,
-                        "Deallocatedby": user_name,  # Added DeallocatedBy to mail_data
-                        "DeallocatedDate": allocation_time  # Added DeallocatedDate to mail_data
-                    }
-                    
+                                "User":allocation_data.AllocatedTo[0]['Name'],
+                                "WWID":allocation_data.AllocatedTo[0]['WWID'],
+                                "program":allocation_data.Program,
+                                "sku":allocation_data.Sku,
+                                "lab_name":lab_name,
+                                "vendor":allocation_data.Vendor,
+                                "allocatedto":allocation_data.AllocatedTo[0]['Name'],
+                                "notifyto":','.join(notify_persons),
+                                "requestedBy":allocation_data.RequestedBy[0]['Name'],
+                                "fromww":str(allocation_data.FromWW),
+                                "toww":str(allocation_data.ToWW),
+                                "duration":allocation_data.Duration,
+                                "remarks":allocation_data.Remarks,
+                                "team":allocation_data.Team,
+                                "id":id,
+                                "numberofbenches":allocation_data.NumberOfbenches,
+                                "bench_data":[bench_data],
+                                "message":message,
+                                "subject":subject,
+                                "deallocatedby":allocation_data.DeallocatedBy,
+                            }
                     TO.append(str(allocation_data.AllocatedTo[0]['Email']))
-                    Cc = [user_email]
                     if notify_emails:
-                        Cc.extend(notify_emails)
+                        Cc = notify_emails
                     else:
                         Cc = []
-                    Cc = Cc + CC
-                    mail = Email(FROM, TO, Cc, mail_data)
+                    Cc.append(user_email)
+                    Cc = Cc+CC
+                    mail = Email(FROM,TO,Cc,mail_data)
                     mail.sendmail()
                     TO.pop()           
-            return Response("Success", status=status.HTTP_200_OK)
+            return Response("Success",status=status.HTTP_200_OK)
         except Exception as e:
             logger_error.error(str(e))
-            return Response(e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(e,status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class ExtendAllocation(APIView):
     def post(self, request):
@@ -2573,7 +2608,7 @@ class ForecastSummary(APIView):
             data = request.data
             year = data.get('year', '2023')
             program = data.get('Program', 'All')
-            sku = data.get('Sku','All')
+            sku = data.get('Sku', 'All')
 
             id = data.get('id')
 
@@ -2595,12 +2630,20 @@ class ForecastSummary(APIView):
                 except BoardAllocationDataModel.DoesNotExist:
                     return Response("Record not found for the specified year", status=status.HTTP_404_NOT_FOUND)
             else:
-                if program == 'All' and sku == 'All':
-                    # Process all data
-                    data = BoardAllocationDataModel.objects.filter(year=year)
+                if program == 'All':
+                    if sku == 'All':
+                        # Process all data for all programs and all Sku
+                        data = BoardAllocationDataModel.objects.filter(year=year)
+                    else:
+                        # Process all data for all programs but specific Sku
+                        data = BoardAllocationDataModel.objects.filter(year=year, Sku=sku)
                 else:
-                    # Process data for a specific program
-                    data = BoardAllocationDataModel.objects.filter(year=year, Program=program,Sku=sku)
+                    if sku == 'All':
+                        # Process data for a specific program and all Sku
+                        data = BoardAllocationDataModel.objects.filter(year=year, Program=program)
+                    else:
+                        # Process data for a specific program and specific Sku
+                        data = BoardAllocationDataModel.objects.filter(year=year, Program=program, Sku=sku)
                 serializer = BoardAllocationDataModelSerializer(data, many=True)
                 serialized_data = serializer.data  # Convert queryset to list of dictionaries
                 filtered_data = [item for item in serialized_data if not item['isdeleted']]
@@ -2666,7 +2709,7 @@ class ForecastSummaryRVP(APIView):
             data = request.data
             year = data.get('year', '2023')
             program = data.get('Program', 'All')
-            sku = data.get('Sku','All')
+            sku = data.get('Sku', 'All')
             board_id = data.get('id')
 
             if board_id is not None:
@@ -2677,10 +2720,20 @@ class ForecastSummaryRVP(APIView):
                 except BoardAllocationDataModel.DoesNotExist:
                     return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
             else:
-                if program == 'All' and sku == 'All':
-                    data = BoardAllocationDataModel.objects.filter(year=year)
+                if program == 'All':
+                    if sku == 'All':
+                        # Process all data for all programs and all Sku
+                        data = BoardAllocationDataModel.objects.filter(year=year)
+                    else:
+                        # Process all data for all programs but specific Sku
+                        data = BoardAllocationDataModel.objects.filter(year=year, Sku=sku)
                 else:
-                    data = BoardAllocationDataModel.objects.filter(year=year, Program=program,Sku=sku)
+                    if sku == 'All':
+                        # Process data for a specific program and all Sku
+                        data = BoardAllocationDataModel.objects.filter(year=year, Program=program)
+                    else:
+                        # Process data for a specific program and specific Sku
+                        data = BoardAllocationDataModel.objects.filter(year=year, Program=program, Sku=sku)
                 # Check if there is any data for the specified year
                 if not data.exists():
                     return Response({year: []}, status=status.HTTP_200_OK)
@@ -2695,10 +2748,26 @@ class ForecastSummaryRVP(APIView):
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class ForecastSummaryTable(APIView):
-    parser_classes = [JSONParser]
-    def process_record(self, records):
+    def call_api(self):
+        url = "https://labspaceapi.apps1-bg-int.icloud.intel.com/home/GetDrillDownChartData/"
+        try:
+            response = requests.get(url, verify=False)
+            if response.status_code == 200:
+                data = response.json()
+                # Filter data for categories "Free" and "Allocated"
+                filtered_data = [item for item in data if item["category"] in ["Free", "Allocated"]]
+                return filtered_data
+            else:
+                print("Failed to call API:", response.status_code)
+                return None
+        except requests.exceptions.RequestException as e:
+            print("Error:", e)
+            return None
+
+    def process_record(self, records, total_sum):
         result = []
         monthly_totals = {month: {'Bench_Demand_Intel': 0, 'Rack_Demand_Intel': 0, 'Bench_Demand_ODC': 0, 'Rack_Demand_ODC': 0, 'Total': 0} for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]}
+                
         for record in records:
             for month in monthly_totals:
                 monthly_totals[month]['Bench_Demand_Intel'] += int(record[month]['boardsIntelBench'] or 0)
@@ -2718,7 +2787,9 @@ class ForecastSummaryTable(APIView):
                 "Intel_percentage": f"{round((total_data['Bench_Demand_Intel'] + total_data['Rack_Demand_Intel']) / total * 100, 2)}%" if total != 0 else "0%",
                 "ODC_percentage": f"{round((total_data['Bench_Demand_ODC'] + total_data['Rack_Demand_ODC']) / total * 100, 2)}%" if total != 0 else "0%",
                 "Total_Bench_Intel" : round(total_data['Bench_Demand_Intel'] / 1.5),
-                "Total_Rack_Intel" : 0
+                "Total_Rack_Intel" : 0,
+                "WSE_BENCH_allocation": total_sum,  # Use the total_sum here
+                "GAP/Demand": round(total_data['Bench_Demand_Intel'] / 1.5) - total_sum
             })
         return result
 
@@ -2728,7 +2799,7 @@ class ForecastSummaryTable(APIView):
             year = data.get('year', '2023')
             board_id = data.get('id')
             program = data.get('Program', 'All')
-            sku = data.get('Sku','All')
+            sku = data.get('Sku', 'All')
             if board_id is not None:
                 try:
                     board = BoardAllocationDataModel.objects.get(pk=board_id)
@@ -2737,10 +2808,20 @@ class ForecastSummaryTable(APIView):
                 except BoardAllocationDataModel.DoesNotExist:
                     return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
             else:
-                if program == 'All' and sku == 'All':
-                    data = BoardAllocationDataModel.objects.filter(year=year)
+                if program == 'All':
+                    if sku == 'All':
+                        # Process all data for all programs and all Sku
+                        data = BoardAllocationDataModel.objects.filter(year=year)
+                    else:
+                        # Process all data for all programs but specific Sku
+                        data = BoardAllocationDataModel.objects.filter(year=year, Sku=sku)
                 else:
-                    data = BoardAllocationDataModel.objects.filter(year=year, Program=program,Sku=sku)
+                    if sku == 'All':
+                        # Process data for a specific program and all Sku
+                        data = BoardAllocationDataModel.objects.filter(year=year, Program=program)
+                    else:
+                        # Process data for a specific program and specific Sku
+                        data = BoardAllocationDataModel.objects.filter(year=year, Program=program, Sku=sku)
                 # Check if there is any data for the specified year
                 if not data.exists():
                     # Return empty data for the specified year
@@ -2750,7 +2831,10 @@ class ForecastSummaryTable(APIView):
                 serialized_data = serializer.data  # Convert queryset to list of dictionaries
                 filtered_data = [item for item in serialized_data if not item['isdeleted']]
                 response_data = filtered_data
-            output_data = {year: self.process_record(response_data)}
+            # Calculate the total_sum using call_api() function
+            api_data = self.call_api()
+            total_sum = sum(item["value"] for item in api_data) if api_data else 0
+            output_data = {year: self.process_record(response_data, total_sum)}
             return Response(output_data, status=status.HTTP_201_CREATED)
         except ObjectDoesNotExist:
             return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
@@ -2769,7 +2853,9 @@ class ForecastSummaryTable(APIView):
                 "Intel_percentage": "0%",
                 "ODC_percentage":"0%",
                 "Total_Bench_Intel" : 0,
-                "Total_Rack_Intel" : 0
+                "Total_Rack_Intel" : 0,
+                "WSE_BENCH_allocation": 0,
+                "GAP/Demand": 0
             }
             for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
         ]
@@ -2834,7 +2920,7 @@ class ForecastQuaterWiseSummary(APIView):
             year = data.get('year', '2023')
             board_id = data.get('id')
             program = data.get('Program', 'All')
-            sku = data.get('Sku','All')
+            sku = data.get('Sku', 'All')
             if board_id is not None:
                 try:
                     board = BoardAllocationDataModel.objects.get(pk=board_id)
@@ -2844,12 +2930,20 @@ class ForecastQuaterWiseSummary(APIView):
                 except BoardAllocationDataModel.DoesNotExist:
                     return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
             else:
-                # Filter data based on the specified year
-                if program == 'All' and sku == 'All': 
-                    data = BoardAllocationDataModel.objects.filter(year=year)
+                if program == 'All':
+                    if sku == 'All':
+                        # Process all data for all programs and all Sku
+                        data = BoardAllocationDataModel.objects.filter(year=year)
+                    else:
+                        # Process all data for all programs but specific Sku
+                        data = BoardAllocationDataModel.objects.filter(year=year, Sku=sku)
                 else:
-                    data = BoardAllocationDataModel.objects.filter(year=year, Program=program,Sku=sku)
-                # Check if there is any data for the specified year
+                    if sku == 'All':
+                        # Process data for a specific program and all Sku
+                        data = BoardAllocationDataModel.objects.filter(year=year, Program=program)
+                    else:
+                        # Process data for a specific program and specific Sku
+                        data = BoardAllocationDataModel.objects.filter(year=year, Program=program, Sku=sku)
                 if not data.exists():
                     return Response({year: []}, status=status.HTTP_200_OK)
 
@@ -3324,16 +3418,19 @@ class GetSkuList(APIView):
     def post(self, request):
         try:
             data = request.data
-            year = data.get('year', '2023')
-            if year:
+            year = data.get('year', 2023)  # Default year is 2023 if not provided
+            program = data.get('Program', 'All')
+            
+            if program == 'All':
                 program_data = BoardAllocationDataModel.objects.filter(year=year).values('Sku')
             else:
-                program_data = BoardAllocationDataModel.objects.all().values('Sku')
+                program_data = BoardAllocationDataModel.objects.filter(year=year, Program=program).values('Sku')
+                
             program_list = set([each_program['Sku'] for each_program in program_data])
             return Response({"Sku": program_list}, status=status.HTTP_200_OK)
         except Exception as e:
             logger_error.error(str(e))
-            return Response(e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class YearWiseComparison(APIView):
     def post(self, request):
@@ -3342,18 +3439,135 @@ class YearWiseComparison(APIView):
             fromyear = data.get('fromyear')
             toyear = data.get('toyear')
             program = data.get('Program', 'All')
+            sku = data.get('Sku', 'All')
 
             if fromyear and toyear and program == 'All':
                 program_data_to = BoardAllocationDataModel.objects.filter(year=toyear)
                 program_data_from = BoardAllocationDataModel.objects.filter(year=fromyear)
                 combined_data = set(program_data_to | program_data_from)
             else:
-                program_data_to = BoardAllocationDataModel.objects.filter(year=toyear, Program=program)
-                program_data_from = BoardAllocationDataModel.objects.filter(year=fromyear, Program=program)
+                program_data_to = BoardAllocationDataModel.objects.filter(year=toyear, Program=program, Sku=sku)
+                program_data_from = BoardAllocationDataModel.objects.filter(year=fromyear, Program=program, Sku=sku)
                 combined_data = set(program_data_to | program_data_from)
 
-            program_list = list(set(each_program.Program for each_program in combined_data))
-            return Response({"Program": program_list}, status=status.HTTP_200_OK)
+            # Convert set back to queryset for filtering
+            combined_data_queryset = BoardAllocationDataModel.objects.filter(pk__in=[item.pk for item in combined_data])
+
+            # Filter combined_data_queryset based on program if Sku is "All"
+            if sku == 'All':
+                if program == 'All':
+                    program_list = list(set(BoardAllocationDataModel.objects.all().values_list('Program', flat=True)))
+                    sku_list = list(set(BoardAllocationDataModel.objects.all().values_list('Sku', flat=True)))
+                else:
+                    program_list = list(set(BoardAllocationDataModel.objects.filter(Program=program).values_list('Program', flat=True)))
+                    sku_list = list(set(BoardAllocationDataModel.objects.filter(Program=program).values_list('Sku', flat=True)))
+            else:
+                program_list = list(set(each_program.Program for each_program in combined_data_queryset))
+                sku_list = list(set(each_program.Sku for each_program in combined_data_queryset))
+
+            return Response({"Program": program_list, "Sku": sku_list}, status=status.HTTP_200_OK)
         except Exception as e:
             logger_error.error(str(e))
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class BroadCastEmail(APIView):
+    def post(self, request):
+        """API to store user list in BroadcastModel and trigger email"""
+        try:
+            # Assuming UserModel is the model representing users and Email is the field storing their emails
+            user_emails = UserModel.objects.values_list('Email', flat=True)
+            user_mail_list = list(user_emails)
+            
+            # Parse request data
+            subject = request.data.get('Subject')
+            content = request.data.get('Content')
+            BroadCast_by = request.data.get('BroadCast_by')
+            CreatedDate = request.data.get('CreatedDate')
+            
+            # Create BroadcastModel instance
+            broadcast_instance = BroadcastModel.objects.create(
+                Subject = subject,
+                Content=content,
+                BroadCast_by=BroadCast_by,
+                CreatedDate=CreatedDate,
+                User_mail_list=user_mail_list
+            )
+            
+            # Response data with the array of email addresses
+            response_data = {
+                "Subject":broadcast_instance.Subject,
+                "Content": broadcast_instance.Content,
+                "BroadCast_by": broadcast_instance.BroadCast_by,
+                "CreatedDate": broadcast_instance.CreatedDate,
+                "User_mail_list": user_mail_list
+            }
+            # Send email to each user in the User_mail_list
+            for email in user_mail_list:
+                content_with_feedback = content
+                subject = subject
+                mail_data = {
+                    "User":BroadCast_by[0]['Name'],
+                    "WWID":BroadCast_by[0]['WWID'],
+                    "content": content_with_feedback,
+                    "subject": f"{subject} "
+                }
+                TO.append(email)
+                Cc = []
+                Cc.append(BroadCast_by[0]['Email'])
+                Cc = Cc+CC
+                mail = BroadcastMail(From=FROM,To=TO,CC=Cc,data=mail_data)
+                mail.sendmail()
+                TO.pop()
+            return Response(response_data, status=201)  
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)
+
+class GetBroadCastDetails(APIView):
+    def get(self, request):
+        try:
+            data = BroadcastModel.objects.all()
+            serializer = BroadcastSerializer(data, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except BroadcastModel.DoesNotExist:
+                return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
+
+class LabLocation(APIView):
+    '''API for Home Page'''
+    def get(self, request):
+        try:
+            lab_locations = LabModel.objects.all().values_list('Name').distinct()
+            lab_data_list = []
+            for lab_location in lab_locations:
+                lab_data = {'Name': lab_location[0]}
+                # Calculate Allocated Count
+                lab_data['NonSIVCounts'] = 0
+                lab_data['SIVAllocated'] = 0
+                lab_data['SIVFree'] = 0
+                lab_data["SIVCounts"] = 0
+                # Fetch bench details for the current lab
+                lab_details = LabModel.objects.filter(Name=lab_location[0]).values('BenchDetails').first()
+                if lab_details and lab_details['BenchDetails'] is not None:
+                    allocated_count = 0
+                    non_siv_count = 0
+                    total_siv_count = 0
+                    for each_bench_row in range(len(lab_details['BenchDetails'])):
+                        for each_column_no in range(len(lab_details['BenchDetails'][each_bench_row]['seats'])):
+                            if lab_details['BenchDetails'][each_bench_row]['seats'][each_column_no]['IsAllocated']:
+                                allocated_count += 1
+                            if lab_details['BenchDetails'][each_bench_row]['seats'][each_column_no]['team'] == 'Non-SIV':
+                                non_siv_count += 1
+                            elif lab_details['BenchDetails'][each_bench_row]['seats'][each_column_no]['team'] == 'SIV':
+                                total_siv_count += 1
+                    lab_data['NonSIVCounts'] = non_siv_count
+                    lab_data['SIVAllocated'] = allocated_count
+                    lab_data["SIVCounts"] = total_siv_count
+                    siv_free = total_siv_count - allocated_count
+                    lab_data['SIVFree'] = max(siv_free, 0)
+                else:
+                    logger_error.error(str(f"Lab {lab_location[0]} does not have bench details"))
+                lab_data_list.append(lab_data)
+            return Response(lab_data_list, status=status.HTTP_200_OK)
+        except LabModel.DoesNotExist:
+            logger_error.error("Lab Not Exist")
+            return Response("Error", status=status.HTTP_404_NOT_FOUND)
