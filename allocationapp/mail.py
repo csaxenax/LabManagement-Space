@@ -38,6 +38,33 @@ def SendEmail(From: str ,To: list, Cc: list, Subject: str, Message: str):
         print("Successfully sent mail")
     except Exception:
         print(traceback.format_exc())
+    
+def BroadCastEmail(From: str ,To: list, Cc: list,Bcc: list, Subject: str, Message: str):
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = Subject
+    msg['From'] = From
+    msg['To'] = ",".join(To)
+    if len(Cc) >= 1:
+        msg['Cc'] = ", ".join(Cc)
+    if len(Bcc) >= 1:
+        msg['Bcc'] = ", ".join(Bcc)
+
+    # Combine To, Cc, and Bcc recipients into a single list
+    recipients = To + Cc + Bcc
+        
+    context = ssl.create_default_context()
+    try:
+        server = smtplib.SMTP(SMTP_SERVER,PORT)
+        server.ehlo()
+        server.starttls(context=context)
+        server.ehlo()
+        server.login(USERNAME,PASSWORD)
+        actual_message = MIMEText(Message,'html')
+        msg.attach(actual_message)
+        server.sendmail(From,recipients,msg.as_string())
+        print("Successfully sent mail")
+    except Exception:
+        print(traceback.format_exc())
 
 Bench_html_text = """
 <!DOCTYPE html>
@@ -379,11 +406,11 @@ table, th, td {{
 """
 
 class Email:
-    def __init__(self,From,To,Cc, data):
+    def __init__(self,From,To,Cc,data):
         self.From = From # input should be in String format
         self.Cc = Cc # input should be in List format
         self.To = To
-        self.data = data
+        self.data = data        
 
     def sendmail(self):
         # Requester+notifyTo need to be in CC , Approver in To, Admin in Bcc
@@ -396,6 +423,7 @@ class Email:
         CC += ccs
         CC = list(set(CC))
         TO = self.To
+        
         #mail_reciepients = self.To + self.Cc.split(',')
         #print("Reciepients",mail_reciepients)
         try:
@@ -422,7 +450,7 @@ class Email:
                                  lab_name=labname,vendor_name=vendor,allocatedto=allocatedto,
                                  from_ww=fromww,to_ww=toww,remarks=remarks,duration=duration,number_of_benches=number_of_benches,
                                  bench_data=bench_data,team=team,id=id,notifyto=notifyto,requestedBy=requestedBy,deallocatedby=deallocatedby)
-            SendEmail(From ,TO, CC, Subject, final_message)
+            SendEmail(From ,TO, CC, Subject,final_message)
         except Exception as e:
             print(e)
             print(traceback.format_exc())
@@ -485,11 +513,12 @@ class SuggestionsMail:
             print(traceback.format_exc())
 
 class BroadcastMail:
-    def __init__(self,From,To,CC,data):
+    def __init__(self,From,To,CC,Bcc,data):
         self.From = From
         self.CC=CC
         self.To = To
         self.data = data
+        self.Bcc = Bcc
 
     def sendmail(self):
         Subject = self.data['subject'] + str(self.data['User']) + " WWID No."  + str(self.data['WWID'])
@@ -499,6 +528,7 @@ class BroadcastMail:
         CC = cc_list
         CC = list(set(CC))
         TO = self.To
+        Bcc = self.Bcc
         User = self.data['User']
         WWID = self.data['WWID']
         content = self.data['content']
@@ -508,9 +538,17 @@ class BroadcastMail:
         print(From)
         print(TO)
         print(CC)
+        print(Bcc)
         print(final_message)
         try:
-            SendEmail(From ,TO,CC ,Subject, final_message)
+            # Ensure Cc and Bcc are lists
+            if not CC:
+                CC = []
+            if not Bcc:
+                Bcc = []
+
+            # Send the email with CC and Bcc recipients
+            BroadCastEmail(From, self.To, CC, Bcc, Subject, final_message)
         except Exception as e:
             print(traceback.format_exc())
 

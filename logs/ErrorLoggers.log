@@ -113,3 +113,6 @@ ERROR 2024-02-12 16:03:31,440 views post 3497 JSON parse error - Extra data: lin
 ERROR 2024-02-12 16:05:41,174 views post 3497 JSON parse error - Extra data: line 25 column 1 (char 176)
 ERROR 2024-02-12 16:06:03,142 views post 3497 JSON parse error - Extra data: line 25 column 1 (char 176)
 ERROR 2024-02-12 16:06:31,369 views post 3497 JSON parse error - Extra data: line 24 column 1 (char 150)
+ERROR 2024-02-14 11:37:36,430 views post 3412 name 'year' is not defined
+ERROR 2024-02-15 14:03:38,522 views get 3645 Error: too many values to unpack (expected 2)
+ERROR 2024-02-15 15:53:33,879 views get 3633 Error: unhashable type: 'dict'

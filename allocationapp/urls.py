@@ -73,4 +73,7 @@ urlpatterns = [
     path('broadcastmail/',views.BroadCastEmail.as_view(),name='broadcast'),
     path('broadcastdetail/',views.GetBroadCastDetails.as_view(),name='broadcast'),
     path('lab-details/',views.LabLocation.as_view(),name='lablocation'),
+    path('ProgramUtilizationlist/', views.ProgramUtilizationList.as_view(), name='utilization_program_list'),
+    path('skuUtilizationlist/', views.SkuUtilizationList.as_view(), name='utilization_sku_list'),
+    path('labdetailCount/',views.LabDetailCount.as_view(),name='lablocation')
 ]

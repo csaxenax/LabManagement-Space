@@ -3347,6 +3347,7 @@ class UpdateNewModelData(APIView):
 class UtilizationSummaryAPIView(APIView):
     def process_record(self, records, year=None):
         result = defaultdict(lambda: {"Planned": 0, "Actual": 0, "Count": 0})
+        available_workweeks = set()  # Store available workweeks with non-empty data
 
         week_keys_range = [f"WW{str(week).zfill(2)}{year}" for week in range(1, 53)]
         for week_key in week_keys_range:
@@ -3361,6 +3362,9 @@ class UtilizationSummaryAPIView(APIView):
             result[week_key]["Actual"] += actual_utilization
             result[week_key]["Count"] += 1  # Increment count for each record
 
+            if planned_utilization > 0 or actual_utilization > 0:
+                available_workweeks.add(week_key)  
+
         utilization_data = [
             {
                 "category": week_key,
@@ -3372,7 +3376,19 @@ class UtilizationSummaryAPIView(APIView):
             for week_key in sorted(result.keys())
         ]
 
-        return utilization_data
+        # Additional workweek data available in the database with non-empty data
+        available_workweek_data = [
+            {
+                "category": week_key,
+                "Planned": int(result[week_key]["Planned"]),
+                "Actual": int(result[week_key]["Actual"]),
+                "Actual_Utilization_Percentage": f"{int(round(result[week_key]['Actual'] / result[week_key]['Planned'] * 100))}%" if result[week_key]['Planned'] > 0 else "0%",
+                "Utilization_Percentage": f"{int(round(result[week_key]['Actual'] / result[week_key]['Count'] * 100))}%" if result[week_key]['Count'] > 0 else "0%"
+            }
+            for week_key in sorted(available_workweeks)
+        ]
+
+        return utilization_data, available_workweek_data
 
     def post(self, request, *args, **kwargs):
         try:
@@ -3391,12 +3407,37 @@ class UtilizationSummaryAPIView(APIView):
             else:
                 utilization_records = UtilizationSummaryModel.objects.all()
 
-            response_data = self.process_record(utilization_records, year)
-
+            utilization_data, available_workweek_data = self.process_record(utilization_records, year)
+            response_data = {"All WorkWeek": utilization_data, "Available workweek": available_workweek_data}
             return Response(response_data, status=status.HTTP_200_OK if response_data else status.HTTP_201_CREATED)
         except UtilizationSummaryModel.DoesNotExist:
             return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class ProgramUtilizationList(APIView):
+    def post(self, request):
+        try:
+            data = request.data
+            # workwwek = data.get('workweek', '2023')
+
+            program_data = UtilizationSummaryModel.objects.filter().values('Program')
+            program_list = set([each_program['Program'] for each_program in program_data])
+            return Response({"Program": program_list}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger_error.error(str(e))
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class SkuUtilizationList(APIView):
+    def get(self, request):
+        try:
+            data = request.data
+            # workwwek = data.get('workweek', '2023')
+            sku_data = UtilizationSummaryModel.objects.filter().values('Sku')
+            sku_list = set([each_program['Sku'] for each_program in sku_data])
+            return Response({"Sku": sku_list}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger_error.error(str(e))
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class GetProgramList(APIView):
@@ -3476,8 +3517,16 @@ class BroadCastEmail(APIView):
         """API to store user list in BroadcastModel and trigger email"""
         try:
             # Assuming UserModel is the model representing users and Email is the field storing their emails
-            user_emails = UserModel.objects.values_list('Email', flat=True)
-            user_mail_list = list(user_emails)
+            users = UserModel.objects.all().values('Email', 'Name', 'WWID')
+            ApproverEmail = ApproverUserModel.objects.values_list('Email',flat=True)
+            approver_email_list = list(ApproverEmail)
+            user_email = [user['Email'] for user in users]
+            # print(user_email)
+            user_WWID = [user['WWID'] for user in users]
+            user_Name = [user['Name'] for user in users]
+            # # print(user_email)
+            # print(user_Name)
+            # print(user_WWID)
             
             # Parse request data
             subject = request.data.get('Subject')
@@ -3491,7 +3540,7 @@ class BroadCastEmail(APIView):
                 Content=content,
                 BroadCast_by=BroadCast_by,
                 CreatedDate=CreatedDate,
-                User_mail_list=user_mail_list
+                User_mail_list=user_email
             )
             
             # Response data with the array of email addresses
@@ -3500,23 +3549,24 @@ class BroadCastEmail(APIView):
                 "Content": broadcast_instance.Content,
                 "BroadCast_by": broadcast_instance.BroadCast_by,
                 "CreatedDate": broadcast_instance.CreatedDate,
-                "User_mail_list": user_mail_list
+                "User_mail_list": user_email
             }
             # Send email to each user in the User_mail_list
-            for email in user_mail_list:
+            for email, name,wwid in zip(user_email, user_Name, user_WWID):
                 content_with_feedback = content
                 subject = subject
                 mail_data = {
-                    "User":BroadCast_by[0]['Name'],
-                    "WWID":BroadCast_by[0]['WWID'],
+                    "WWID":f"{wwid}",
+                    "User":f"{name}",
                     "content": content_with_feedback,
                     "subject": f"{subject} "
                 }
                 TO.append(email)
                 Cc = []
-                Cc.append(BroadCast_by[0]['Email'])
+                Cc = approver_email_list
+                Bcc = ["charux.saxena@intel.com"]
                 Cc = Cc+CC
-                mail = BroadcastMail(From=FROM,To=TO,CC=Cc,data=mail_data)
+                mail = BroadcastMail(From=FROM,To=TO,CC=Cc,data=mail_data,Bcc=Bcc)
                 mail.sendmail()
                 TO.pop()
             return Response(response_data, status=201)  
@@ -3526,7 +3576,7 @@ class BroadCastEmail(APIView):
 class GetBroadCastDetails(APIView):
     def get(self, request):
         try:
-            data = BroadcastModel.objects.all()
+            data = BroadcastModel.objects.order_by('-CreatedDate').all()
             serializer = BroadcastSerializer(data, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except BroadcastModel.DoesNotExist:
@@ -3571,3 +3621,51 @@ class LabLocation(APIView):
         except LabModel.DoesNotExist:
             logger_error.error("Lab Not Exist")
             return Response("Error", status=status.HTTP_404_NOT_FOUND)
+
+
+class LabDetailCount(APIView):
+    '''API for Home Page'''
+    def call_api(self):
+        url = "https://labmanager.apps1-fm-int.icloud.intel.com/home/GetDrillDownChartData/"
+        try:
+            response = requests.get(url, verify=False)
+            if response.status_code == 200:
+                data = response.json()
+                return data
+            else:
+                print("Failed to call API:", response.status_code)
+                return None
+        except requests.exceptions.RequestException as e:
+            print("Error:", e)
+            return None
+
+    def get(self, request):
+        try:
+            api_data = self.call_api()
+            total_non_siv = 0
+            bench_allocated = 0
+            bench_free = 0
+            lab_locations = LabModel.objects.all().values_list('Name').distinct()
+            lab_count = len(lab_locations)
+            if api_data:
+                for item in api_data:
+                    if item["category"] == "Non-SIV":
+                        total_non_siv = item["value"]
+                    elif item["category"] == "Allocated":
+                        bench_allocated = item["value"]
+                    elif item["category"] == "Free":
+                        bench_free = item["value"]
+
+            response_data = {
+                'Total Lab': lab_count,
+                'Total Bench': bench_allocated + bench_free + total_non_siv,
+                'Total Non-Siv': total_non_siv,
+                'Bench Allocated': bench_allocated,
+                'Bench Free': bench_free,
+                'Total Rack': 0,  # Adjust as necessary
+                'Total Closed Room': 0  # Adjust as necessary
+            }
+
+            return Response(response_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
