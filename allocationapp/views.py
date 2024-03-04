@@ -9,9 +9,10 @@ from rest_framework import status,generics
 from django.db.models import Q,Sum,F,FloatField, ExpressionWrapper,Count
 from django.db import connection
 from django.utils import timezone
+from django.utils.html import escape
 import traceback
-from django.db.models.signals import post_save, pre_delete
-from django.dispatch import receiver
+# from django.db.models.signals import post_save, pre_delete
+# from django.dispatch import receiver
 from django.shortcuts import get_object_or_404
 from django.db.models.functions import Coalesce
 from itertools import chain
@@ -19,6 +20,8 @@ from datetime import datetime
 import traceback , requests
 import os,re,json
 import urllib3 
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 import logging
 from .UserAuthentication import GetUserData
 from collections import defaultdict
@@ -28,7 +31,7 @@ from rest_framework.parsers import JSONParser
 from django.core.exceptions import FieldError
 from django.db.models import Max
 from copy import deepcopy
-import sys,ast,cProfile,pdb
+import sys,ast,cProfile,pdb,html
 # from allocationapp.functions import calculate_workweek
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logger = logging.getLogger(__name__)
@@ -38,7 +41,7 @@ logger_error = logging.getLogger('error_logger')
 # Local imports
 from .models import AllocationDetailsModel,LabModel,ProgramsModel,\
                     VendorsModel,TeamsModel,SkuModel,UserModel, \
-                        UserRolesModel,UserRequestModel,SuggestionsModel,ApproverUserModel,BoardAllocationDataModel,UtilizationSummaryModel,BroadcastModel
+                        UserRolesModel,UserRequestModel,SuggestionsModel,ApproverUserModel,BoardAllocationDataModel,UtilizationSummaryModel,BroadcastModel,UtilizationSummaryModelTrackData
 from .mail import Email,UserModuleMail,SuggestionsMail,BroadcastMail
 from .ldapvalidate import validate_user_mail
 # Create your views here.
@@ -905,20 +908,27 @@ class GetVendorDetails(APIView):
 
 
 class ReportPageView(APIView):
-     def get(self, request):
-        """ API used in the report page to generate all allocation data"""
+    def get(self, request):
+        """API used in the report page to generate all allocation data"""
         try:
-            pending_data = AllocationDetailsModel.objects.filter().order_by('-created').values('id','Program','Sku','Vendor','FromWW',
-            'ToWW','Duration','AllocatedTo','NumberOfbenches','Remarks','Team','IsAllocated','IsRequested','Location__Name','BenchData','AllocatedDate','status','approvedBy','RejectedBy','RequestedBy','RequestedDate','RejectedDate','DeallocatedBy','deallocatedDate','Reason')
+            pending_data = AllocationDetailsModel.objects.filter().order_by('-created').values('id', 'Program', 'Sku', 'Vendor', 'FromWW',
+                                                                                                'ToWW', 'Duration', 'AllocatedTo', 'NumberOfbenches', 'Remarks', 'Team', 'IsAllocated', 'IsRequested', 'Location__Name', 'BenchData', 'AllocatedDate', 'status', 'approvedBy', 'RejectedBy', 'RequestedBy', 'RequestedDate', 'RejectedDate', 'DeallocatedBy', 'deallocatedDate', 'Reason')
             if pending_data is not None:
-                #serializer = ApproveViewSerializer(pending_data,many=True)
-                return Response(pending_data, status.HTTP_200_OK)
+                for item in pending_data:
+                    # Format AllocatedDate field
+                    if 'AllocatedDate' or 'RequestedDate' or 'deallocatedDate' in item:
+                        allocated_date_str = str(item['AllocatedDate'])  # Convert to string
+                        allocated_date_obj = datetime.strptime(allocated_date_str, '%Y-%m-%d %H:%M:%S.%f%z')
+                        item['AllocatedDate'] = allocated_date_obj.strftime('%d-%m-%Y %H:%M:%S')
+                        item['RequestedDate'] = allocated_date_obj.strftime('%d-%m-%Y %H:%M:%S')
+                        item['deallocatedDate'] = allocated_date_obj.strftime('%d-%m-%Y %H:%M:%S')
+
+                return Response(pending_data, status=status.HTTP_200_OK)
             else:
-                return Response([],status=status.HTTP_404_NOT_FOUND)
+                return Response([], status=status.HTTP_404_NOT_FOUND)
         except AllocationDetailsModel.DoesNotExist:
             logger_error.error(str("Allocation Data not Exists!!"))
-            return Response("Allocation Data not Exists!!",status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+            return Response("Allocation Data not Exists!!", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class GetTeamNamesView(APIView):
     def get(self, request):
@@ -1314,7 +1324,7 @@ class DeallocateBenchesView(APIView):
         allocation_time = data[0]["DateandTime"]
 
         # # Print the extracted values
-        # print("User Name:", user_name)
+        print("User Name:", user_name)
         # print("Allocation Time:", allocation_time)
         try:
             lab_name = data[0]['LabName']
@@ -1333,6 +1343,7 @@ class DeallocateBenchesView(APIView):
                     allocation_data.BenchData.remove(bench_data)
                     allocation_data.DeallocatedBenchData.append(bench_data)
                     allocation_data.DeallocatedBy = user_name
+                    print(user_name)
                     allocation_data.deallocatedDate = allocation_time
                     allocation_data.save()
                     # If all benches are deallocated
@@ -1343,6 +1354,7 @@ class DeallocateBenchesView(APIView):
                         allocation_data.BenchData = allocation_data.DeallocatedBenchData
                         allocation_data.Reason = str(bench_data) + ":" +str(reason) + str(allocation_data.Reason)
                         # changes
+                        
                         allocation_data.DeallocatedBy = user_name
                         allocation_data.deallocatedDate = datetime.now()
                         allocation_data.save()
@@ -1377,30 +1389,31 @@ class DeallocateBenchesView(APIView):
                     message = f"This email is a confirmation of your Lab Bench <b>Deallocated<b> for reason {reason}"
                     subject = "Bench request Deallocated for "
                     mail_data = {
-                                "User":allocation_data.AllocatedTo[0]['Name'],
-                                "WWID":allocation_data.AllocatedTo[0]['WWID'],
-                                "program":allocation_data.Program,
-                                "sku":allocation_data.Sku,
-                                "lab_name":lab_name,
-                                "vendor":allocation_data.Vendor,
-                                "allocatedto":allocation_data.AllocatedTo[0]['Name'],
-                                "notifyto":','.join(notify_persons),
-                                "requestedBy":allocation_data.RequestedBy[0]['Name'],
-                                "fromww":str(allocation_data.FromWW),
-                                "toww":str(allocation_data.ToWW),
-                                "duration":allocation_data.Duration,
-                                "remarks":allocation_data.Remarks,
-                                "team":allocation_data.Team,
-                                "id":id,
-                                "numberofbenches":allocation_data.NumberOfbenches,
-                                "bench_data":[bench_data],
-                                "message":message,
-                                "subject":subject,
-                                "deallocatedby":allocation_data.DeallocatedBy,
-                            }
+                        "User": allocation_data.AllocatedTo[0]['Name'],
+                        "WWID": allocation_data.AllocatedTo[0]['WWID'],
+                        "program": allocation_data.Program,
+                        "sku": allocation_data.Sku,
+                        "lab_name": lab_name,
+                        "vendor": allocation_data.Vendor,
+                        "allocatedto": allocation_data.AllocatedTo[0]['Name'],
+                        "notifyto": ','.join(notify_persons),
+                        "requestedBy": allocation_data.RequestedBy[0]['Name'],
+                        "fromww": str(allocation_data.FromWW),
+                        "toww": str(allocation_data.ToWW),
+                        "duration": allocation_data.Duration,
+                        "remarks": allocation_data.Remarks,
+                        "team": allocation_data.Team,
+                        "id": id,
+                        "numberofbenches": allocation_data.NumberOfbenches,
+                        "bench_data": [bench_data],
+                        "message": message,
+                        "subject": subject,
+                        "deallocatedby": allocation_data.DeallocatedBy
+
+                    }
                     TO.append(str(allocation_data.AllocatedTo[0]['Email']))
                     if notify_emails:
-                        Cc = notify_emails
+                        Cc = ','.join(notify_persons)
                     else:
                         Cc = []
                     Cc.append(user_email)
@@ -1411,7 +1424,7 @@ class DeallocateBenchesView(APIView):
             return Response("Success",status=status.HTTP_200_OK)
         except Exception as e:
             logger_error.error(str(e))
-            return Response(e,status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(str(e),status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ExtendAllocation(APIView):
@@ -2592,14 +2605,19 @@ class ForecastSummary(APIView):
                 "Rack_Demand_Intel": sum(int(record[month]['boardIntelRack'] or 0) for record in records),
                 "Bench_Demand_ODC": sum(int(record[month]['boardsODCBench'] or 0) for record in records),
                 "Rack_Demand_ODC": sum(int(record[month]['boardsODCRack'] or 0) for record in records),
+                "Total_Bench_Intel" :round(sum(int(record[month]['boardsIntelBench'] or 0) / 1.5 for record in records)),
+                "Total_Rack_Intel" : 0,
             }
             for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
         ]
         total_board_sum = sum(int(record.get('TotalBoard', 0)) for record in records)
-
+        intel_count = sum(month_data["intel"] for month_data in monthly_data)
+        odc_count = sum(month_data["ODC"] for month_data in monthly_data)
         result = {
             year: monthly_data,
-            "TotalBoard": total_board_sum
+            "TotalBoard": total_board_sum,
+            "Intel_count":intel_count,
+            "ODC_count":odc_count,
         }
         return result
 
@@ -2609,7 +2627,6 @@ class ForecastSummary(APIView):
             year = data.get('year', '2023')
             program = data.get('Program', 'All')
             sku = data.get('Sku', 'All')
-
             id = data.get('id')
 
             # Replace with actual lab_names_list based on your data
@@ -2625,7 +2642,6 @@ class ForecastSummary(APIView):
                     board = BoardAllocationDataModel.objects.get(pk=id, year=year)
                     serializer = BoardAllocationDataModelSerializer(board)
                     response_data = serializer.data
-                    total_board_sum = sum(int(record['TotalBoard'] or 0) for record in board),
                     return Response(self.process_record([response_data], allocated_count, year), status=status.HTTP_200_OK)
                 except BoardAllocationDataModel.DoesNotExist:
                     return Response("Record not found for the specified year", status=status.HTTP_404_NOT_FOUND)
@@ -2701,6 +2717,8 @@ class ForecastSummaryRVP(APIView):
                 # "intel": sum(int(record[month]['boardsIntelBench'] or 0) + int(record[month]['boardIntelRack'] or 0) for record in records),
                 # "ODC": sum(int(record[month]['boardsODCBench'] or 0) + int(record[month]['boardsODCRack'] or 0) for record in records),
                 "Total": total_data['Total'],
+                "Total_Bench_Intel" :round(sum(int(record[month]['boardsIntelBench'] or 0) / 1.5 for record in records)),
+                "Total_Rack_Intel" : 0,
             })
         return result
 
@@ -2905,6 +2923,8 @@ class ForecastQuaterWiseSummary(APIView):
                     "Rack_Demand_ODC":quarterly_data[quarter]["Rack_Demand_ODC"],
                     "intel_percentage": round((quarterly_data[quarter]["intel"] / (quarterly_data[quarter]["intel"] + quarterly_data[quarter]["ODC"])) * 100,2) if (quarterly_data[quarter]["intel"] + quarterly_data[quarter]["ODC"]) != 0 else 0,
                     "ODC_percentage": round((quarterly_data[quarter]["ODC"] / (quarterly_data[quarter]["intel"] + quarterly_data[quarter]["ODC"])) * 100, 2) if (quarterly_data[quarter]["intel"] + quarterly_data[quarter]["ODC"]) != 0 else 0,
+                    "Total_Bench_Intel" :round(quarterly_data[quarter]["Bench_Demand_Intel"]  / 1.5),
+                    "Total_Rack_Intel" : 0,
                 }
                 for quarter in ["Q1", "Q2", "Q3", "Q4"]
             ]
@@ -2957,90 +2977,7 @@ class ForecastQuaterWiseSummary(APIView):
                 return Response(combined_record, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            
-class FreeBenchReport(APIView):
-    def post(self, request):
-        try:
-            payload_work_week = request.data.get("workweek", "")
-            payload_work_week_str = str(payload_work_week).ljust(6, '0') 
-            current_work_week = timezone.now().strftime("%V%Y")
-            print(f"Current work week: {current_work_week}")
-            print(f"Payload work week: {payload_work_week_str}")
-
-            payload_year = int(payload_work_week_str[2:])
-            current_year = int(current_work_week[2:])
-
-            category_list = ["All", "Non-SIV", "Allocated", "Free"]
-            lab_filter_query = LabModel.objects.filter().values('Name')
-            lab_filter_query_list = [each_query['Name'] for each_query in lab_filter_query if "TOE" not in each_query['Name']]
-            lab_data = LabModel.objects.filter(Name__in=lab_filter_query_list).values('Name')
-            lab_names_list = sorted(list(set(['-'.join(str(each_lab['Name']).split('-')[0:2]) for each_lab in lab_data])))
-            master_list = []
-            
-            # Extracting the code for the "Free" category
-            if "Free" in category_list:
-                free_report_dict = {}
-                for each_location in lab_names_list:
-                    lab_data = LabModel.objects.filter(Name__icontains=each_location)
-                    free_report_lab_dict = {}
-                    for each_lab in lab_data:
-                        if (each_lab.BenchDetails is not None) and ("TOE" not in each_lab.Name):
-                            if each_lab.Name not in free_report_lab_dict.keys():
-                                free_report_lab_dict[each_lab.Name] = []
-
-                            if payload_work_week_str == current_work_week:
-                                for each_row_no in range(len(each_lab.BenchDetails)):
-                                    for each_bench_no in range(len(each_lab.BenchDetails[each_row_no]['seats'])):
-                                        if each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['IsAllocated'] == False and \
-                                                each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['team'] == "SIV":
-                                            free_report_lab_dict[each_lab.Name].append(
-                                                each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['labelNo'])
-                            
-                            elif payload_work_week_str[2:] == current_work_week[2:]:
-                                # Fetch distinct work weeks greater than or equal to the current work week
-                                allocated_benches1 = AllocationDetailsModel.objects.filter(
-                                    status="allocated",
-                                    Location__Name=each_lab.Name,
-                                    ToWW__gt=current_work_week,
-                                ).values_list('BenchData', flat=True)
-                                free_report_lab_dict[each_lab.Name].extend(allocated_benches1)
-                            else:
-                                allocated_benches1 = AllocationDetailsModel.objects.filter(
-                                    status="allocated",
-                                    Location__Name=each_lab.Name,
-                                    ToWW__gte=current_work_week,
-                                ).values_list('BenchData', flat=True)
-                                allocated_benches2 = AllocationDetailsModel.objects.filter(
-                                    status="allocated",
-                                    Location__Name=each_lab.Name,
-                                    ToWW__lte=payload_work_week_str
-                                ).values_list('BenchData', flat=True)
-                                combined_report_allocation_data = list(chain(allocated_benches1, allocated_benches2))
-                                free_report_lab_dict[each_lab.Name].extend(combined_report_allocation_data)
-                                
-                            flattened_benches = list(chain.from_iterable(free_report_lab_dict[each_lab.Name]))
-                            free_report_lab_dict[each_lab.Name] = [flattened_benches]
-                            # Include free benches for the lab
-                            for each_row_no in range(len(each_lab.BenchDetails)):
-                                for each_bench_no in range(len(each_lab.BenchDetails[each_row_no]['seats'])):
-                                    if each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['IsAllocated'] == False and \
-                                            each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['team'] == "SIV":
-                                        free_report_lab_dict[each_lab.Name].append(
-                                            each_lab.BenchDetails[each_row_no]['seats'][each_bench_no]['labelNo'])
-
-                    if free_report_lab_dict:
-                        free_report_dict[each_location] = free_report_lab_dict
-
-                if free_report_dict:
-                    master_list.append({
-                        'category': 'Free',
-                        'Report': free_report_dict,
-                    })
-
-            return Response(master_list, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+                    
 class GetLabList(APIView):
     def get(self, request):
         try:
@@ -3057,34 +2994,56 @@ class GetLabList(APIView):
 
 class UtilizationSummary(APIView):
     def post(self, request, *args, **kwargs):
-        workweek = request.data.get('workweek')
-        queryset = UtilizationSummaryModel.objects.filter(workweek=workweek)
-        # Check if the queryset is empty, return an empty list
-        if not queryset.exists():
-            return Response([])
-        # Group by Location and calculate sum of Planned_Utilization and Actual_Utilization
-        location_data = queryset.values('Location').annotate(
-            planned_utilization=Sum('Planned_Utilization'),
-            actual_utilization=Sum('Actual_Utilization')
-        )
-        response_data = []
-        for location in location_data:
-            planned_utilization = location['planned_utilization'] or 0
-            actual_utilization = location['actual_utilization'] or 0
-            # Calculate Utilization Percentage
-            utilization_percentage = (
-                f"{int(actual_utilization / planned_utilization * 100)}%" 
-                if planned_utilization > 0 
-                else "0.00%"
+        try:
+            workweek = request.data.get('workweek')
+            program = request.data.get('Program','All')
+            sku = request.data.get('Sku','All')
+            queryset = UtilizationSummaryModel.objects.filter(workweek=workweek)
+            if program == 'All':
+                if sku == 'All':
+                        # Process all data for all programs and all Sku
+                    queryset = UtilizationSummaryModel.objects.filter(workweek=workweek)
+                else:
+                        # Process all data for all programs but specific Sku
+                    queryset = UtilizationSummaryModel.objects.filter(workweek=workweek, Sku=sku)
+            else:
+                if sku == 'All':
+                        # Process data for a specific program and all Sku
+                    queryset = UtilizationSummaryModel.objects.filter(workweek=workweek, Program=program)
+                else:
+                        # Process data for a specific program and specific Sku
+                    queryset = UtilizationSummaryModel.objects.filter(workweek=workweek, Program=program, Sku=sku)
+            
+            if not queryset.exists():
+                return Response([])
+            
+            location_data = queryset.values('Location').annotate(
+                planned_utilization=Sum('Planned_Utilization'),
+                actual_utilization=Sum('Actual_Utilization')
             )
-            response_data.append({
-                'LocationName': location['Location'],
-                'Planned Utilization': int(planned_utilization),
-                'Actual Utilization': int(actual_utilization),
-                'Utilization': utilization_percentage,
-            })
-        return Response(response_data)
-    
+            
+            Count = queryset.all().values('id') # Count the number of locations
+            id_count = len(Count) 
+            response_data = []
+            for location in location_data:
+                planned_utilization = location['planned_utilization'] or 0
+                actual_utilization = location['actual_utilization'] or 0
+                
+                utilization_percentage = (
+                    f"{int(round(actual_utilization / id_count * 100))}%"
+                    if planned_utilization > 0 
+                    else "0.00%"
+                )
+                response_data.append({
+                    'LocationName': location['Location'],
+                    'Planned Utilization': int(planned_utilization),
+                    'Actual Utilization': int(actual_utilization),
+                    'Utilization': utilization_percentage,
+                })
+            return Response(response_data)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+        
 class YearlyUtilizationAPI(APIView):
     def post(self, request, *args, **kwargs):
         payload = request.data.get("workweek")
@@ -3296,6 +3255,42 @@ class UtilizationApi(APIView):
             inserted_data = [model_instance.__dict__ for model_instance in new_model_objects]
             for data in inserted_data:
                 data.pop('_state', None)
+            track_data_objects = []
+            for data in inserted_data:
+                track_data = UtilizationSummaryModelTrackData(
+                    instance_id=data['id'],
+                    action='insert',
+                    workweek=data['workweek'],
+                    Location=data['Location'],
+                    BenchData=data['BenchData'],
+                    Program = data['Program'],
+                    Sku = data['Sku'],
+                    Vendor = data['Vendor'],
+                    FromWW =data['FromWW'],
+                    ToWW = data['ToWW'],
+                    Duration = data['Duration'],
+                    AllocatedTo = data['AllocatedTo'],
+                    NumberOfbenches = data['NumberOfbenches'],
+                    Remarks = data['Remarks'],
+                    Team = data['Team'],
+                    approvedBy = data['approvedBy'],
+                    Planned_Utilization = data['Planned_Utilization'],
+                    Actual_Utilization =data['Actual_Utilization'],
+                    Actual_utilization_in_percentage = data['Actual_utilization_in_percentage'],
+                    Utilization_Percentage = data['Utilization_Percentage'],
+                    Allocated_POC = data['Allocated_POC'],
+                    Remarks_Utilization = data['Remarks_Utilization'],
+                    Createdby = data['Createdby'],
+                    CreatedDate = data['CreatedDate'],
+                    Modifiedby = data['Modifiedby'],
+                    ModifiedDate = data['ModifiedDate'],
+                    Deletedby = data['Deletedby'],
+                    DeletedDate = data['DeletedDate'],
+                    timestamp = datetime.now(),
+                )
+                track_data_objects.append(track_data)
+
+            UtilizationSummaryModelTrackData.objects.bulk_create(track_data_objects)
             return Response(inserted_data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3338,14 +3333,53 @@ class UpdateNewModelData(APIView):
     def post(self, request, *args, **kwargs):
         workweek = request.data.get('workweek', None)
         deleted_by = request.data.get("Deletedby")
+
         if not workweek:
             return Response({'error': 'Workweek is required in the payload'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get instances to soft delete
+        instances_to_delete = UtilizationSummaryModel.objects.filter(workweek=workweek)
+        # Create historical records for each instance
+        historical_records = []
+        for instance in instances_to_delete:
+            historical_records.append(UtilizationSummaryModelTrackData(
+                instance_id=instance.id,
+                action='delete',
+                workweek=instance.workweek,
+                Location=instance.Location,
+                BenchData=instance.BenchData,
+                Program=instance.Program,
+                Sku=instance.Sku,
+                Vendor=instance.Vendor,
+                FromWW=instance.FromWW,
+                ToWW=instance.ToWW,
+                Duration=instance.Duration,
+                AllocatedTo=instance.AllocatedTo,
+                NumberOfbenches=instance.NumberOfbenches,
+                Remarks=instance.Remarks,
+                Team=instance.Team,
+                approvedBy=instance.approvedBy,
+                Planned_Utilization=instance.Planned_Utilization,
+                Actual_Utilization=instance.Actual_Utilization,
+                Actual_utilization_in_percentage=instance.Actual_utilization_in_percentage,
+                Utilization_Percentage=instance.Utilization_Percentage,
+                Allocated_POC=instance.Allocated_POC,
+                Remarks_Utilization=instance.Remarks_Utilization,
+                Createdby=instance.Createdby,
+                CreatedDate=instance.CreatedDate,
+                Modifiedby=instance.Modifiedby,
+                ModifiedDate=instance.ModifiedDate,
+                Deletedby=deleted_by,
+                DeletedDate=datetime.now(),
+                isDeleted=True
+            ))
+        UtilizationSummaryModelTrackData.objects.bulk_create(historical_records)
         # Perform soft delete for all instances with the specified workweek using bulk update
-        UtilizationSummaryModel.objects.filter(workweek=workweek).update(isDeleted=True,Deletedby=deleted_by)
+        instances_to_delete.update(isDeleted=True, Deletedby=deleted_by)
         return Response([], status=status.HTTP_200_OK)
 
 class UtilizationSummaryAPIView(APIView):
-    def process_record(self, records, year=None):
+    def process_record(self, records, year=None, program=None, sku=None):
         result = defaultdict(lambda: {"Planned": 0, "Actual": 0, "Count": 0})
         available_workweeks = set()  # Store available workweeks with non-empty data
 
@@ -3358,12 +3392,13 @@ class UtilizationSummaryAPIView(APIView):
             planned_utilization = entry.Planned_Utilization or 0
             actual_utilization = entry.Actual_Utilization or 0
 
-            result[week_key]["Planned"] += planned_utilization
-            result[week_key]["Actual"] += actual_utilization
-            result[week_key]["Count"] += 1  # Increment count for each record
+            if (program == "All" or entry.Program == program) and (sku == "All" or entry.Sku == sku):
+                result[week_key]["Planned"] += planned_utilization
+                result[week_key]["Actual"] += actual_utilization
+                result[week_key]["Count"] += 1  # Increment count for each record
 
-            if planned_utilization > 0 or actual_utilization > 0:
-                available_workweeks.add(week_key)  
+                if planned_utilization > 0 or actual_utilization > 0:
+                    available_workweeks.add(week_key)
 
         utilization_data = [
             {
@@ -3394,34 +3429,45 @@ class UtilizationSummaryAPIView(APIView):
         try:
             data = request.data
             year = data.get('Year')
-            board_id = data.get('id')
+            program = data.get('Program')
+            sku = data.get('Sku')
 
             if year is not None:
                 utilization_records = UtilizationSummaryModel.objects.filter(workweek__endswith=f'{year}')
-                if not utilization_records:
-                    return Response([], status=status.HTTP_200_OK)
-            elif board_id is not None:
-                utilization = UtilizationSummaryModel.objects.get(pk=board_id)
-                serializer = UtilizationSerializer2(utilization)
-                response_data = [serializer.data]
             else:
                 utilization_records = UtilizationSummaryModel.objects.all()
 
-            utilization_data, available_workweek_data = self.process_record(utilization_records, year)
+            if program != "All":
+                utilization_records = utilization_records.filter(Program=program)
+            if sku != "All":
+                utilization_records = utilization_records.filter(Sku=sku)
+
+            utilization_data, available_workweek_data = self.process_record(utilization_records, year, program, sku)
             response_data = {"All WorkWeek": utilization_data, "Available workweek": available_workweek_data}
             return Response(response_data, status=status.HTTP_200_OK if response_data else status.HTTP_201_CREATED)
         except UtilizationSummaryModel.DoesNotExist:
             return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+            
 class ProgramUtilizationList(APIView):
     def post(self, request):
         try:
             data = request.data
-            # workwwek = data.get('workweek', '2023')
-
-            program_data = UtilizationSummaryModel.objects.filter().values('Program')
+            year = data.get('Year')
+            program_data = UtilizationSummaryModel.objects.filter(workweek__endswith=f'{year}').values('Program')
+            program_list = set([each_program['Program'] for each_program in program_data])
+            return Response({"Program": program_list}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger_error.error(str(e))
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class WorkweekProgramUtilization(APIView):
+    def post(self, request):
+        try:
+            data = request.data
+            workweek = data.get('workweek')
+            program_data = UtilizationSummaryModel.objects.filter(workweek=workweek).values('Program')
             program_list = set([each_program['Program'] for each_program in program_data])
             return Response({"Program": program_list}, status=status.HTTP_200_OK)
         except Exception as e:
@@ -3429,12 +3475,32 @@ class ProgramUtilizationList(APIView):
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class SkuUtilizationList(APIView):
-    def get(self, request):
+    def post(self, request):
         try:
             data = request.data
-            # workwwek = data.get('workweek', '2023')
-            sku_data = UtilizationSummaryModel.objects.filter().values('Sku')
-            sku_list = set([each_program['Sku'] for each_program in sku_data])
+            year = data.get('Year')
+            program = data.get('Program', 'All')
+            if program == 'All':
+                program_data = UtilizationSummaryModel.objects.filter(workweek__endswith=f'{year}').values('Sku')
+            else:
+                program_data = UtilizationSummaryModel.objects.filter(Program=program).values('Sku')
+            sku_list = set([each_program['Sku'] for each_program in program_data])
+            return Response({"Sku": sku_list}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger_error.error(str(e))
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class WorkweekSkuUtilization(APIView):
+    def post(self, request):
+        try:
+            data = request.data
+            workweek = data.get('workweek')
+            program = data.get('Program', 'All')
+            if program == 'All':
+                program_data = UtilizationSummaryModel.objects.filter(workweek=workweek).values('Sku')
+            else:
+                program_data = UtilizationSummaryModel.objects.filter(Program=program).values('Sku')
+            sku_list = set([each_program['Sku'] for each_program in program_data])
             return Response({"Sku": sku_list}, status=status.HTTP_200_OK)
         except Exception as e:
             logger_error.error(str(e))
@@ -3490,10 +3556,8 @@ class YearWiseComparison(APIView):
                 program_data_to = BoardAllocationDataModel.objects.filter(year=toyear, Program=program, Sku=sku)
                 program_data_from = BoardAllocationDataModel.objects.filter(year=fromyear, Program=program, Sku=sku)
                 combined_data = set(program_data_to | program_data_from)
-
             # Convert set back to queryset for filtering
             combined_data_queryset = BoardAllocationDataModel.objects.filter(pk__in=[item.pk for item in combined_data])
-
             # Filter combined_data_queryset based on program if Sku is "All"
             if sku == 'All':
                 if program == 'All':
@@ -3518,60 +3582,66 @@ class BroadCastEmail(APIView):
         try:
             # Assuming UserModel is the model representing users and Email is the field storing their emails
             users = UserModel.objects.all().values('Email', 'Name', 'WWID')
-            ApproverEmail = ApproverUserModel.objects.values_list('Email',flat=True)
-            approver_email_list = list(ApproverEmail)
             user_email = [user['Email'] for user in users]
-            # print(user_email)
             user_WWID = [user['WWID'] for user in users]
             user_Name = [user['Name'] for user in users]
-            # # print(user_email)
-            # print(user_Name)
-            # print(user_WWID)
             
             # Parse request data
             subject = request.data.get('Subject')
             content = request.data.get('Content')
             BroadCast_by = request.data.get('BroadCast_by')
             CreatedDate = request.data.get('CreatedDate')
+            NewUser = request.data.get('NewUser', [])  # Get new users array from request data
             
+            # Duplicates check and appending unique new users to user_email list
+            for new_user in NewUser:
+                new_user_email = new_user.get('Email')
+                if new_user_email and new_user_email not in user_email:
+                    user_email.append(new_user_email)
+                    user_WWID.append(new_user.get('WWID'))
+                    user_Name.append(new_user.get('Name'))
             # Create BroadcastModel instance
             broadcast_instance = BroadcastModel.objects.create(
-                Subject = subject,
+                Subject=subject,
                 Content=content,
                 BroadCast_by=BroadCast_by,
+                NewUser = NewUser,
+                User_mail_list=user_email,
                 CreatedDate=CreatedDate,
-                User_mail_list=user_email
             )
-            
             # Response data with the array of email addresses
             response_data = {
-                "Subject":broadcast_instance.Subject,
+                "Subject": broadcast_instance.Subject,
                 "Content": broadcast_instance.Content,
                 "BroadCast_by": broadcast_instance.BroadCast_by,
                 "CreatedDate": broadcast_instance.CreatedDate,
-                "User_mail_list": user_email
+                "User_mail_list": user_email,
+                "New_User":NewUser,
             }
+            
             # Send email to each user in the User_mail_list
-            for email, name,wwid in zip(user_email, user_Name, user_WWID):
+            for email, name, wwid in zip(user_email, user_Name, user_WWID):
                 content_with_feedback = content
                 subject = subject
                 mail_data = {
-                    "WWID":f"{wwid}",
-                    "User":f"{name}",
+                    "WWID": f"{wwid}",
+                    "User": f"{name}",
                     "content": content_with_feedback,
                     "subject": f"{subject} "
                 }
                 TO.append(email)
                 Cc = []
-                Cc = approver_email_list
                 Bcc = ["charux.saxena@intel.com"]
-                Cc = Cc+CC
-                mail = BroadcastMail(From=FROM,To=TO,CC=Cc,data=mail_data,Bcc=Bcc)
+                Cc = Cc + CC
+                # Cc = ["charux.saxena@intel.com"]
+                mail = BroadcastMail(From=FROM, To=TO, CC=Cc, data=mail_data, Bcc=Bcc)
                 mail.sendmail()
                 TO.pop()
+                
             return Response(response_data, status=201)  
         except Exception as e:
             return Response({"error": str(e)}, status=400)
+
 
 class GetBroadCastDetails(APIView):
     def get(self, request):
@@ -3662,11 +3732,92 @@ class LabDetailCount(APIView):
                 'Total Non-Siv': total_non_siv,
                 'Bench Allocated': bench_allocated,
                 'Bench Free': bench_free,
-                'Total Rack': 0,  # Adjust as necessary
-                'Total Closed Room': 0  # Adjust as necessary
+                'Total Rack': 0,  
+                'Total Closed Room': 3  
             }
-
             return Response(response_data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class AllYearsForecastSummary(APIView):
+    def process_record(self, records, year):
+        current_year = datetime.now().year
+        monthly_data = [
+            {
+                "category": month,
+                "intel": sum(int(record[month]['boardsIntelBench'] or 0) + int(record[month]['boardIntelRack'] or 0) for record in records),
+                "ODC": sum(int(record[month]['boardsODCBench'] or 0) + int(record[month]['boardsODCRack'] or 0) for record in records),
+                "Bench_Demand_Intel": sum(int(record[month]['boardsIntelBench'] or 0) for record in records),
+                "Rack_Demand_Intel": sum(int(record[month]['boardIntelRack'] or 0) for record in records),
+                "Bench_Demand_ODC": sum(int(record[month]['boardsODCBench'] or 0) for record in records),
+                "Rack_Demand_ODC": sum(int(record[month]['boardsODCRack'] or 0) for record in records),
+                "Total_Bench_Intel": round(sum(int(record[month]['boardsIntelBench'] or 0) / 1.5 for record in records)),
+                "Total_Rack_Intel": 0,
+                "Ramp_value":sum(int(record[month]['boardsIntelBench'] or 0) + int(record[month]['boardIntelRack'] or 0) for record in records)+
+                            sum(int(record[month]['boardsODCBench'] or 0) + int(record[month]['boardsODCRack'] or 0) for record in records)
+            }
+            for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+        ]
+        result = {
+            year: monthly_data,
+        }
+        return result
+    def post(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            program = data.get('Program', 'All')
+            sku = data.get('Sku', 'All')
+            id = data.get('id')
+            result = []
+            years = set(BoardAllocationDataModel.objects.values_list('year', flat=True))
+
+            for year in years:
+                if id is not None:
+                    try:
+                        board = BoardAllocationDataModel.objects.get(pk=id, year=year)
+                        serializer = BoardAllocationDataModelSerializer(board)
+                        response_data = serializer.data
+                        result.append(self.process_record([response_data],year))
+                    except BoardAllocationDataModel.DoesNotExist:
+                        return Response("Record not found for the specified year", status=status.HTTP_404_NOT_FOUND)
+                else:
+                    if program == 'All':
+                        if sku == 'All':
+                            data = BoardAllocationDataModel.objects.filter(year=year)
+                        else:
+                            data = BoardAllocationDataModel.objects.filter(year=year, Sku=sku)
+                    else:
+                        if sku == 'All':
+                            data = BoardAllocationDataModel.objects.filter(year=year, Program=program)
+                        else:
+                            data = BoardAllocationDataModel.objects.filter(year=year, Program=program, Sku=sku)
+                    serializer = BoardAllocationDataModelSerializer(data, many=True)
+                    serialized_data = serializer.data
+                    filtered_data = [item for item in serialized_data if not item['isdeleted']]
+                    if not data.exists():
+                        result.append(self.process_empty_record(year))
+                    else:
+                        combined_record = self.process_record(filtered_data,year)
+                        result.append(combined_record)
+            return Response(result, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def process_empty_record(self, year):
+        empty_data = [
+            {
+                "category": month,
+                "intel": 0,
+                "ODC": 0,
+                "Bench_Demand_Intel": 0,
+                "Rack_Demand_Intel": 0,
+                "Bench_Demand_ODC": 0,
+                "Rack_Demand_ODC": 0,
+                "Ramp_value":0
+            }
+            for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+        ]
+        result = {
+            year: empty_data,
+        }
+        return result

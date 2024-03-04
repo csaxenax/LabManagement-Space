@@ -52,8 +52,13 @@ def DeallocationSchedular():
         next_workweek = str(int(Workweek)+1) + str(year)
     try:
         allocation_data = AllocationDetailsModel.objects.filter(status='allocated').values('id','Program','Sku','Vendor','FromWW',
-            'ToWW','Duration','AllocatedTo','NumberOfbenches','Remarks','Team','IsAllocated','IsRequested','Location__Name','BenchData','AllocatedDate','status')
+            'ToWW','Duration','AllocatedTo','NumberOfbenches','Remarks','Team','IsAllocated','IsRequested','Location__Name','BenchData','AllocatedDate','status','DeallocatedBy')
         #changes
+         # CHANGES
+        # data= request.data
+        # user_name = data[0]["DeallcationUserInfo"]["name"]
+        # user_email = data[0]["DeallcationUserInfo"]["emailId"]
+        # allocation_time = data[0]["DateandTime"]
         summary_data_list = []
         if allocation_data:
             for each_allocation in allocation_data:
@@ -81,7 +86,7 @@ def DeallocationSchedular():
                     current_allocation.Reason="Allocation Completed successfully"
                     #changes
                     current_allocation.DeallocatedBy = "Automated Deallocation"
-                    current_allocation.DeallocatedDate = datetime.now()
+                    current_allocation.deallocatedDate = datetime.now()
                     current_allocation.save()
                     benchdata = current_allocation.BenchData
                     lab_query = LabModel.objects.get(Q(Name=current_allocation.Location.Name))
@@ -119,6 +124,7 @@ def DeallocationSchedular():
                                 "vendor":current_allocation.Vendor,
                                 "allocatedto":current_allocation.AllocatedTo[0]['Name'],
                                 "notifyto":','.join(notify_persons),
+                                "requestedBy": current_allocation.RequestedBy[0]['Name'],
                                 "fromww":str(current_allocation.FromWW),
                                 "toww":str(current_allocation.ToWW),
                                 "duration":current_allocation.Duration,
@@ -129,13 +135,16 @@ def DeallocationSchedular():
                                 "bench_data":current_allocation.BenchData,
                                 "message":message,
                                 "subject":subject,
+                                "deallocatedby": current_allocation.DeallocatedBy
                             }
                     TO.append(' '+str(current_allocation.AllocatedTo[0]['Email']))
+                    # TO.append("sakthirajanx.sembulingam@intel.com")
                     if notify_emails:
                         Cc = notify_emails
                     else:
                         Cc = []
                     Cc = Cc + CC
+                    # Cc = ["charux.saxena@intel.com"]
                     mail = Email(FROM,TO,Cc,mail_data)
                     mail.sendmail()
                     TO.pop()
@@ -215,9 +224,6 @@ def DeallocationSchedular():
 
 
                     # new mail implementation
-
-                
-
 
         schedular_logger.info("Scheduler Completed Execution")
         print("Scheduler Completed Execution")

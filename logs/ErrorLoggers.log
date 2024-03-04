@@ -116,3 +116,26 @@ ERROR 2024-02-12 16:06:31,369 views post 3497 JSON parse error - Extra data: lin
 ERROR 2024-02-14 11:37:36,430 views post 3412 name 'year' is not defined
 ERROR 2024-02-15 14:03:38,522 views get 3645 Error: too many values to unpack (expected 2)
 ERROR 2024-02-15 15:53:33,879 views get 3633 Error: unhashable type: 'dict'
+ERROR 2024-02-21 09:21:49,555 views post 3394 Cannot resolve keyword 'workwwek' into field. Choices are: Actual_Utilization, Actual_utilization_in_percentage, AllocatedTo, Allocated_POC, BenchData, CreatedDate, Createdby, DeletedDate, Deletedby, Duration, FromWW, Location, ModifiedDate, Modifiedby, NumberOfbenches, Planned_Utilization, Program, Remarks, Remarks_Utilization, Sku, Team, ToWW, Utilization_Percentage, Vendor, approvedBy, id, isDeleted, workweek
+ERROR 2024-02-21 09:25:03,616 views post 3392 Cannot resolve keyword 'workweek_endwith' into field. Choices are: Actual_Utilization, Actual_utilization_in_percentage, AllocatedTo, Allocated_POC, BenchData, CreatedDate, Createdby, DeletedDate, Deletedby, Duration, FromWW, Location, ModifiedDate, Modifiedby, NumberOfbenches, Planned_Utilization, Program, Remarks, Remarks_Utilization, Sku, Team, ToWW, Utilization_Percentage, Vendor, approvedBy, id, isDeleted, workweek
+ERROR 2024-02-21 09:30:00,687 views post 3394 Unsupported lookup 'year' for CharField or join on the field not permitted.
+ERROR 2024-02-21 09:31:40,040 views post 3393 Unsupported lookup 'year' for CharField or join on the field not permitted.
+ERROR 2024-02-21 09:32:16,929 views post 3393 Unsupported lookup 'year' for CharField or join on the field not permitted.
+ERROR 2024-02-21 09:43:32,718 views post 3436 JSON parse error - Expecting ',' delimiter: line 2 column 16 (char 18)
+ERROR 2024-02-21 15:20:22,393 views post 1416 'AllocationDetailsModel' object has no attribute 'get'
+ERROR 2024-02-21 15:32:19,859 views post 1416 'AllocationDetailsModel' object has no attribute 'get'
+ERROR 2024-02-21 15:37:10,636 views post 1416 'NoneType' object is not subscriptable
+ERROR 2024-02-21 15:39:23,367 views post 1416 'NoneType' object is not subscriptable
+ERROR 2024-02-21 15:50:23,337 views post 1416 'NoneType' object is not subscriptable
+ERROR 2024-02-21 16:05:35,974 views post 1419 'NoneType' object is not subscriptable
+ERROR 2024-02-21 16:06:13,975 views post 1419 'NoneType' object is not subscriptable
+ERROR 2024-02-21 16:10:32,700 views post 1419 'NoneType' object is not subscriptable
+ERROR 2024-02-21 16:13:16,533 views post 1419 'NoneType' object is not subscriptable
+ERROR 2024-02-21 16:18:00,764 views post 1411 'NoneType' object is not subscriptable
+ERROR 2024-02-21 16:19:06,836 views post 1408 'NoneType' object is not subscriptable
+ERROR 2024-02-21 16:24:25,435 views post 1417 'NoneType' object is not subscriptable
+ERROR 2024-02-21 16:33:02,489 views post 1417 'NoneType' object is not subscriptable
+ERROR 2024-02-21 16:51:54,537 views post 1417 'NoneType' object is not subscriptable
+ERROR 2024-02-21 16:58:49,621 views post 1418 'NoneType' object is not subscriptable
+ERROR 2024-02-21 16:59:46,997 views post 1418 'NoneType' object is not subscriptable
+ERROR 2024-02-21 17:00:05,576 views post 1418 'NoneType' object is not subscriptable

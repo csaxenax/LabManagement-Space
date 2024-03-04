@@ -450,6 +450,9 @@ class Email:
                                  lab_name=labname,vendor_name=vendor,allocatedto=allocatedto,
                                  from_ww=fromww,to_ww=toww,remarks=remarks,duration=duration,number_of_benches=number_of_benches,
                                  bench_data=bench_data,team=team,id=id,notifyto=notifyto,requestedBy=requestedBy,deallocatedby=deallocatedby)
+            print(TO)
+            # print(CC)
+            print(final_message)
             SendEmail(From ,TO, CC, Subject,final_message)
         except Exception as e:
             print(e)

@@ -1395,3 +1395,12 @@ INFO 2024-01-23 15:28:03,406 functions DeallocationSchedular 37 Scheduler Starte
 INFO 2024-01-23 15:28:03,887 functions DeallocationSchedular 240 Scheduler Completed Execution
 INFO 2024-01-23 15:28:04,217 functions DeallocationSchedular 37 Scheduler Started
 INFO 2024-01-23 15:28:04,728 functions DeallocationSchedular 240 Scheduler Completed Execution
+INFO 2024-02-28 15:02:59,697 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-02-28 15:03:00,608 functions DeallocationSchedular 36 Scheduler Started
+INFO 2024-02-28 15:03:07,604 functions DeallocationSchedular 171 Bench Deallocated for id 280,                     User SAKTHIRAJAN Sembulingam for benches ['F1']
+INFO 2024-02-28 15:03:08,378 functions DeallocationSchedular 171 Bench Deallocated for id 138,                     User Avinash Kumar for benches ['B5', 'B4', 'B3']
+INFO 2024-02-28 15:03:13,645 functions DeallocationSchedular 171 Bench Deallocated for id 282,                     User ARBAZ ALI for benches ['A7']
+INFO 2024-02-28 15:03:13,645 functions DeallocationSchedular 229 Scheduler Completed Execution
+INFO 2024-02-28 15:03:14,394 functions DeallocationSchedular 171 Bench Deallocated for id 280,                     User SAKTHIRAJAN Sembulingam for benches ['F1']
+INFO 2024-02-28 15:03:20,415 functions DeallocationSchedular 171 Bench Deallocated for id 282,                     User ARBAZ ALI for benches ['A7']
+INFO 2024-02-28 15:03:20,415 functions DeallocationSchedular 229 Scheduler Completed Execution

@@ -360,6 +360,50 @@ class UtilizationSummaryModel(models.Model):
     Deletedby = models.CharField(max_length=255,blank=True)
     DeletedDate = models.DateTimeField(auto_now_add=True,null=True)
     isDeleted = models.BooleanField(default=False)
+    
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            action = 'insert'
+        elif not getattr(self, 'isdeleted', False):
+            # This is an update operation (excluding soft deletes)
+            action = 'update'
+        else:
+            action = 'delete',
+            self.isdeleted = True
+        
+        super(UtilizationSummaryModel, self).save(*args, **kwargs)
+        # Create a historical record
+        UtilizationSummaryModelTrackData.objects.create(
+            instance_id=self.id,
+            action=action,
+            workweek = self.workweek,
+            Location = self.Location,
+            BenchData = self.BenchData,
+            Program = self.Program,
+            Sku = self.Sku,
+            Vendor = self.Vendor,
+            FromWW = self.FromWW,
+            ToWW = self.ToWW,
+            Duration = self.Duration,
+            AllocatedTo = self.AllocatedTo,
+            NumberOfbenches = self.NumberOfbenches,
+            Remarks = self.Remarks,
+            Team = self.Team,
+            approvedBy = self.approvedBy,
+            Planned_Utilization = self.Planned_Utilization,
+            Actual_Utilization = self.Actual_Utilization,
+            Actual_utilization_in_percentage = self.Actual_utilization_in_percentage,
+            Utilization_Percentage = self.Utilization_Percentage,
+            Allocated_POC = self.Allocated_POC,
+            Remarks_Utilization = self.Remarks_Utilization,
+            Createdby = self.Createdby,
+            CreatedDate = self.CreatedDate,
+            Modifiedby = self.Modifiedby,
+            ModifiedDate = self.ModifiedDate,
+            Deletedby = self.Deletedby,
+            DeletedDate = self.DeletedDate,
+            isDeleted = self.isDeleted
+        )
 
     def soft_delete(self):
         self.isDeleted = True
@@ -371,10 +415,47 @@ class UtilizationSummaryModel(models.Model):
 
     objects = models.Manager()  # The default manager
     active_objects = models.Manager()  # A manager that includes only non-deleted records
-
-
     def __str__(self):
         return f"{self.workweek} - {self.Location}"
+    
+class UtilizationSummaryModelTrackData(models.Model):
+    ACTION_CHOICES = (
+        ('insert', 'Insert'),
+        ('update', 'Update'),
+        ('delete', 'Delete'),
+    )
+
+    id = models.AutoField(primary_key=True)
+    instance_id = models.IntegerField()  # ID of the instance in BoardAllocationDataModel
+    workweek = models.CharField(max_length=20,blank=True)
+    Location = models.CharField(max_length=100,blank=True)
+    BenchData = models.CharField(max_length=255)
+    Program = models.CharField(max_length=100,blank=True)
+    Sku = models.CharField(max_length=100,blank=True)
+    Vendor = models.CharField(max_length=100,blank=True)
+    FromWW = models.CharField(max_length=20,blank=True)
+    ToWW = models.CharField(max_length=20,blank=True)
+    Duration = models.CharField(max_length=10,blank=True)
+    AllocatedTo = models.ArrayField(model_container=AllocatedToModel,blank=True)
+    NumberOfbenches = models.IntegerField()
+    Remarks = models.TextField(blank=True)
+    Team = models.CharField(max_length=100,blank=True)
+    approvedBy = models.CharField(max_length=255,blank=True)
+    Planned_Utilization = models.FloatField(default=0)
+    Actual_Utilization = models.FloatField(default=0)
+    Actual_utilization_in_percentage = models.CharField(max_length=255,blank=True, null=True)
+    Utilization_Percentage = models.CharField(max_length=255,blank=True,null=True)
+    Allocated_POC = models.CharField(max_length=100)
+    Remarks_Utilization = models.CharField(max_length=255,blank=True)
+    Createdby = models.CharField(max_length=255,blank=True)
+    CreatedDate = models.DateTimeField(auto_now_add=True,null=True)
+    Modifiedby = models.CharField(max_length=255,blank=True)
+    ModifiedDate = models.DateTimeField(auto_now_add=True,null=True)
+    Deletedby = models.CharField(max_length=255,blank=True)
+    DeletedDate = models.DateTimeField(auto_now_add=True,null=True)
+    isDeleted = models.BooleanField(default=False)
+    action = models.CharField(max_length=250, choices=ACTION_CHOICES)
+    timestamp = models.DateTimeField(auto_now_add=True)
     
 class BroadcastModel(models.Model):
     """ Models for Broadcast Page"""
@@ -382,6 +463,7 @@ class BroadcastModel(models.Model):
     Subject = models.CharField(max_length=100,null=True,blank=True)
     Content = models.CharField(max_length=100,null=True,blank=True)
     BroadCast_by = models.ArrayField(model_container=AllocatedToModel,blank=True,null=True)
+    NewUser = models.ArrayField(model_container=AllocatedToModel,blank=True,null=True)
     CreatedDate = models.DateTimeField(auto_now_add=True,null=True)
     User_mail_list = models.CharField(max_length=100,null=True,blank=True)
 

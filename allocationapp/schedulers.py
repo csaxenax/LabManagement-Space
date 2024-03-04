@@ -9,7 +9,7 @@ def start_deallocate_schedular():
     """
     scheduler = BackgroundScheduler()
     #Runs on every sunday
-    #scheduler.add_job(DeallocationSchedular,'cron',day_of_week='fri',hour="23",minute="05",timezone='Asia/Kolkata')
+    # scheduler.add_job(DeallocationSchedular,'cron',day_of_week='fri',hour="23",minute="05",timezone='Asia/Kolkata')
     # scheduler.add_job(DeallocationSchedular, 'cron', day_of_week='fri',hour='20',minute="57",timezone='Asia/Kolkata')
-    # scheduler.add_job(DeallocationSchedular, 'interval', seconds=120)
+    # scheduler.add_job(DeallocationSchedular, 'interval', seconds=60)
     scheduler.start()
