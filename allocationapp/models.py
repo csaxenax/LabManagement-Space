@@ -2,6 +2,8 @@
 from djongo import models
 from django import forms
 from django.utils import timezone
+from djongo import models as djongo_models
+
 # from simple_history.models import HistoricalRecords
 
 
@@ -465,7 +467,6 @@ class BroadcastModel(models.Model):
     BroadCast_by = models.ArrayField(model_container=AllocatedToModel,blank=True,null=True)
     NewUser = models.ArrayField(model_container=AllocatedToModel,blank=True,null=True)
     CreatedDate = models.DateTimeField(auto_now_add=True,null=True)
-    User_mail_list = models.CharField(max_length=100,null=True,blank=True)
-
+    User_mail_list = djongo_models.JSONField(blank=True, null=True)
     def __str__(self):
         return self.id

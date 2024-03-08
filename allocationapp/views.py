@@ -9,6 +9,7 @@ from rest_framework import status,generics
 from django.db.models import Q,Sum,F,FloatField, ExpressionWrapper,Count
 from django.db import connection
 from django.utils import timezone
+from datetime import timedelta
 from django.utils.html import escape
 import traceback
 # from django.db.models.signals import post_save, pre_delete
@@ -916,12 +917,14 @@ class ReportPageView(APIView):
             if pending_data is not None:
                 for item in pending_data:
                     # Format AllocatedDate field
-                    if 'AllocatedDate' or 'RequestedDate' or 'deallocatedDate' in item:
+                    if 'AllocatedDate' in item:
                         allocated_date_str = str(item['AllocatedDate'])  # Convert to string
                         allocated_date_obj = datetime.strptime(allocated_date_str, '%Y-%m-%d %H:%M:%S.%f%z')
-                        item['AllocatedDate'] = allocated_date_obj.strftime('%d-%m-%Y %H:%M:%S')
-                        item['RequestedDate'] = allocated_date_obj.strftime('%d-%m-%Y %H:%M:%S')
-                        item['deallocatedDate'] = allocated_date_obj.strftime('%d-%m-%Y %H:%M:%S')
+                        date_with_offset = allocated_date_obj + timedelta(hours=5, minutes=30, seconds=10)
+                        item['AllocatedDate'] = date_with_offset.strftime('%d-%m-%Y %H:%M:%S')
+                        item['RequestedDate'] = date_with_offset.strftime('%d-%m-%Y %H:%M:%S')
+                        item['deallocatedDate'] = date_with_offset.strftime('%d-%m-%Y %H:%M:%S')
+                        item['RejectedDate'] = date_with_offset.strftime('%d-%m-%Y %H:%M:%S')
 
                 return Response(pending_data, status=status.HTTP_200_OK)
             else:
@@ -2624,18 +2627,18 @@ class ForecastSummary(APIView):
     def post(self, request, *args, **kwargs):
         try:
             data = request.data
-            year = data.get('year', '2023')
+            year = data.get('year', 2023)  # Default year is 2023
             program = data.get('Program', 'All')
             sku = data.get('Sku', 'All')
+            team = data.get('Team', 'All')
             id = data.get('id')
 
-            # Replace with actual lab_names_list based on your data
             lab_filter_query = LabModel.objects.filter().values('Name')
             lab_filter_query_list = [each_query['Name'] for each_query in lab_filter_query if "TOE" not in each_query['Name']]
             lab_data = LabModel.objects.filter(Name__in=lab_filter_query_list).values('Name')
             lab_names_list = sorted(list(set(['-'.join(str(each_lab['Name']).split('-')[0:2]) for each_lab in lab_data])))
+
             allocated_count = self.get_allocated_count(lab_names_list)
-            total_board = 0
 
             if id is not None:
                 try:
@@ -2647,32 +2650,29 @@ class ForecastSummary(APIView):
                     return Response("Record not found for the specified year", status=status.HTTP_404_NOT_FOUND)
             else:
                 if program == 'All':
-                    if sku == 'All':
-                        # Process all data for all programs and all Sku
-                        data = BoardAllocationDataModel.objects.filter(year=year)
-                    else:
-                        # Process all data for all programs but specific Sku
-                        data = BoardAllocationDataModel.objects.filter(year=year, Sku=sku)
+                    data = BoardAllocationDataModel.objects.filter(year=year)
                 else:
-                    if sku == 'All':
-                        # Process data for a specific program and all Sku
-                        data = BoardAllocationDataModel.objects.filter(year=year, Program=program)
-                    else:
-                        # Process data for a specific program and specific Sku
-                        data = BoardAllocationDataModel.objects.filter(year=year, Program=program, Sku=sku)
+                    data = BoardAllocationDataModel.objects.filter(year=year, Program=program)
+
+                if sku != 'All':
+                    data = data.filter(Sku=sku)
+
+                if team != 'All':
+                    data = data.filter(Team=team)
+
                 serializer = BoardAllocationDataModelSerializer(data, many=True)
-                serialized_data = serializer.data  # Convert queryset to list of dictionaries
-                filtered_data = [item for item in serialized_data if not item['isdeleted']]
-                # Check if there is any data for the specified year
+                serialized_data = serializer.data
+                filtered_data = [item for item in serialized_data if not item.get('isdeleted', False)]
+
                 if not data.exists():
-                    # Return empty data for the specified year
                     empty_data = self.process_empty_record(year)
                     return Response(empty_data, status=status.HTTP_200_OK)
+
                 combined_record = self.process_record(filtered_data, allocated_count, year)
-            return Response(combined_record, status=status.HTTP_200_OK)
+                return Response(combined_record, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+        
     def process_empty_record(self, year):
         empty_data = [
             {
@@ -2683,7 +2683,9 @@ class ForecastSummary(APIView):
                 "Bench_Demand_Intel": 0,
                 "Rack_Demand_Intel": 0,
                 "Bench_Demand_ODC": 0,
-                "Rack_Demand_ODC": 0
+                "Rack_Demand_ODC": 0,
+                "Total_Bench_Intel":0,
+                "Total_Rack_Intel":0
             }
             for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
         ]
@@ -2728,6 +2730,7 @@ class ForecastSummaryRVP(APIView):
             year = data.get('year', '2023')
             program = data.get('Program', 'All')
             sku = data.get('Sku', 'All')
+            team=data.get('Team','ALl')
             board_id = data.get('id')
 
             if board_id is not None:
@@ -2739,19 +2742,15 @@ class ForecastSummaryRVP(APIView):
                     return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
             else:
                 if program == 'All':
-                    if sku == 'All':
-                        # Process all data for all programs and all Sku
-                        data = BoardAllocationDataModel.objects.filter(year=year)
-                    else:
-                        # Process all data for all programs but specific Sku
-                        data = BoardAllocationDataModel.objects.filter(year=year, Sku=sku)
+                    data = BoardAllocationDataModel.objects.filter(year=year)
                 else:
-                    if sku == 'All':
-                        # Process data for a specific program and all Sku
-                        data = BoardAllocationDataModel.objects.filter(year=year, Program=program)
-                    else:
-                        # Process data for a specific program and specific Sku
-                        data = BoardAllocationDataModel.objects.filter(year=year, Program=program, Sku=sku)
+                    data = BoardAllocationDataModel.objects.filter(year=year, Program=program)
+
+                if sku != 'All':
+                    data = data.filter(Sku=sku)
+
+                if team != 'All':
+                    data = data.filter(Team=team)
                 # Check if there is any data for the specified year
                 if not data.exists():
                     return Response({year: []}, status=status.HTTP_200_OK)
@@ -2818,6 +2817,7 @@ class ForecastSummaryTable(APIView):
             board_id = data.get('id')
             program = data.get('Program', 'All')
             sku = data.get('Sku', 'All')
+            team = data.get('Team','All')
             if board_id is not None:
                 try:
                     board = BoardAllocationDataModel.objects.get(pk=board_id)
@@ -2827,19 +2827,15 @@ class ForecastSummaryTable(APIView):
                     return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
             else:
                 if program == 'All':
-                    if sku == 'All':
-                        # Process all data for all programs and all Sku
-                        data = BoardAllocationDataModel.objects.filter(year=year)
-                    else:
-                        # Process all data for all programs but specific Sku
-                        data = BoardAllocationDataModel.objects.filter(year=year, Sku=sku)
+                    data = BoardAllocationDataModel.objects.filter(year=year)
                 else:
-                    if sku == 'All':
-                        # Process data for a specific program and all Sku
-                        data = BoardAllocationDataModel.objects.filter(year=year, Program=program)
-                    else:
-                        # Process data for a specific program and specific Sku
-                        data = BoardAllocationDataModel.objects.filter(year=year, Program=program, Sku=sku)
+                    data = BoardAllocationDataModel.objects.filter(year=year, Program=program)
+
+                if sku != 'All':
+                    data = data.filter(Sku=sku)
+
+                if team != 'All':
+                    data = data.filter(Team=team)
                 # Check if there is any data for the specified year
                 if not data.exists():
                     # Return empty data for the specified year
@@ -2941,6 +2937,7 @@ class ForecastQuaterWiseSummary(APIView):
             board_id = data.get('id')
             program = data.get('Program', 'All')
             sku = data.get('Sku', 'All')
+            team = data.get('Team','All')
             if board_id is not None:
                 try:
                     board = BoardAllocationDataModel.objects.get(pk=board_id)
@@ -2951,19 +2948,15 @@ class ForecastQuaterWiseSummary(APIView):
                     return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
             else:
                 if program == 'All':
-                    if sku == 'All':
-                        # Process all data for all programs and all Sku
-                        data = BoardAllocationDataModel.objects.filter(year=year)
-                    else:
-                        # Process all data for all programs but specific Sku
-                        data = BoardAllocationDataModel.objects.filter(year=year, Sku=sku)
+                    data = BoardAllocationDataModel.objects.filter(year=year)
                 else:
-                    if sku == 'All':
-                        # Process data for a specific program and all Sku
-                        data = BoardAllocationDataModel.objects.filter(year=year, Program=program)
-                    else:
-                        # Process data for a specific program and specific Sku
-                        data = BoardAllocationDataModel.objects.filter(year=year, Program=program, Sku=sku)
+                    data = BoardAllocationDataModel.objects.filter(year=year, Program=program)
+
+                if sku != 'All':
+                    data = data.filter(Sku=sku)
+
+                if team != 'All':
+                    data = data.filter(Team=team)
                 if not data.exists():
                     return Response({year: []}, status=status.HTTP_200_OK)
 
@@ -3521,6 +3514,21 @@ class GetProgramList(APIView):
             logger_error.error(str(e))
             return Response(e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+class GetFunctionList(APIView):
+    def post(self, request):
+        try:
+            data = request.data
+            year = data.get('year', '2023')
+            if year:
+                team_data = BoardAllocationDataModel.objects.filter(year=year).values('Team')
+            else:
+                team_data = BoardAllocationDataModel.objects.all().values('Team')
+            team_list = set([each_program['Team'] for each_program in team_data])
+            return Response({"Team": team_list}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger_error.error(str(e))
+            return Response(e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 class GetSkuList(APIView):
     def post(self, request):
         try:
@@ -3547,31 +3555,30 @@ class YearWiseComparison(APIView):
             toyear = data.get('toyear')
             program = data.get('Program', 'All')
             sku = data.get('Sku', 'All')
+            team = data.get('Team', 'All')
 
-            if fromyear and toyear and program == 'All':
-                program_data_to = BoardAllocationDataModel.objects.filter(year=toyear)
-                program_data_from = BoardAllocationDataModel.objects.filter(year=fromyear)
-                combined_data = set(program_data_to | program_data_from)
-            else:
-                program_data_to = BoardAllocationDataModel.objects.filter(year=toyear, Program=program, Sku=sku)
-                program_data_from = BoardAllocationDataModel.objects.filter(year=fromyear, Program=program, Sku=sku)
-                combined_data = set(program_data_to | program_data_from)
-            # Convert set back to queryset for filtering
-            combined_data_queryset = BoardAllocationDataModel.objects.filter(pk__in=[item.pk for item in combined_data])
-            # Filter combined_data_queryset based on program if Sku is "All"
-            if sku == 'All':
-                if program == 'All':
-                    program_list = list(set(BoardAllocationDataModel.objects.all().values_list('Program', flat=True)))
-                    sku_list = list(set(BoardAllocationDataModel.objects.all().values_list('Sku', flat=True)))
-                else:
-                    program_list = list(set(BoardAllocationDataModel.objects.filter(Program=program).values_list('Program', flat=True)))
-                    sku_list = list(set(BoardAllocationDataModel.objects.filter(Program=program).values_list('Sku', flat=True)))
-            else:
-                program_list = list(set(each_program.Program for each_program in combined_data_queryset))
-                sku_list = list(set(each_program.Sku for each_program in combined_data_queryset))
+            # Filter data based on provided parameters
+            queryset = BoardAllocationDataModel.objects.all()
+            if fromyear:
+                queryset = queryset.filter(year__gte=fromyear)
+            if toyear:
+                queryset = queryset.filter(year__lte=toyear)
+            if program != 'All':
+                queryset = queryset.filter(Program=program)
+            if sku != 'All':
+                queryset = queryset.filter(Sku=sku)
+            if team != 'All':
+                queryset = queryset.filter(Team=team)
 
-            return Response({"Program": program_list, "Sku": sku_list}, status=status.HTTP_200_OK)
+            # Retrieve unique sets of programs, SKUs, and teams
+            program_list = queryset.values_list('Program', flat=True).distinct()
+            sku_list = queryset.values_list('Sku', flat=True).distinct()
+            team_list = queryset.values_list('Team', flat=True).distinct()
+
+            return Response({"Program": program_list, "Sku": sku_list, "Team": team_list}, status=status.HTTP_200_OK)
+
         except Exception as e:
+            # Log the error
             logger_error.error(str(e))
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
@@ -3590,7 +3597,7 @@ class BroadCastEmail(APIView):
             subject = request.data.get('Subject')
             content = request.data.get('Content')
             BroadCast_by = request.data.get('BroadCast_by')
-            CreatedDate = request.data.get('CreatedDate')
+            CreatedDate = datetime.now()
             NewUser = request.data.get('NewUser', [])  # Get new users array from request data
             
             # Duplicates check and appending unique new users to user_email list
@@ -3619,7 +3626,7 @@ class BroadCastEmail(APIView):
                 "New_User":NewUser,
             }
             
-            # Send email to each user in the User_mail_list
+            # # Send email to each user in the User_mail_list
             for email, name, wwid in zip(user_email, user_Name, user_WWID):
                 content_with_feedback = content
                 subject = subject
@@ -3630,6 +3637,7 @@ class BroadCastEmail(APIView):
                     "subject": f"{subject} "
                 }
                 TO.append(email)
+                # TO.append("charux.saxena@intel.com")
                 Cc = []
                 Bcc = ["charux.saxena@intel.com"]
                 Cc = Cc + CC
@@ -3644,14 +3652,45 @@ class BroadCastEmail(APIView):
 
 
 class GetBroadCastDetails(APIView):
+    def remove_html_tags(self, text):
+        text_content = ''
+        image_urls = []  # Store image URLs in a list
+        
+        # Extract text content
+        text_content_matches = re.findall(r'>([^<]+)<', text)
+        text_content = ' '.join(text_content_matches)
+
+        # Extract image URLs
+        img_src_matches = re.findall(r'<img.*?src=(?:\"(.*?)\"|\'(.*?)\').*?>', text)
+        for match in img_src_matches:
+            image_urls.append(match[0] or match[1])
+
+        return {'Content': text_content, 'Attachment': image_urls}
+    
     def get(self, request):
         try:
-            data = BroadcastModel.objects.order_by('-CreatedDate').all()
-            serializer = BroadcastSerializer(data, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            data = BroadcastModel.objects.all()
+            formatted_data = []
+            for item in data:
+                created_date_with_offset = item.CreatedDate + timedelta(hours=5, minutes=30, seconds=10)
+                created_date_formatted = created_date_with_offset.strftime('%d-%m-%Y %H:%M:%S')
+                cleaned_data = self.remove_html_tags(item.Content)
+                item_data = {
+                    "id": item.id,
+                    'Subject': item.Subject,
+                    'Content': cleaned_data['Content'],  # Display text content here
+                    'Attachment': cleaned_data['Attachment'],  # Display image URLs here
+                    'NewUser': item.NewUser,
+                    'BroadCast_by': item.BroadCast_by,
+                    'CreatedDate': created_date_formatted,
+                    'User_mail_list': item.User_mail_list,
+                    'Content_with_html_tag': item.Content
+                }
+                formatted_data.append(item_data)
+            return Response(formatted_data, status=status.HTTP_200_OK)
         except BroadcastModel.DoesNotExist:
-                return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
-
+            return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
+        
 class LabLocation(APIView):
     '''API for Home Page'''
     def get(self, request):

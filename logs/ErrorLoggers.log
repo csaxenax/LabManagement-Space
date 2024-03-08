@@ -139,3 +139,4 @@ ERROR 2024-02-21 16:51:54,537 views post 1417 'NoneType' object is not subscript
 ERROR 2024-02-21 16:58:49,621 views post 1418 'NoneType' object is not subscriptable
 ERROR 2024-02-21 16:59:46,997 views post 1418 'NoneType' object is not subscriptable
 ERROR 2024-02-21 17:00:05,576 views post 1418 'NoneType' object is not subscriptable
+ERROR 2024-03-08 15:36:32,433 views post 3557 JSON parse error - Extra data: line 13 column 1 (char 33)

@@ -101,14 +101,7 @@ class UtilizationSerializer2(serializers.ModelSerializer):
         fields = '__all__'
     
 class BroadcastSerializer(serializers.ModelSerializer):
-    content_without_html = serializers.SerializerMethodField()
-
-    def get_content_without_html(self, obj):
-        # Remove HTML tags from content
-        import re
-        clean_content = re.sub('<[^<]+?>', '', obj.Content)
-        return clean_content
 
     class Meta:
         model = BroadcastModel
-        fields = ('id', 'Subject', 'Content','NewUser' ,'BroadCast_by', 'CreatedDate', 'User_mail_list', 'content_without_html')
+        fields = ('id', 'Subject', 'Content','NewUser' ,'BroadCast_by', 'CreatedDate', 'User_mail_list')
