@@ -79,4 +79,10 @@ urlpatterns = [
     path('workweekWiseSkuUtilization/', views.WorkweekSkuUtilization.as_view(), name='utilization_sku_list'),
     path('labdetailCount/',views.LabDetailCount.as_view(),name='lablocation'),
     path('allyearsummary/', views.AllYearsForecastSummary.as_view(),name='created'),
+    # path('GetUserDetails/', views.UserDetails.as_view(),name='userDetail'),   
+    path('UserAllocationList/',views.AllocatedUserList.as_view(),name='teamsdrilldowndata'),
+    path('UserBasedLocationDrillDown/',views.UserBasedLocationDrillDown.as_view(),name='userlocationrilldowndata'),
+    path('UserBasedProgramDrillDown/',views.UserBasedProgramDrillDown.as_view(),name='userprogramdrilldowndata'),
+    path('UserBasedTeamDrillDown/',views.UserBasedTeamDrillDown.as_view(),name='userteamdrilldowndata'),
 ]
+

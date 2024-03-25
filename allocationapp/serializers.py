@@ -105,3 +105,6 @@ class BroadcastSerializer(serializers.ModelSerializer):
     class Meta:
         model = BroadcastModel
         fields = ('id', 'Subject', 'Content','NewUser' ,'BroadCast_by', 'CreatedDate', 'User_mail_list')
+
+
+

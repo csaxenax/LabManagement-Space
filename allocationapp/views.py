@@ -2,7 +2,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework.parsers import FileUploadParser
-from .serializers import BoardAllocationDataModelSerializer,UtilizationSerializer2,BroadcastSerializer
+from .serializers import BoardAllocationDataModelSerializer,UtilizationSerializer2
 from rest_framework.views  import APIView
 from rest_framework.response import Response
 from rest_framework import status,generics
@@ -12,8 +12,6 @@ from django.utils import timezone
 from datetime import timedelta
 from django.utils.html import escape
 import traceback
-# from django.db.models.signals import post_save, pre_delete
-# from django.dispatch import receiver
 from django.shortcuts import get_object_or_404
 from django.db.models.functions import Coalesce
 from itertools import chain
@@ -21,7 +19,7 @@ from datetime import datetime
 import traceback , requests
 import os,re,json
 import urllib3 
-from django.db.models.signals import pre_save
+# from django.db.models.signals import pre_save
 from django.dispatch import receiver
 import logging
 from .UserAuthentication import GetUserData
@@ -1472,8 +1470,11 @@ class CurrentUserDataView(APIView):
         data = request.data
         token = data['token']
         user_data = GetUserData(token)
+        print("user_data",user_data)
+        user_data['avatarURL'] = 'https://photoisa.intel.com/Photo/' + user_data['emailId']
         idsid = user_data['idsid']
         try:
+            # pdb.set_trace()
             user_details = UserModel.objects.filter(Idsid=idsid).values('Role__role_name')
             if user_details:
                 user_data['Role'] = user_details[0]['Role__role_name']
@@ -1486,7 +1487,9 @@ class CurrentUserDataView(APIView):
                     approver_user_query.save()
                 except ApproverUserModel.DoesNotExist:
                     pass
+                # pdb.set_trace()
                 return Response(user_data,status=status.HTTP_200_OK)
+                
             else:
                 user_data['Role'] = None
                 return Response(user_data,status=status.HTTP_200_OK)
@@ -2126,7 +2129,7 @@ class TeamDrillDownView(APIView):
             return Response(response_team_list,status=status.HTTP_200_OK)
         except Exception as e:
             return Response(e,status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+        
 class ProgramDrillDownView(APIView):
     def get(self, request):
         """API to get drill down data for Program vs Location chart"""
@@ -2407,6 +2410,7 @@ class EditAPIView(APIView):
             logger_error.error(str(e))
             return Response(e,status=status.HTTP_500_INTERNAL_SERVER_ERROR)
      
+# FORECAST PAGE APIS
 class BoardAPI(APIView):
     queryset = BoardAllocationDataModel.objects.all()
     def get(self, request, id=None):
@@ -2545,7 +2549,6 @@ class excelUpload(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
     
-        
 class YearListAPI(APIView):
     def get(self, request):
         years = sorted(BoardAllocationDataModel.objects.values_list('year', flat=True).distinct())
@@ -2628,49 +2631,57 @@ class ForecastSummary(APIView):
         try:
             data = request.data
             year = data.get('year', 2023)  # Default year is 2023
-            program = data.get('Program', 'All')
-            sku = data.get('Sku', 'All')
-            team = data.get('Team', 'All')
+            programs = data.get('Program', 'All').split(',')
+            skus = data.get('Sku', 'All').split(',')
+            teams = data.get('Team', 'All').split(',')
             id = data.get('id')
-
             lab_filter_query = LabModel.objects.filter().values('Name')
             lab_filter_query_list = [each_query['Name'] for each_query in lab_filter_query if "TOE" not in each_query['Name']]
             lab_data = LabModel.objects.filter(Name__in=lab_filter_query_list).values('Name')
             lab_names_list = sorted(list(set(['-'.join(str(each_lab['Name']).split('-')[0:2]) for each_lab in lab_data])))
-
             allocated_count = self.get_allocated_count(lab_names_list)
 
             if id is not None:
-                try:
-                    board = BoardAllocationDataModel.objects.get(pk=id, year=year)
+                board = BoardAllocationDataModel.objects.filter(pk=id, year=year).first()
+                if board:
                     serializer = BoardAllocationDataModelSerializer(board)
                     response_data = serializer.data
                     return Response(self.process_record([response_data], allocated_count, year), status=status.HTTP_200_OK)
-                except BoardAllocationDataModel.DoesNotExist:
+                else:
                     return Response("Record not found for the specified year", status=status.HTTP_404_NOT_FOUND)
             else:
-                if program == 'All':
-                    data = BoardAllocationDataModel.objects.filter(year=year)
-                else:
-                    data = BoardAllocationDataModel.objects.filter(year=year, Program=program)
+                data = BoardAllocationDataModel.objects.filter(year=year)
+                if 'All' not in programs:
+                    program_filters = Q()
+                    for program in programs:
+                        program_filters |= Q(Program=program)
+                    data = data.filter(program_filters)
 
-                if sku != 'All':
-                    data = data.filter(Sku=sku)
+                if 'All' not in skus:
+                    sku_filters = Q()
+                    for sku in skus:
+                        sku_filters |= Q(Sku=sku)
+                    data = data.filter(sku_filters)
 
-                if team != 'All':
-                    data = data.filter(Team=team)
-
+                if 'All' not in teams:
+                    team_filters = Q()
+                    for team in teams:
+                        team_filters |= Q(Team=team)
+                    data = data.filter(team_filters)
                 serializer = BoardAllocationDataModelSerializer(data, many=True)
                 serialized_data = serializer.data
                 filtered_data = [item for item in serialized_data if not item.get('isdeleted', False)]
 
-                if not data.exists():
+                if not filtered_data:
                     empty_data = self.process_empty_record(year)
                     return Response(empty_data, status=status.HTTP_200_OK)
 
                 combined_record = self.process_record(filtered_data, allocated_count, year)
                 return Response(combined_record, status=status.HTTP_200_OK)
         except Exception as e:
+            print("Error occurred:", e)
+            import traceback
+            traceback.print_exc()  # Print full traceback for debugging
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     def process_empty_record(self, year):
@@ -2696,7 +2707,6 @@ class ForecastSummary(APIView):
         }
         return result
 
-        
 class ForecastSummaryRVP(APIView):
     parser_classes = [JSONParser]
     def process_record(self, records):
@@ -2728,9 +2738,9 @@ class ForecastSummaryRVP(APIView):
         try:
             data = request.data
             year = data.get('year', '2023')
-            program = data.get('Program', 'All')
-            sku = data.get('Sku', 'All')
-            team=data.get('Team','ALl')
+            programs = data.get('Program', 'All').split(',')
+            skus = data.get('Sku', 'All').split(',')
+            teams=data.get('Team','ALl').split(',')
             board_id = data.get('id')
 
             if board_id is not None:
@@ -2741,16 +2751,24 @@ class ForecastSummaryRVP(APIView):
                 except BoardAllocationDataModel.DoesNotExist:
                     return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
             else:
-                if program == 'All':
-                    data = BoardAllocationDataModel.objects.filter(year=year)
-                else:
-                    data = BoardAllocationDataModel.objects.filter(year=year, Program=program)
+                data = BoardAllocationDataModel.objects.filter(year=year)
+                if 'All' not in programs:
+                    program_filters = Q()
+                    for program in programs:
+                        program_filters |= Q(Program=program)
+                    data = data.filter(program_filters)
 
-                if sku != 'All':
-                    data = data.filter(Sku=sku)
+                if 'All' not in skus:
+                    sku_filters = Q()
+                    for sku in skus:
+                        sku_filters |= Q(Sku=sku)
+                    data = data.filter(sku_filters)
 
-                if team != 'All':
-                    data = data.filter(Team=team)
+                if 'All' not in teams:
+                    team_filters = Q()
+                    for team in teams:
+                        team_filters |= Q(Team=team)
+                    data = data.filter(team_filters)
                 # Check if there is any data for the specified year
                 if not data.exists():
                     return Response({year: []}, status=status.HTTP_200_OK)
@@ -2815,9 +2833,9 @@ class ForecastSummaryTable(APIView):
             data = request.data
             year = data.get('year', '2023')
             board_id = data.get('id')
-            program = data.get('Program', 'All')
-            sku = data.get('Sku', 'All')
-            team = data.get('Team','All')
+            programs = data.get('Program', 'All').split(',')
+            skus = data.get('Sku', 'All').split(',')
+            teams = data.get('Team','All').split(',')
             if board_id is not None:
                 try:
                     board = BoardAllocationDataModel.objects.get(pk=board_id)
@@ -2826,16 +2844,24 @@ class ForecastSummaryTable(APIView):
                 except BoardAllocationDataModel.DoesNotExist:
                     return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
             else:
-                if program == 'All':
-                    data = BoardAllocationDataModel.objects.filter(year=year)
-                else:
-                    data = BoardAllocationDataModel.objects.filter(year=year, Program=program)
+                data = BoardAllocationDataModel.objects.filter(year=year)
+                if 'All' not in programs:
+                    program_filters = Q()
+                    for program in programs:
+                        program_filters |= Q(Program=program)
+                    data = data.filter(program_filters)
 
-                if sku != 'All':
-                    data = data.filter(Sku=sku)
+                if 'All' not in skus:
+                    sku_filters = Q()
+                    for sku in skus:
+                        sku_filters |= Q(Sku=sku)
+                    data = data.filter(sku_filters)
 
-                if team != 'All':
-                    data = data.filter(Team=team)
+                if 'All' not in teams:
+                    team_filters = Q()
+                    for team in teams:
+                        team_filters |= Q(Team=team)
+                    data = data.filter(team_filters)
                 # Check if there is any data for the specified year
                 if not data.exists():
                     # Return empty data for the specified year
@@ -2877,8 +2903,7 @@ class ForecastSummaryTable(APIView):
             year: empty_data
         }
         return result
-
-        
+  
 class ForecastQuaterWiseSummary(APIView):
     parser_classes = [JSONParser]
     def process_record(self, records, year):
@@ -2935,9 +2960,9 @@ class ForecastQuaterWiseSummary(APIView):
             data = request.data
             year = data.get('year', '2023')
             board_id = data.get('id')
-            program = data.get('Program', 'All')
-            sku = data.get('Sku', 'All')
-            team = data.get('Team','All')
+            programs= data.get('Program', 'All').split(',')
+            skus = data.get('Sku', 'All').split(',')
+            teams = data.get('Team','All').split(',')
             if board_id is not None:
                 try:
                     board = BoardAllocationDataModel.objects.get(pk=board_id)
@@ -2947,16 +2972,24 @@ class ForecastQuaterWiseSummary(APIView):
                 except BoardAllocationDataModel.DoesNotExist:
                     return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
             else:
-                if program == 'All':
-                    data = BoardAllocationDataModel.objects.filter(year=year)
-                else:
-                    data = BoardAllocationDataModel.objects.filter(year=year, Program=program)
+                data = BoardAllocationDataModel.objects.filter(year=year)
+                if 'All' not in programs:
+                    program_filters = Q()
+                    for program in programs:
+                        program_filters |= Q(Program=program)
+                    data = data.filter(program_filters)
 
-                if sku != 'All':
-                    data = data.filter(Sku=sku)
+                if 'All' not in skus:
+                    sku_filters = Q()
+                    for sku in skus:
+                        sku_filters |= Q(Sku=sku)
+                    data = data.filter(sku_filters)
 
-                if team != 'All':
-                    data = data.filter(Team=team)
+                if 'All' not in teams:
+                    team_filters = Q()
+                    for team in teams:
+                        team_filters |= Q(Team=team)
+                    data = data.filter(team_filters)
                 if not data.exists():
                     return Response({year: []}, status=status.HTTP_200_OK)
 
@@ -2984,58 +3017,6 @@ class GetLabList(APIView):
             return JsonResponse({'labs': lab_list}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
-
-class UtilizationSummary(APIView):
-    def post(self, request, *args, **kwargs):
-        try:
-            workweek = request.data.get('workweek')
-            program = request.data.get('Program','All')
-            sku = request.data.get('Sku','All')
-            queryset = UtilizationSummaryModel.objects.filter(workweek=workweek)
-            if program == 'All':
-                if sku == 'All':
-                        # Process all data for all programs and all Sku
-                    queryset = UtilizationSummaryModel.objects.filter(workweek=workweek)
-                else:
-                        # Process all data for all programs but specific Sku
-                    queryset = UtilizationSummaryModel.objects.filter(workweek=workweek, Sku=sku)
-            else:
-                if sku == 'All':
-                        # Process data for a specific program and all Sku
-                    queryset = UtilizationSummaryModel.objects.filter(workweek=workweek, Program=program)
-                else:
-                        # Process data for a specific program and specific Sku
-                    queryset = UtilizationSummaryModel.objects.filter(workweek=workweek, Program=program, Sku=sku)
-            
-            if not queryset.exists():
-                return Response([])
-            
-            location_data = queryset.values('Location').annotate(
-                planned_utilization=Sum('Planned_Utilization'),
-                actual_utilization=Sum('Actual_Utilization')
-            )
-            
-            Count = queryset.all().values('id') # Count the number of locations
-            id_count = len(Count) 
-            response_data = []
-            for location in location_data:
-                planned_utilization = location['planned_utilization'] or 0
-                actual_utilization = location['actual_utilization'] or 0
-                
-                utilization_percentage = (
-                    f"{int(round(actual_utilization / id_count * 100))}%"
-                    if planned_utilization > 0 
-                    else "0.00%"
-                )
-                response_data.append({
-                    'LocationName': location['Location'],
-                    'Planned Utilization': int(planned_utilization),
-                    'Actual Utilization': int(actual_utilization),
-                    'Utilization': utilization_percentage,
-                })
-            return Response(response_data)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
         
 class YearlyUtilizationAPI(APIView):
     def post(self, request, *args, **kwargs):
@@ -3053,7 +3034,193 @@ class YearlyUtilizationAPI(APIView):
             return Response(filtered_data, status=status.HTTP_200_OK)
         else:
             return Response([], status=status.HTTP_200_OK)
-    
+        
+class GetProgramList(APIView):
+    def post(self, request):
+        try:
+            data = request.data
+            year = data.get('year', '2023')
+            if year:
+                program_data = BoardAllocationDataModel.objects.filter(year=year).values('Program')
+            else:
+                program_data = BoardAllocationDataModel.objects.all().values('Program')
+            program_list = set([each_program['Program'] for each_program in program_data])
+            return Response({"Program": program_list}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger_error.error(str(e))
+            return Response(e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class GetFunctionList(APIView):
+    def post(self, request):
+        try:
+            data = request.data
+            year = data.get('year', '2023')
+            program = data.get('Program', 'All').split(',')
+            sku = data.get('Sku', 'All').split(',')
+            # Constructing filter arguments dynamically
+            filters = {'year': year}
+            if 'All' not in program:
+                filters['Program__in'] = program
+            if 'All' not in sku:
+                filters['Sku__in'] = sku
+            # Querying the database
+            team_data = BoardAllocationDataModel.objects.filter(**filters).values('Team')
+            # Extracting unique team names
+            team_list = set(each_program['Team'] for each_program in team_data)
+            return Response({"Team": list(team_list)}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger_error.error(str(e))
+            return Response({"error": "Internal Server Error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+ 
+class GetSkuList(APIView):
+    def post(self, request):
+        try:
+            data = request.data
+            year = data.get('year', 2024)  # Default year is 2023 if not provided
+            programs = data.get('Program', 'All').split(',')  # Split programs by comma
+            
+            sku_set = set()
+            for program in programs:
+                if program == 'All':
+                    program_data = BoardAllocationDataModel.objects.filter(year=year).values('Sku')
+                else:
+                    program_data = BoardAllocationDataModel.objects.filter(year=year, Program=program).values('Sku')
+                
+                sku_set.update(set(each_program['Sku'] for each_program in program_data))
+
+            return Response({"Sku": list(sku_set)}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger_error.error(str(e))
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class YearWiseComparison(APIView):
+    def post(self, request):
+        try:
+            data = request.data
+            fromyear = data.get('fromyear')
+            toyear = data.get('toyear')
+            programs = data.get('Program', 'All').split(',')
+            skus = data.get('Sku', 'All').split(',')
+            teams = data.get('Team', 'All').split(',')
+
+            # Filter data based on provided parameters
+            queryset = BoardAllocationDataModel.objects.all()
+            queryset = queryset.filter(
+                year__range=(min(fromyear, toyear), max(fromyear, toyear)) if fromyear is not None and toyear is not None else
+                ('year__gte', fromyear) if fromyear is not None else
+                ('year__lte', toyear) if toyear is not None else None
+            )
+            if 'All' not in programs:
+                queryset = queryset.filter(Program__in=programs)
+            if 'All' not in skus:
+                queryset = queryset.filter(Sku__in=skus)
+            if 'All' not in teams:
+                queryset = queryset.filter(Team__in=teams)
+
+            # Retrieve unique sets of programs, SKUs, and teams
+            program_list = queryset.values_list('Program', flat=True).distinct()
+            sku_list = queryset.values_list('Sku', flat=True).distinct()
+            team_list = queryset.values_list('Team', flat=True).distinct()
+
+            return Response({"Program": program_list, "Sku": sku_list, "Team": team_list}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            # Log the error
+            logger_error.error(str(e))
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class AllYearsForecastSummary(APIView):
+    def process_record(self, records, year):
+        current_year = datetime.now().year
+        monthly_data = [
+            {
+                "category": month,
+                "intel": sum(int(record[month]['boardsIntelBench'] or 0) + int(record[month]['boardIntelRack'] or 0) for record in records),
+                "ODC": sum(int(record[month]['boardsODCBench'] or 0) + int(record[month]['boardsODCRack'] or 0) for record in records),
+                "Bench_Demand_Intel": sum(int(record[month]['boardsIntelBench'] or 0) for record in records),
+                "Rack_Demand_Intel": sum(int(record[month]['boardIntelRack'] or 0) for record in records),
+                "Bench_Demand_ODC": sum(int(record[month]['boardsODCBench'] or 0) for record in records),
+                "Rack_Demand_ODC": sum(int(record[month]['boardsODCRack'] or 0) for record in records),
+                "Total_Bench_Intel": round(sum(int(record[month]['boardsIntelBench'] or 0) / 1.5 for record in records)),
+                "Total_Rack_Intel": 0,
+                "Ramp_value":sum(int(record[month]['boardsIntelBench'] or 0) + int(record[month]['boardIntelRack'] or 0) for record in records)+
+                            sum(int(record[month]['boardsODCBench'] or 0) + int(record[month]['boardsODCRack'] or 0) for record in records)
+            }
+            for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+        ]
+        result = {
+            year: monthly_data,
+        }
+        return result
+    def post(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            programs = data.get('Program', 'All').split(',')
+            skus = data.get('Sku', 'All').split(',')
+            teams = data.get('Team','All').split(',')
+            id = data.get('id')
+            result = []
+            years = set(BoardAllocationDataModel.objects.values_list('year', flat=True))
+
+            for year in years:
+                if id is not None:
+                    try:
+                        board = BoardAllocationDataModel.objects.get(pk=id, year=year)
+                        serializer = BoardAllocationDataModelSerializer(board)
+                        response_data = serializer.data
+                        result.append(self.process_record([response_data],year))
+                    except BoardAllocationDataModel.DoesNotExist:
+                        return Response("Record not found for the specified year", status=status.HTTP_404_NOT_FOUND)
+                else:
+                    data = BoardAllocationDataModel.objects.filter(year=year)
+                    if 'All' not in programs:
+                        program_filters = Q()
+                        for program in programs:
+                            program_filters |= Q(Program=program)
+                        data = data.filter(program_filters)
+
+                    if 'All' not in skus:
+                        sku_filters = Q()
+                        for sku in skus:
+                            sku_filters |= Q(Sku=sku)
+                        data = data.filter(sku_filters)
+
+                    if 'All' not in teams:
+                        team_filters = Q()
+                        for team in teams:
+                            team_filters |= Q(Team=team)
+                        data = data.filter(team_filters)
+                    serializer = BoardAllocationDataModelSerializer(data, many=True)
+                    serialized_data = serializer.data
+                    filtered_data = [item for item in serialized_data if not item['isdeleted']]
+                    if not data.exists():
+                        result.append(self.process_empty_record(year))
+                    else:
+                        combined_record = self.process_record(filtered_data,year)
+                        result.append(combined_record)
+            return Response(result, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def process_empty_record(self, year):
+        empty_data = [
+            {
+                "category": month,
+                "intel": 0,
+                "ODC": 0,
+                "Bench_Demand_Intel": 0,
+                "Rack_Demand_Intel": 0,
+                "Bench_Demand_ODC": 0,
+                "Rack_Demand_ODC": 0,
+                "Ramp_value":0
+            }
+            for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+        ]
+        result = {
+            year: empty_data,
+        }
+        return result
+
 class WorkWeekWiseData(APIView):
     def calculate_siv_non_siv_counts(self, lab_names_list):
         siv_count = 0
@@ -3152,6 +3319,7 @@ class WorkWeekWiseData(APIView):
         response_data = percentage_data
         return Response(response_data, status=status.HTTP_200_OK)
         
+# UTILIZATION PAGE
 class UtilizationApi(APIView):
     def post(self, request):
         """ API to get the drill down data for home page location vs counts(Allocated, Free, Non-SIV) chart """
@@ -3370,6 +3538,58 @@ class UpdateNewModelData(APIView):
         # Perform soft delete for all instances with the specified workweek using bulk update
         instances_to_delete.update(isDeleted=True, Deletedby=deleted_by)
         return Response([], status=status.HTTP_200_OK)
+    
+class UtilizationSummary(APIView):
+    def post(self, request, *args, **kwargs):
+        try:
+            workweek = request.data.get('workweek')
+            program = request.data.get('Program','All')
+            sku = request.data.get('Sku','All')
+            queryset = UtilizationSummaryModel.objects.filter(workweek=workweek)
+            if program == 'All':
+                if sku == 'All':
+                        # Process all data for all programs and all Sku
+                    queryset = UtilizationSummaryModel.objects.filter(workweek=workweek)
+                else:
+                        # Process all data for all programs but specific Sku
+                    queryset = UtilizationSummaryModel.objects.filter(workweek=workweek, Sku=sku)
+            else:
+                if sku == 'All':
+                        # Process data for a specific program and all Sku
+                    queryset = UtilizationSummaryModel.objects.filter(workweek=workweek, Program=program)
+                else:
+                        # Process data for a specific program and specific Sku
+                    queryset = UtilizationSummaryModel.objects.filter(workweek=workweek, Program=program, Sku=sku)
+            
+            if not queryset.exists():
+                return Response([])
+            
+            location_data = queryset.values('Location').annotate(
+                planned_utilization=Sum('Planned_Utilization'),
+                actual_utilization=Sum('Actual_Utilization')
+            )
+            
+            Count = queryset.all().values('id') # Count the number of locations
+            id_count = len(Count) 
+            response_data = []
+            for location in location_data:
+                planned_utilization = location['planned_utilization'] or 0
+                actual_utilization = location['actual_utilization'] or 0
+                
+                utilization_percentage = (
+                    f"{int(round(actual_utilization / id_count * 100))}%"
+                    if planned_utilization > 0 
+                    else "0.00%"
+                )
+                response_data.append({
+                    'LocationName': location['Location'],
+                    'Planned Utilization': int(planned_utilization),
+                    'Actual Utilization': int(actual_utilization),
+                    'Utilization': utilization_percentage,
+                })
+            return Response(response_data)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
 
 class UtilizationSummaryAPIView(APIView):
     def process_record(self, records, year=None, program=None, sku=None):
@@ -3499,90 +3719,7 @@ class WorkweekSkuUtilization(APIView):
             logger_error.error(str(e))
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-class GetProgramList(APIView):
-    def post(self, request):
-        try:
-            data = request.data
-            year = data.get('year', '2023')
-            if year:
-                program_data = BoardAllocationDataModel.objects.filter(year=year).values('Program')
-            else:
-                program_data = BoardAllocationDataModel.objects.all().values('Program')
-            program_list = set([each_program['Program'] for each_program in program_data])
-            return Response({"Program": program_list}, status=status.HTTP_200_OK)
-        except Exception as e:
-            logger_error.error(str(e))
-            return Response(e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-class GetFunctionList(APIView):
-    def post(self, request):
-        try:
-            data = request.data
-            year = data.get('year', '2023')
-            if year:
-                team_data = BoardAllocationDataModel.objects.filter(year=year).values('Team')
-            else:
-                team_data = BoardAllocationDataModel.objects.all().values('Team')
-            team_list = set([each_program['Team'] for each_program in team_data])
-            return Response({"Team": team_list}, status=status.HTTP_200_OK)
-        except Exception as e:
-            logger_error.error(str(e))
-            return Response(e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-class GetSkuList(APIView):
-    def post(self, request):
-        try:
-            data = request.data
-            year = data.get('year', 2023)  # Default year is 2023 if not provided
-            program = data.get('Program', 'All')
-            
-            if program == 'All':
-                program_data = BoardAllocationDataModel.objects.filter(year=year).values('Sku')
-            else:
-                program_data = BoardAllocationDataModel.objects.filter(year=year, Program=program).values('Sku')
-                
-            program_list = set([each_program['Sku'] for each_program in program_data])
-            return Response({"Sku": program_list}, status=status.HTTP_200_OK)
-        except Exception as e:
-            logger_error.error(str(e))
-            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-class YearWiseComparison(APIView):
-    def post(self, request):
-        try:
-            data = request.data
-            fromyear = data.get('fromyear')
-            toyear = data.get('toyear')
-            program = data.get('Program', 'All')
-            sku = data.get('Sku', 'All')
-            team = data.get('Team', 'All')
-
-            # Filter data based on provided parameters
-            queryset = BoardAllocationDataModel.objects.all()
-            if fromyear:
-                queryset = queryset.filter(year__gte=fromyear)
-            if toyear:
-                queryset = queryset.filter(year__lte=toyear)
-            if program != 'All':
-                queryset = queryset.filter(Program=program)
-            if sku != 'All':
-                queryset = queryset.filter(Sku=sku)
-            if team != 'All':
-                queryset = queryset.filter(Team=team)
-
-            # Retrieve unique sets of programs, SKUs, and teams
-            program_list = queryset.values_list('Program', flat=True).distinct()
-            sku_list = queryset.values_list('Sku', flat=True).distinct()
-            team_list = queryset.values_list('Team', flat=True).distinct()
-
-            return Response({"Program": program_list, "Sku": sku_list, "Team": team_list}, status=status.HTTP_200_OK)
-
-        except Exception as e:
-            # Log the error
-            logger_error.error(str(e))
-            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-
+# BROADCAST PAGE APIS 
 class BroadCastEmail(APIView):
     def post(self, request):
         """API to store user list in BroadcastModel and trigger email"""
@@ -3650,7 +3787,6 @@ class BroadCastEmail(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=400)
 
-
 class GetBroadCastDetails(APIView):
     def remove_html_tags(self, text):
         text_content = ''
@@ -3690,46 +3826,68 @@ class GetBroadCastDetails(APIView):
             return Response(formatted_data, status=status.HTTP_200_OK)
         except BroadcastModel.DoesNotExist:
             return Response("Record not found", status=status.HTTP_404_NOT_FOUND)
-        
+          
+# HOME PAGE     
 class LabLocation(APIView):
     '''API for Home Page'''
+
     def get(self, request):
         try:
-            lab_locations = LabModel.objects.all().values_list('Name').distinct()
+            lab_locations = LabModel.objects.values_list('Name', flat=True).distinct()
             lab_data_list = []
+            lab_without_toe_list = []
+            closed_room = []
+            Total_rack = []
+
             for lab_location in lab_locations:
-                lab_data = {'Name': lab_location[0]}
-                # Calculate Allocated Count
-                lab_data['NonSIVCounts'] = 0
-                lab_data['SIVAllocated'] = 0
-                lab_data['SIVFree'] = 0
-                lab_data["SIVCounts"] = 0
-                # Fetch bench details for the current lab
-                lab_details = LabModel.objects.filter(Name=lab_location[0]).values('BenchDetails').first()
+                lab_details = LabModel.objects.filter(Name=lab_location).values('BenchDetails').first()
+
                 if lab_details and lab_details['BenchDetails'] is not None:
                     allocated_count = 0
                     non_siv_count = 0
                     total_siv_count = 0
-                    for each_bench_row in range(len(lab_details['BenchDetails'])):
-                        for each_column_no in range(len(lab_details['BenchDetails'][each_bench_row]['seats'])):
-                            if lab_details['BenchDetails'][each_bench_row]['seats'][each_column_no]['IsAllocated']:
+
+                    for each_bench_row in lab_details['BenchDetails']:
+                        for seat in each_bench_row.get('seats', []):
+                            if seat.get('IsAllocated', False):
                                 allocated_count += 1
-                            if lab_details['BenchDetails'][each_bench_row]['seats'][each_column_no]['team'] == 'Non-SIV':
+                            if seat.get('team') == 'Non-SIV':
                                 non_siv_count += 1
-                            elif lab_details['BenchDetails'][each_bench_row]['seats'][each_column_no]['team'] == 'SIV':
+                            elif seat.get('team') == 'SIV':
                                 total_siv_count += 1
-                    lab_data['NonSIVCounts'] = non_siv_count
-                    lab_data['SIVAllocated'] = allocated_count
-                    lab_data["SIVCounts"] = total_siv_count
-                    siv_free = total_siv_count - allocated_count
-                    lab_data['SIVFree'] = max(siv_free, 0)
+
+                    siv_free = max(total_siv_count - allocated_count, 0)
+                    lab_data = {
+                        'Name': lab_location,
+                        'NonSIVCounts': non_siv_count,
+                        'SIVAllocated': allocated_count,
+                        'SIVFree': siv_free,
+                        'WSE': total_siv_count
+                    }
+
+                    lab_data_list.append(lab_data)
+
+                    if "TOE" not in lab_location:
+                        lab_without_toe_list.append(lab_data)
+
+                    if lab_location in ["SRR-1-CRD-2", "SRR-2-CRD-5"]:
+                        closed_room.append(lab_data)
+                    if lab_location in ["SRR-1-CRD-2", "SRR-2-CRD-4"]:
+                        Total_rack.append(lab_data)
                 else:
-                    logger_error.error(str(f"Lab {lab_location[0]} does not have bench details"))
-                lab_data_list.append(lab_data)
-            return Response(lab_data_list, status=status.HTTP_200_OK)
-        except LabModel.DoesNotExist:
-            logger_error.error("Lab Not Exist")
-            return Response("Error", status=status.HTTP_404_NOT_FOUND)
+                    logger_error.error(f"Lab {lab_location} does not have bench details")
+
+            response_data = {
+                "ALL_LABS": lab_data_list,
+                "LAB_WITHOUT_TOE": lab_without_toe_list,
+                "Closed_room": closed_room,
+                "Total_rack": Total_rack
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger_error.error(f"An error occurred: {str(e)}")
+            return Response("Error", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class LabDetailCount(APIView):
@@ -3771,92 +3929,204 @@ class LabDetailCount(APIView):
                 'Total Non-Siv': total_non_siv,
                 'Bench Allocated': bench_allocated,
                 'Bench Free': bench_free,
-                'Total Rack': 0,  
+                'Total Rack': 2,  
                 'Total Closed Room': 3  
             }
             return Response(response_data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-class AllYearsForecastSummary(APIView):
-    def process_record(self, records, year):
-        current_year = datetime.now().year
-        monthly_data = [
-            {
-                "category": month,
-                "intel": sum(int(record[month]['boardsIntelBench'] or 0) + int(record[month]['boardIntelRack'] or 0) for record in records),
-                "ODC": sum(int(record[month]['boardsODCBench'] or 0) + int(record[month]['boardsODCRack'] or 0) for record in records),
-                "Bench_Demand_Intel": sum(int(record[month]['boardsIntelBench'] or 0) for record in records),
-                "Rack_Demand_Intel": sum(int(record[month]['boardIntelRack'] or 0) for record in records),
-                "Bench_Demand_ODC": sum(int(record[month]['boardsODCBench'] or 0) for record in records),
-                "Rack_Demand_ODC": sum(int(record[month]['boardsODCRack'] or 0) for record in records),
-                "Total_Bench_Intel": round(sum(int(record[month]['boardsIntelBench'] or 0) / 1.5 for record in records)),
-                "Total_Rack_Intel": 0,
-                "Ramp_value":sum(int(record[month]['boardsIntelBench'] or 0) + int(record[month]['boardIntelRack'] or 0) for record in records)+
-                            sum(int(record[month]['boardsODCBench'] or 0) + int(record[month]['boardsODCRack'] or 0) for record in records)
-            }
-            for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-        ]
-        result = {
-            year: monthly_data,
-        }
-        return result
-    def post(self, request, *args, **kwargs):
-        try:
-            data = request.data
-            program = data.get('Program', 'All')
-            sku = data.get('Sku', 'All')
-            id = data.get('id')
-            result = []
-            years = set(BoardAllocationDataModel.objects.values_list('year', flat=True))
+# GET UserDetails 
+# class UserDetails(APIView):
+#     def post(self, request):
+#         try:
+#             data = request.data
+#             values = data.get('values')
+#             type = data.get('type')
+#             name = ""
+#             if type == "FullName":
+#                 name = "ActiveDirectoryMailNm=" + values
+#             else:
+#                 name = type + "=" + values
+#             url = f"{os.environ.get('WORKER_API')}?$format=json&{name}"
+#             response = http_worker_get_async(url)
+#             #deserialize a JSON string into a Python object
+#             worker_json = json.loads(response)
+#             print(worker_json)
+#             # Create a new dictionary and populate it with datas
+#             user_info_dict = {
+#                 'EmailId': worker_json['elements'][0]['CorporateEmailTxt'],
+#                 'Name': worker_json['elements'][0]['FullNm'],
+#                 'IDSID': worker_json['elements'][0]['Idsid'],
+#                 'WWID': int(worker_json['elements'][0]['Wwid']),
+#                 'EmployeeBadgeType': worker_json['elements'][0]['Wwid'],
+#                 'AvatarURL': f"https://photoisa.intel.com/Photo/{worker_json['elements'][0]['CorporateEmailTxt']}",
+#                 'DisplayName': worker_json['elements'][0]['FullNm'],
+#                 # 'isApplicationAccess':worker_json['elements'][0]['isApplicationAccess']
+#             }
+#             # Convert the dictionary into a JSON response
+#             return JsonResponse(user_info_dict)
+#         except Exception as ex:
+#             return JsonResponse({'error': str(ex)}, status=500)
+        
+# def http_worker_get_async(url):
+#     try:
+#         token = oauth_generate_token_async()
+#         proxy_server = "proxy-chain.intel.com"
+#         proxy_port = 911
+#         bearer_req = requests.get(
+#             url,
+#             headers={"Authorization": f"Bearer {token}"},
+#             proxies={"https": f"http://{proxy_server}:{proxy_port}"}
+#         )
+#         response = bearer_req.text
+#         return response
+#     except Exception as e:
+#         return str(e)
 
-            for year in years:
-                if id is not None:
-                    try:
-                        board = BoardAllocationDataModel.objects.get(pk=id, year=year)
-                        serializer = BoardAllocationDataModelSerializer(board)
-                        response_data = serializer.data
-                        result.append(self.process_record([response_data],year))
-                    except BoardAllocationDataModel.DoesNotExist:
-                        return Response("Record not found for the specified year", status=status.HTTP_404_NOT_FOUND)
-                else:
-                    if program == 'All':
-                        if sku == 'All':
-                            data = BoardAllocationDataModel.objects.filter(year=year)
-                        else:
-                            data = BoardAllocationDataModel.objects.filter(year=year, Sku=sku)
-                    else:
-                        if sku == 'All':
-                            data = BoardAllocationDataModel.objects.filter(year=year, Program=program)
-                        else:
-                            data = BoardAllocationDataModel.objects.filter(year=year, Program=program, Sku=sku)
-                    serializer = BoardAllocationDataModelSerializer(data, many=True)
-                    serialized_data = serializer.data
-                    filtered_data = [item for item in serialized_data if not item['isdeleted']]
-                    if not data.exists():
-                        result.append(self.process_empty_record(year))
-                    else:
-                        combined_record = self.process_record(filtered_data,year)
-                        result.append(combined_record)
-            return Response(result, status=status.HTTP_200_OK)
+# def oauth_generate_token_async():
+#     try:
+#         consumer_key = os.environ.get('WORKER_CLIENT_ID')
+#         consumer_secret = os.environ.get('WORKER_CLIENT_SECRET')
+#         worker_token_api = os.environ.get('WORKER_TOKEN_API')
+#         proxy_server = "proxy-chain.intel.com"
+#         proxy_port = 911
+#         data = f"grant_type=client_credentials&client_id={consumer_key}&client_secret={consumer_secret}"
+#         bearer_req = requests.post(
+#             worker_token_api,
+#             data=data,
+#             headers={"Accept": "application/json", "Content-Type": "application/x-www-form-urlencoded"},
+#             proxies={"https": f"http://{proxy_server}:{proxy_port}"}
+#         )
+#         response = json.loads(bearer_req.text)
+#         access_token = response['access_token']
+#         return access_token
+#     except Exception as ex:
+#         return str(ex)
+    
+class AllocatedUserList(APIView):
+    def get(self, request):
+        try:
+            users_list = AllocationDetailsModel.objects.filter().values('AllocatedTo')
+            users_list = sorted(list(set([ each_team['AllocatedTo'][0]['Name'] for each_team in users_list])))
+            filtered_user_list = users_list.copy()
+            users_list.insert(0,'All')
+            return Response({"UserList": filtered_user_list}, status=status.HTTP_200_OK)
         except Exception as e:
+            logger_error.error(str(e))
+            return Response(e, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class UserBasedLocationDrillDown(APIView):
+    def post(self, request):
+        try:
+            payload = request.data
+            users = payload.get('user', 'All').split(',')
+
+            program_sku_list = SkuModel.objects.filter().values_list('ProgramName__ProgramShortName', flat=True).distinct()
+            lab_data = LabModel.objects.filter()
+
+            master_list = []
+
+            for program_sku in ['All', *program_sku_list]:
+                master_dict = {'category': program_sku, 'value': 0, 'breakdown': []}
+                breakdown_dict = defaultdict(int)
+
+                for lab in lab_data:
+                    if lab.BenchDetails and 'TOE' not in lab.Name:
+                        for row in lab.BenchDetails:
+                            for seat in row['seats']:
+                                allocation_data = seat.get('AllocationData', [])
+                                if allocation_data:
+                                    allocation = allocation_data[0]
+                                    if allocation['Program'] == program_sku or program_sku == 'All':
+                                        if 'All' in users or any(user in allocation['Who'][0]['Name'] for user in users):
+                                            location = lab.Name  # Assuming 'Name' field holds location information
+                                            breakdown_dict[location] += 1
+                                            master_dict['value'] += 1
+
+                breakdown_list = [{'category': location, 'value': count} for location, count in breakdown_dict.items() if count > 0]
+                master_dict['breakdown'] = breakdown_list
+                if master_dict['value'] > 0:
+                    master_list.append(master_dict)
+
+            return Response(master_list, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger_error.error(str(e))
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def process_empty_record(self, year):
-        empty_data = [
-            {
-                "category": month,
-                "intel": 0,
-                "ODC": 0,
-                "Bench_Demand_Intel": 0,
-                "Rack_Demand_Intel": 0,
-                "Bench_Demand_ODC": 0,
-                "Rack_Demand_ODC": 0,
-                "Ramp_value":0
-            }
-            for month in ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-        ]
-        result = {
-            year: empty_data,
-        }
-        return result
+class UserBasedProgramDrillDown(APIView):
+    def post(self, request):
+        try:
+            payload = request.data
+            users = payload.get('user', 'All').split(',')
+
+            program_sku_list = SkuModel.objects.filter().values_list('ProgramName__ProgramShortName', flat=True).distinct()
+            vendor_list = VendorsModel.objects.filter().values_list('VendorName', flat=True)
+            lab_data = LabModel.objects.filter()
+
+            master_list = []
+
+            for program_sku in ['All', *program_sku_list]:
+                master_dict = {'category': program_sku, 'value': 0, 'breakdown': []}
+                breakdown_dict = defaultdict(int)
+
+                for vendor in vendor_list:
+                    for lab in lab_data:
+                        if lab.BenchDetails and 'TOE' not in lab.Name:
+                            for row in lab.BenchDetails:
+                                for seat in row['seats']:
+                                    allocation_data = seat.get('AllocationData', [])
+                                    if allocation_data:
+                                        allocation = allocation_data[0]
+                                        if allocation['Program'] == program_sku or program_sku == 'All':
+                                            if allocation['Vendor'] == vendor:
+                                                if 'All' in users or any(user in allocation['Who'][0]['Name'] for user in users):
+                                                    breakdown_dict[vendor] += 1
+                                                    master_dict['value'] += 1
+
+                breakdown_list = [{'category': vendor, 'value': count} for vendor, count in breakdown_dict.items() if count > 0]
+                master_dict['breakdown'] = breakdown_list
+                if master_dict['value'] > 0:
+                    master_list.append(master_dict)
+
+            return Response(master_list, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger_error.error(str(e))
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class UserBasedTeamDrillDown(APIView):
+    def post(self, request):
+        try:
+            payload = request.data
+            users = payload.get('user', 'All').split(',')
+            program_sku_list = SkuModel.objects.filter().values_list('ProgramName__ProgramShortName', flat=True).distinct()
+            teams_list = TeamsModel.objects.filter().values_list('TeamName',flat=True).distinct()
+            lab_data = LabModel.objects.filter()
+            master_list = []
+            for program_sku in ['All', *program_sku_list]:
+                master_dict = {'category': program_sku, 'value': 0, 'breakdown': []}
+                breakdown_dict = defaultdict(int)
+                for team in teams_list:
+                    for lab in lab_data:
+                        if lab.BenchDetails and 'TOE' not in lab.Name:
+                            for row in lab.BenchDetails:
+                                for seat in row['seats']:
+                                    allocation_data = seat.get('AllocationData', [])
+                                    if allocation_data:
+                                        allocation = allocation_data[0]
+                                        if allocation['Program'] == program_sku or program_sku == 'All':
+                                            if allocation['Team'] == team:
+                                                if 'All' in users or any(user in allocation['Who'][0]['Name'] for user in users):
+                                                    breakdown_dict[team] += 1
+                                                    master_dict['value'] += 1
+                breakdown_list = [{'category': team, 'value': count} for team, count in breakdown_dict.items() if count > 0]
+                master_dict['breakdown'] = breakdown_list
+                if master_dict['value'] > 0:
+                    master_list.append(master_dict)
+            return Response(master_list, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger_error.error(str(e))
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    

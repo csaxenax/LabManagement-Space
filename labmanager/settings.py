@@ -11,16 +11,24 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
-import os
+import os,requests
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+# SECURE_SSL_REDIRECT = True
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-&-cy7#2$1@3lin26-q-j4vi=8$x756y0kilqptr@+d^y2je+e+'
+
+# WORKER_CLIENT_ID = os.environ.get('WORKER_CLIENT_ID')
+# WORKER_CLIENT_SECRET = os.environ.get('WORKER_CLIENT_SECRET')
+# WORKER_TOKEN_API = os.environ.get('WORKER_TOKEN_API')
+# WORKER_API =  os.environ.get('WORKER_API')
+
+# requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS = 'TLSv1.2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -89,6 +97,7 @@ INSTALLED_APPS = [
     'allocationapp',
     'rest_framework.authtoken',
     # 'simple_history',
+    'sslserver'
 ]
 
 

@@ -470,3 +470,9 @@ class BroadcastModel(models.Model):
     User_mail_list = djongo_models.JSONField(blank=True, null=True)
     def __str__(self):
         return self.id
+    
+
+    
+
+    
+

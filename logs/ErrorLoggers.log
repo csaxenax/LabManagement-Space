@@ -140,3 +140,36 @@ ERROR 2024-02-21 16:58:49,621 views post 1418 'NoneType' object is not subscript
 ERROR 2024-02-21 16:59:46,997 views post 1418 'NoneType' object is not subscriptable
 ERROR 2024-02-21 17:00:05,576 views post 1418 'NoneType' object is not subscriptable
 ERROR 2024-03-08 15:36:32,433 views post 3557 JSON parse error - Extra data: line 13 column 1 (char 33)
+ERROR 2024-03-20 09:33:29,709 views get 4011 Cannot resolve keyword 'Name' into field. Join on 'AllocatedTo' not permitted.
+ERROR 2024-03-20 09:34:36,675 views get 4011 Cannot resolve keyword 'Name' into field. Join on 'AllocatedTo' not permitted.
+ERROR 2024-03-20 09:43:54,401 views post 4051 unhashable type: 'list'
+ERROR 2024-03-20 09:59:00,902 views get 4048 Cannot resolve keyword 'Name' into field. Join on 'AllocatedTo' not permitted.
+ERROR 2024-03-20 10:01:02,695 views get 4047 too many values to unpack (expected 2)
+ERROR 2024-03-20 10:01:19,692 views get 4047 too many values to unpack (expected 2)
+ERROR 2024-03-20 10:04:41,869 views get 4052 'dict' object has no attribute 'AllocatedTo'
+ERROR 2024-03-20 10:06:43,709 views get 4051 unhashable type: 'list'
+ERROR 2024-03-20 10:09:28,025 views get 4051 unhashable type: 'list'
+ERROR 2024-03-20 10:10:21,372 views get 4051 unhashable type: 'list'
+ERROR 2024-03-20 10:11:04,149 views get 4052 unhashable type: 'list'
+ERROR 2024-03-20 10:12:21,884 views get 4051 list indices must be integers or slices, not str
+ERROR 2024-03-20 10:20:44,721 views get 4069 Unsupported lookup 'Name' for ArrayField or join on the field not permitted.
+ERROR 2024-03-20 10:30:09,260 views get 4075 'dict' object has no attribute 'BenchDetails'
+ERROR 2024-03-20 10:34:47,841 views get 4041 Cannot resolve keyword 'Name' into field. Join on 'AllocatedTo' not permitted.
+ERROR 2024-03-20 10:58:27,042 views get 4110 Unsupported lookup 'seats_AlllocatedData' for ArrayField or join on the field not permitted.
+ERROR 2024-03-22 10:16:27,243 views post 4142 'AllocatedTo'
+ERROR 2024-03-22 10:18:47,122 views post 4149 'AllocatedTo'
+ERROR 2024-03-22 10:23:06,179 views post 4154 'AllocatedTo'
+ERROR 2024-03-22 12:13:23,643 views post 4131 'str' object has no attribute 'items'
+ERROR 2024-03-22 12:42:30,977 views post 4144 list.remove(x): x not in list
+ERROR 2024-03-22 12:51:57,299 views post 4138 
+ERROR 2024-03-22 12:53:01,257 views post 4127 
+ERROR 2024-03-22 12:53:49,778 views post 4136 
+ERROR 2024-03-22 14:53:32,838 views post 4134 
+ERROR 2024-03-22 15:17:07,723 views post 4137 JSON parse error - Expecting ',' delimiter: line 4 column 5 (char 39)
+ERROR 2024-03-22 15:23:49,459 views post 4121 Unsupported lookup 'seats' for ArrayField or join on the field not permitted, perhaps you meant exact?
+ERROR 2024-03-22 15:25:07,361 views post 4123 Cannot resolve keyword 'seats' into field. Join on 'BenchDetails' not permitted.
+ERROR 2024-03-22 15:26:55,205 views post 4133 
+ERROR 2024-03-22 15:56:33,384 views post 4118 Unsupported lookup 'Name' for ArrayField or join on the field not permitted.
+ERROR 2024-03-22 15:57:25,590 views post 4118 Unsupported lookup 'Name' for ArrayField or join on the field not permitted.
+ERROR 2024-03-22 15:58:28,303 views post 4118 Cannot resolve keyword 'Name' into field. Join on 'AllocatedTo' not permitted.
+ERROR 2024-03-22 16:06:06,078 views post 4052 Cannot resolve keyword 'Location' into field. Choices are: AllocatedWorkbenches, BenchDetails, Name, NumberOfWorkbenches, allocationdetailsmodel, id
